@@ -15,7 +15,9 @@ public record MemoResponse(
     @Schema(description = "내용", example = "text", requiredMode = REQUIRED)
     String content,
 
-    @Schema(description = "태그", example = "text", requiredMode = REQUIRED)
+    @Schema(description = "태그", example = """
+        ["tag1", "tag2"]
+        """, requiredMode = REQUIRED)
     List<String> tags
 ) {
 
