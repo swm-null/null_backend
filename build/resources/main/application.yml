@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: memo
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+  ai:
+    url: ${AI_URL}
