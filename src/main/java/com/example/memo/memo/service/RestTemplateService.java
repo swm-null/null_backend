@@ -5,36 +5,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.memo.memo.service.exception.AiResponseErrorHandler;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.MemoRequestBridge;
 import com.example.memo.memo.service.models.AiSaveResponse;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class RestTemplateService {
-    RestTemplate restTemplate = new RestTemplate();
+
+    private final RestTemplate restTemplate;
 
     @Value("${AI_URL}")
     private String aiUrl;
 
     public AiSaveResponse getTags(MemoRequestBridge memoRequestBridge) {
-        String uri = aiUrl + "/add_memo/";
+        restTemplate.setErrorHandler(new AiResponseErrorHandler());
+        final String query = "/add_memo/";
+        final String uri = String.format("%s%s", aiUrl, query);
         ResponseEntity<AiSaveResponse> aiResponse = restTemplate.postForEntity(uri, memoRequestBridge,
             AiSaveResponse.class);
         return aiResponse.getBody();
     }
 
     public AiSearchResponse searchMemo(String content) {
-        System.out.println(content);
-
-        String uri = aiUrl + "/user_query?query=" + content;
-
-        System.out.println(uri);
+        restTemplate.setErrorHandler(new AiResponseErrorHandler());
+        final String query = "/user_query?query=";
+        final String uri = String.format("%s%s%s", aiUrl, query, content);
         ResponseEntity<AiSearchResponse> aiResponse = restTemplate.getForEntity(uri, AiSearchResponse.class);
-        if (aiResponse.getStatusCode().is5xxServerError()) {
-            throw new RuntimeException("AI 서비스 서버 에러");
-        } else if (aiResponse.getStatusCode().is4xxClientError() || aiResponse.getBody() == null) {
-            throw new RuntimeException("AI 서비스 클라이언트 에러");
-        }
         return aiResponse.getBody();
     }
 }

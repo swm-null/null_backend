@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.memo.memo.service.exception.MemoNotFoundException;
 import com.example.memo.memo.service.models.AiSaveResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
@@ -43,7 +44,7 @@ public class MemoService {
             case 1 -> searchMemoByIdList(aiSearchResponse.content(), memoResponseBridgeList);
             case 2 -> searchMemoByRegex(aiSearchResponse.content().get(0), memoResponseBridgeList);
             case 3 -> searchMemoByTag(aiSearchResponse.content().get(0), memoResponseBridgeList);
-            default -> throw new RuntimeException("메모를 찾지 못했습니다.");
+            default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         return memoResponseBridgeList;
     }
