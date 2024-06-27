@@ -3,6 +3,6 @@ spring:
     name: memo
   data:
     mongodb:
-      uri:
+      uri: ${MONGODB_URI}
   ai:
-    url:
+    url: ${AI_URL}
