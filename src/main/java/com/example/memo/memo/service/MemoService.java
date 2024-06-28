@@ -33,7 +33,6 @@ public class MemoService {
             memoRequestBridge.getContent()
         );
         Memo savedMemo = memoRepository.save(memo);
-
         return MemoResponseBridge.from(savedMemo);
     }
 
