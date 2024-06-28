@@ -1,5 +1,7 @@
 package com.example.memo.memo.service.models;
 
+import java.util.List;
+
 import lombok.Getter;
 
 @Getter
@@ -11,10 +13,11 @@ public class MemoRequestBridge {
         this.content = content;
     }
 
-    public static Memo toMemo(MemoRequestBridge memoRequestBridge) {
+    public static Memo toMemo(String memoId, List<String> tags, String content) {
         return Memo.builder()
-            .content(memoRequestBridge.getContent())
-            .tags(null)
+            .id(memoId)
+            .tags(tags)
+            .content(content)
             .build();
     }
 }

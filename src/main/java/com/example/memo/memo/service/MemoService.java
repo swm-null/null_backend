@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.memo.memo.service.models.AiResponse;
+import com.example.memo.memo.service.exception.MemoNotFoundException;
+import com.example.memo.memo.service.models.AiSaveResponse;
+import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
 import com.example.memo.memo.service.models.MemoRequestBridge;
 import com.example.memo.memo.service.models.MemoResponseBridge;
-import com.example.memo.memo.service.models.SaveResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,25 +26,25 @@ public class MemoService {
 
     @Transactional
     public MemoResponseBridge createMemo(MemoRequestBridge memoRequestBridge) {
-
-        Memo memo = MemoRequestBridge.toMemo(memoRequestBridge);
+        AiSaveResponse aiSaveResponse = restTemplateService.getTags(memoRequestBridge);
+        Memo memo = MemoRequestBridge.toMemo(
+            aiSaveResponse.memoId(),
+            aiSaveResponse.tags(),
+            memoRequestBridge.getContent()
+        );
         Memo savedMemo = memoRepository.save(memo);
-
-        ResponseEntity<SaveResponse> saveResponse  = restTemplateService.getTags(memoRequestBridge);
-
-        savedMemo.update(saveResponse.getBody().getMemo_id(), saveResponse.getBody().getTags());
 
         return MemoResponseBridge.from(savedMemo);
     }
 
     public List<MemoResponseBridge> searchMemo(MemoRequestBridge memoRequestBridge) {
-        AiResponse aiResponse = restTemplateService.searchMemo(memoRequestBridge.getContent());
+        AiSearchResponse aiSearchResponse = restTemplateService.searchMemo(memoRequestBridge.getContent());
         List<MemoResponseBridge> memoResponseBridgeList = new ArrayList<>();
-        switch (aiResponse.getType()) {
-            case 1 -> searchMemoByIdList(aiResponse.getContent(), memoResponseBridgeList);
-            case 2 -> searchMemoByRegex(aiResponse.getContent().get(0), memoResponseBridgeList);
-            case 3 -> searchMemoByTag(aiResponse.getContent().get(0), memoResponseBridgeList);
-            default -> throw new RuntimeException("메모를 찾지 못했습니다.");
+        switch (aiSearchResponse.type()) {
+            case 1 -> searchMemoByIdList(aiSearchResponse.content(), memoResponseBridgeList);
+            case 2 -> searchMemoByRegex(aiSearchResponse.content().get(0), memoResponseBridgeList);
+            case 3 -> searchMemoByTag(aiSearchResponse.content().get(0), memoResponseBridgeList);
+            default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         return memoResponseBridgeList;
     }

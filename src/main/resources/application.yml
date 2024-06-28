@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: memo
-  data:
-    mongodb:
-      uri:
-  ai:
-    url:
