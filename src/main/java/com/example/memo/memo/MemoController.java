@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +29,9 @@ public class MemoController {
     public ResponseEntity<MemoResponse> createMemo(
         @RequestBody @Valid MemoRequest memoRequest
     ) {
-        MemoResponse memoResponse = MemoResponse
-            .from(memoService.createMemo(memoRequest.toMemoRequestBridge(memoRequest)));
+        MemoResponse memoResponse = MemoResponse.from(
+            memoService.createMemo(memoRequest.toMemoRequestBridge(memoRequest))
+        );
         return new ResponseEntity<>(memoResponse, HttpStatus.CREATED);
     }
 

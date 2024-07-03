@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-@JsonNaming(value = SnakeCaseStrategy.class)
+@JsonNaming(SnakeCaseStrategy.class)
 public record AiSearchResponse(
     int type,
 

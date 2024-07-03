@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class MemoRequestBridge {
 
-    private String content;
+    String content;
 
     public MemoRequestBridge(String content) {
         this.content = content;
