@@ -1,5 +1,7 @@
 package com.example.memo.memo.models;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import java.util.List;
 
 import com.example.memo.memo.service.models.MemoResponseBridge;
@@ -15,7 +17,7 @@ public record MemoResponse(
 
     @Schema(description = "태그", example = """
         ["tag1", "tag2"]
-        """)
+        """, requiredMode = REQUIRED)
     List<String> tags
 ) {
 
