@@ -11,8 +11,10 @@ import com.example.memo.memo.service.exception.MemoNotFoundException;
 import com.example.memo.memo.service.models.AiSaveResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
-import com.example.memo.memo.service.models.MemoRequestBridge;
-import com.example.memo.memo.service.models.MemoResponseBridge;
+import com.example.memo.memo.service.models.bridge.MemoRequestBridge;
+import com.example.memo.memo.service.models.bridge.MemoResponseBridge;
+import com.example.memo.memo.service.models.bridge.UpdateMemoRequestBridge;
+import com.example.memo.memo.service.models.bridge.UpdateMemoResponseBridge;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,6 +48,17 @@ public class MemoService {
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         return memoResponseBridgeList;
+    }
+
+    @Transactional
+    public UpdateMemoResponseBridge updateMemo(String memoId, UpdateMemoRequestBridge updateMemoRequestBridge) {
+        Memo memo = memoRepository.getById(memoId);
+        memo.update(
+            updateMemoRequestBridge.getContent(),
+            updateMemoRequestBridge.getTags()
+        );
+        Memo updatedMemo = memoRepository.save(memo);
+        return UpdateMemoResponseBridge.from(updatedMemo);
     }
 
     private void searchMemoByIdList(List<String> ids, List<MemoResponseBridge> memoResponseBridgeList) {
