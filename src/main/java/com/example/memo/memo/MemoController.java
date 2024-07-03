@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class MemoController {
+public class MemoController implements MemoApi {
 
     private final MemoService memoService;
 
@@ -43,7 +43,7 @@ public class MemoController {
             .stream()
             .map(MemoResponse::from)
             .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.CREATED).body(memoResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(memoResponses);
     }
 
     @PutMapping("/memos/{id}")
