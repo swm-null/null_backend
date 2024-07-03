@@ -22,11 +22,11 @@ import lombok.RequiredArgsConstructor;
 public class MemoService {
 
     private final MemoRepository memoRepository;
-    private final RestTemplateService restTemplateService;
+    private final AiMemoClient aiMemoClient;
 
     @Transactional
     public MemoResponseBridge createMemo(MemoRequestBridge memoRequestBridge) {
-        AiSaveResponse aiSaveResponse = restTemplateService.getTags(memoRequestBridge);
+        AiSaveResponse aiSaveResponse = aiMemoClient.getTags(memoRequestBridge);
         Memo memo = MemoRequestBridge.toMemo(
             aiSaveResponse.memoId(),
             aiSaveResponse.tags(),
@@ -37,7 +37,7 @@ public class MemoService {
     }
 
     public List<MemoResponseBridge> searchMemo(MemoRequestBridge memoRequestBridge) {
-        AiSearchResponse aiSearchResponse = restTemplateService.searchMemo(memoRequestBridge.getContent());
+        AiSearchResponse aiSearchResponse = aiMemoClient.searchMemo(memoRequestBridge.getContent());
         List<MemoResponseBridge> memoResponseBridgeList = new ArrayList<>();
         switch (aiSearchResponse.type()) {
             case 1 -> searchMemoByIdList(aiSearchResponse.content(), memoResponseBridgeList);

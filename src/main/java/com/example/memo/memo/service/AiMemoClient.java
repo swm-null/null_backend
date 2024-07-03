@@ -9,16 +9,16 @@ import com.example.memo.memo.service.models.AiSaveResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.MemoRequestBridge;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
-public class RestTemplateService {
+public class AiMemoClient {
 
     private final RestTemplate restTemplate;
+    private final String aiUrl;
 
-    @Value("${AI_URL}")
-    private String aiUrl;
+    public AiMemoClient(RestTemplate restTemplate, @Value("${spring.ai.url}") String aiUrl) {
+        this.restTemplate = restTemplate;
+        this.aiUrl = aiUrl;
+    }
 
     public AiSaveResponse getTags(MemoRequestBridge memoRequestBridge) {
         final String uri = aiUrl + "/add_memo/";
