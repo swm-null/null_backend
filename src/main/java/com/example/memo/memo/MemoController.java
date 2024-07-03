@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,7 +32,7 @@ public class MemoController {
         @RequestBody @Valid MemoRequest memoRequest
     ) {
         MemoResponse memoResponse = MemoResponse.from(memoService.createMemo(memoRequest.toMemoRequestBridge()));
-        return new ResponseEntity<>(memoResponse, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memoResponse);
     }
 
     @PostMapping("/memos/search")
@@ -42,7 +43,7 @@ public class MemoController {
             .stream()
             .map(MemoResponse::from)
             .collect(Collectors.toList());
-        return ResponseEntity.ok(memoResponses);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memoResponses);
     }
 
     @PutMapping("/memos/{id}")
@@ -53,6 +54,14 @@ public class MemoController {
         UpdateMemoResponse updateMemoResponse = UpdateMemoResponse.from(
             memoService.updateMemo(memoId, updateMemoRequest.toUpdateMemoRequestBridge())
         );
-        return new ResponseEntity<>(updateMemoResponse, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updateMemoResponse);
+    }
+
+    @DeleteMapping("/memos/{id}")
+    public ResponseEntity<Void> deleteMemo(
+        @PathVariable("id") String memoId
+    ) {
+        memoService.deleteMemo(memoId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -61,6 +61,12 @@ public class MemoService {
         return UpdateMemoResponseBridge.from(updatedMemo);
     }
 
+    @Transactional
+    public void deleteMemo(String memoId) {
+        Memo memo = memoRepository.getById(memoId);
+        memoRepository.delete(memo);
+    }
+
     private void searchMemoByIdList(List<String> ids, List<MemoResponseBridge> memoResponseBridgeList) {
         ids.stream()
             .map(memoRepository::findById)
