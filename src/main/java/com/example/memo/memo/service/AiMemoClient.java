@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.memo.memo.service.models.AiSaveResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
-import com.example.memo.memo.service.models.MemoRequestBridge;
+import com.example.memo.memo.service.models.bridge.MemoRequestBridge;
 
 @Service
 public class AiMemoClient {
