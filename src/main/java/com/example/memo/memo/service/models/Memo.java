@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,18 +20,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Memo {
 
-    @Id
+    @MongoId
     @Field("_id")
     private String id;
 
+    @NotBlank
     @Field("content")
     private String content;
 
     @Field("tags")
     private List<String> tags;
 
-    public void update(String memoId, List<String> tags) {
-        this.id = memoId;
+    public void update(String content, List<String> tags) {
+        this.content = content;
         this.tags = tags;
     }
 }

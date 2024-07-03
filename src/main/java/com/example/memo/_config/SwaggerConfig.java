@@ -1,5 +1,8 @@
 package com.example.memo._config;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,19 +10,35 @@ import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
 
+    private final String serverUrl;
+
+    public SwaggerConfig(
+        @Value("${swagger.server-url}") String serverUrl
+    ) {
+        this.serverUrl = serverUrl;
+    }
+
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
-            .info(new Info().title("SpringShop API")
-                .description("Spring shop sample application")
-                .version("v0.0.1")
-                .license(new License().name("Apache 2.0").url("http://springdoc.org")))
-            .externalDocs(new ExternalDocumentation()
-                .description("SpringShop Wiki Documentation")
-                .url("https://springshop.wiki.github.org/docs"));
+            .info(apiInfo())
+            .addServersItem(apiServer());
+    }
+
+    private Info apiInfo() {
+        return new Info()
+            .title("OatNote API")
+            .description("오트노트의 API 문서입니다.")
+            .version("v0.0.2");
+    }
+
+    private Server apiServer() {
+        return new Server()
+            .url(serverUrl);
     }
 }

@@ -11,8 +11,10 @@ import com.example.memo.memo.service.exception.MemoNotFoundException;
 import com.example.memo.memo.service.models.AiSaveResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
-import com.example.memo.memo.service.models.MemoRequestBridge;
-import com.example.memo.memo.service.models.MemoResponseBridge;
+import com.example.memo.memo.service.models.bridge.MemoRequestBridge;
+import com.example.memo.memo.service.models.bridge.MemoResponseBridge;
+import com.example.memo.memo.service.models.bridge.UpdateMemoRequestBridge;
+import com.example.memo.memo.service.models.bridge.UpdateMemoResponseBridge;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,23 +24,22 @@ import lombok.RequiredArgsConstructor;
 public class MemoService {
 
     private final MemoRepository memoRepository;
-    private final RestTemplateService restTemplateService;
+    private final AiMemoClient aiMemoClient;
 
     @Transactional
     public MemoResponseBridge createMemo(MemoRequestBridge memoRequestBridge) {
-        AiSaveResponse aiSaveResponse = restTemplateService.getTags(memoRequestBridge);
+        AiSaveResponse aiSaveResponse = aiMemoClient.getTags(memoRequestBridge);
         Memo memo = MemoRequestBridge.toMemo(
             aiSaveResponse.memoId(),
             aiSaveResponse.tags(),
             memoRequestBridge.getContent()
         );
         Memo savedMemo = memoRepository.save(memo);
-
         return MemoResponseBridge.from(savedMemo);
     }
 
     public List<MemoResponseBridge> searchMemo(MemoRequestBridge memoRequestBridge) {
-        AiSearchResponse aiSearchResponse = restTemplateService.searchMemo(memoRequestBridge.getContent());
+        AiSearchResponse aiSearchResponse = aiMemoClient.searchMemo(memoRequestBridge.getContent());
         List<MemoResponseBridge> memoResponseBridgeList = new ArrayList<>();
         switch (aiSearchResponse.type()) {
             case 1 -> searchMemoByIdList(aiSearchResponse.content(), memoResponseBridgeList);
@@ -47,6 +48,23 @@ public class MemoService {
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         return memoResponseBridgeList;
+    }
+
+    @Transactional
+    public UpdateMemoResponseBridge updateMemo(String memoId, UpdateMemoRequestBridge updateMemoRequestBridge) {
+        Memo memo = memoRepository.getById(memoId);
+        memo.update(
+            updateMemoRequestBridge.getContent(),
+            updateMemoRequestBridge.getTags()
+        );
+        Memo updatedMemo = memoRepository.save(memo);
+        return UpdateMemoResponseBridge.from(updatedMemo);
+    }
+
+    @Transactional
+    public void deleteMemo(String memoId) {
+        Memo memo = memoRepository.getById(memoId);
+        memoRepository.delete(memo);
     }
 
     private void searchMemoByIdList(List<String> ids, List<MemoResponseBridge> memoResponseBridgeList) {
