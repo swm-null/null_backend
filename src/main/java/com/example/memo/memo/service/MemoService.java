@@ -40,9 +40,9 @@ public class MemoService {
         AiSearchResponse aiSearchResponse = aiMemoClient.searchMemo(searchMemoRequest.content());
         List<SearchMemoResponse> searchMemoResponseList = new ArrayList<>();
         switch (aiSearchResponse.type()) {
-            case 1 -> searchMemoByIdList(aiSearchResponse.content(), searchMemoResponseList);
-            case 2 -> searchMemoByRegex(aiSearchResponse.content().get(0), searchMemoResponseList);
-            case 3 -> searchMemoByTag(aiSearchResponse.content().get(0), searchMemoResponseList);
+            case "similarity" -> searchMemoByIdList(aiSearchResponse.ids(), searchMemoResponseList);
+            case "tag" -> searchMemoByRegex(aiSearchResponse.regex(), searchMemoResponseList);
+            case "regex" -> searchMemoByTag(aiSearchResponse.tags(), searchMemoResponseList);
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         return searchMemoResponseList;
@@ -65,22 +65,22 @@ public class MemoService {
 
     private void searchMemoByIdList(List<String> ids, List<SearchMemoResponse> searchMemoResponseList) {
         ids.stream()
-            .map(memoRepository::findById)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .map(memoRepository::getById)
             .map(SearchMemoResponse::from)
             .forEach(searchMemoResponseList::add);
     }
 
     private void searchMemoByRegex(String regex, List<SearchMemoResponse> searchMemoResponseList) {
-        memoRepository.findByContentRegex(regex).stream()
+        memoRepository.getByContentRegex(regex).stream()
             .map(SearchMemoResponse::from)
             .forEach(searchMemoResponseList::add);
     }
 
-    private void searchMemoByTag(String tag, List<SearchMemoResponse> searchMemoResponseList) {
-        memoRepository.findByTagsContaining(tag).stream()
-            .map(SearchMemoResponse::from)
-            .forEach(searchMemoResponseList::add);
+    private void searchMemoByTag(List<String> tags, List<SearchMemoResponse> searchMemoResponseList) {
+        tags.forEach(tag ->
+            memoRepository.getByTagsContaining(tag).stream()
+                .map(SearchMemoResponse::from)
+                .forEach(searchMemoResponseList::add)
+        );
     }
 }

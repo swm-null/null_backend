@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AiSearchResponse(
-    int type,
-
-    List<String> content
+    String type, // "similarity" | "tag" | "regex" | "unspecified"
+    String processedMessage,
+    List<String> ids,
+    String regex,
+    List<String> tags
 ) {
 
 }
