@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
@@ -27,6 +29,12 @@ import lombok.RequiredArgsConstructor;
 public class MemoController implements MemoApi {
 
     private final MemoService memoService;
+
+    @GetMapping("/memos")
+    public ResponseEntity<List<MemoResponse>> getAllMemos() {
+        List<MemoResponse> MemoResponseList = memoService.getAllMemos();
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponseList);
+    }
 
     @PostMapping("/memos")
     public ResponseEntity<CreateMemoResponse> createMemo(

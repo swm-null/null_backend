@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
@@ -25,6 +26,12 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
     private final AiMemoClient aiMemoClient;
+
+    public List<MemoResponse> getAllMemos() {
+        return memoRepository.findAll().stream()
+            .map(MemoResponse::from)
+            .collect(Collectors.toList());
+    }
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
         AiSaveResponse aiSaveResponse = aiMemoClient.getTags(createMemoRequest.content());

@@ -19,7 +19,7 @@ public record SearchMemoResponse(
 ) {
 
     @JsonNaming(SnakeCaseStrategy.class)
-    public static record InnerMemo(
+    public record InnerMemo(
         @Schema(description = "메모 고유 ID", example = "1")
         String id,
 

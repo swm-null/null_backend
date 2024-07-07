@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
@@ -26,6 +28,15 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Memo", description = "메모 관리 API")
 public interface MemoApi {
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+        }
+    )
+    @Operation(summary = "메모 전체 조회")
+    @GetMapping("/memos")
+    ResponseEntity<List<MemoResponse>> getAllMemos();
 
     @ApiResponses(
         value = {
