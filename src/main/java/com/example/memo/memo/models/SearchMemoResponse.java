@@ -11,23 +11,39 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record SearchMemoResponse(
-    @Schema(description = "메모 고유 ID", example = "1")
-    String id,
+    @Schema(description = "자연어 응답", example = "자연어 응답입니다.")
+    String processedMessage,
 
-    @Schema(description = "내용", example = "text")
-    String content,
-
-    @Schema(description = "태그", example = """
-        ["tag1", "tag2"]
-        """)
-    List<String> tags
+    @Schema(description = "메모 리스트")
+    List<InnerMemo> memos
 ) {
 
-    public static SearchMemoResponse from(Memo memo) {
+    @JsonNaming(SnakeCaseStrategy.class)
+    public static record InnerMemo(
+        @Schema(description = "메모 고유 ID", example = "1")
+        String id,
+
+        @Schema(description = "내용", example = "text")
+        String content,
+
+        @Schema(description = "태그", example = """
+            ["tag1", "tag2"]
+            """)
+        List<String> tags
+    ) {
+        public static InnerMemo from(Memo memo) {
+            return new InnerMemo(
+                memo.getId(),
+                memo.getContent(),
+                memo.getTags()
+            );
+        }
+    }
+
+    public static SearchMemoResponse from(String processedMessage, List<Memo> memos) {
         return new SearchMemoResponse(
-            memo.getId(),
-            memo.getContent(),
-            memo.getTags()
+            processedMessage,
+            memos.stream().map(InnerMemo::from).toList()
         );
     }
 }

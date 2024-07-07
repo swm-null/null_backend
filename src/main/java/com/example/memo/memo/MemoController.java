@@ -37,11 +37,11 @@ public class MemoController implements MemoApi {
     }
 
     @PostMapping("/memos/search")
-    public ResponseEntity<List<SearchMemoResponse>> searchMemos(
+    public ResponseEntity<SearchMemoResponse> searchMemos(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest
     ) {
-        List<SearchMemoResponse> searchMemoResponseList = memoService.searchMemo(searchMemoRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponseList);
+        SearchMemoResponse searchMemoResponse = memoService.searchMemo(searchMemoRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
     @PutMapping("/memos/{id}")

@@ -49,7 +49,7 @@ public interface MemoApi {
     )
     @Operation(summary = "메모 검색")
     @PostMapping("/memos/search")
-    ResponseEntity<List<SearchMemoResponse>> searchMemos(
+    ResponseEntity<SearchMemoResponse> searchMemos(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest
     );
 

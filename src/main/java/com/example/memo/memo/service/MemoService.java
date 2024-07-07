@@ -2,6 +2,7 @@ package com.example.memo.memo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -35,16 +36,16 @@ public class MemoService {
         return CreateMemoResponse.from(savedMemo);
     }
 
-    public List<SearchMemoResponse> searchMemo(SearchMemoRequest searchMemoRequest) {
+    public SearchMemoResponse searchMemo(SearchMemoRequest searchMemoRequest) {
         AiSearchResponse aiSearchResponse = aiMemoClient.searchMemo(searchMemoRequest.content());
-        List<SearchMemoResponse> searchMemoResponseList = new ArrayList<>();
+        List<Memo> memos = new ArrayList<>();
         switch (aiSearchResponse.type()) {
-            case "similarity" -> searchMemoByIdList(aiSearchResponse.ids(), searchMemoResponseList);
-            case "tag" -> searchMemoByRegex(aiSearchResponse.regex(), searchMemoResponseList);
-            case "regex" -> searchMemoByTag(aiSearchResponse.tags(), searchMemoResponseList);
+            case "similarity" -> memos.addAll(searchMemoByIdList(aiSearchResponse.ids()));
+            case "tag" -> memos.addAll(searchMemoByRegex(aiSearchResponse.regex()));
+            case "regex" -> memos.addAll(searchMemoByTag(aiSearchResponse.tags()));
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
-        return searchMemoResponseList;
+        return SearchMemoResponse.from(aiSearchResponse.processedMessage(), memos);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
@@ -62,24 +63,19 @@ public class MemoService {
         memoRepository.delete(memo);
     }
 
-    private void searchMemoByIdList(List<String> ids, List<SearchMemoResponse> searchMemoResponseList) {
-        ids.stream()
+    private List<Memo> searchMemoByIdList(List<String> ids) {
+        return ids.stream()
             .map(memoRepository::getById)
-            .map(SearchMemoResponse::from)
-            .forEach(searchMemoResponseList::add);
+            .collect(Collectors.toList());
     }
 
-    private void searchMemoByRegex(String regex, List<SearchMemoResponse> searchMemoResponseList) {
-        memoRepository.getByContentRegex(regex).stream()
-            .map(SearchMemoResponse::from)
-            .forEach(searchMemoResponseList::add);
+    private List<Memo> searchMemoByRegex(String regex) {
+        return memoRepository.getByContentRegex(regex);
     }
 
-    private void searchMemoByTag(List<String> tags, List<SearchMemoResponse> searchMemoResponseList) {
-        tags.forEach(tag ->
-            memoRepository.getByTagsContaining(tag).stream()
-                .map(SearchMemoResponse::from)
-                .forEach(searchMemoResponseList::add)
-        );
+    private List<Memo> searchMemoByTag(List<String> tags) {
+        return tags.stream()
+            .flatMap(tag -> memoRepository.getByTagsContaining(tag).stream())
+            .collect(Collectors.toList());
     }
 }
