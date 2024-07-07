@@ -2,11 +2,11 @@ package com.example.memo.memo.models;
 
 import java.util.List;
 
-import com.example.memo.memo.service.models.bridge.MemoResponseBridge;
+import com.example.memo.memo.service.models.Memo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record MemoResponse(
+public record CreateMemoResponse(
     @Schema(description = "메모 고유 ID", example = "1")
     String id,
 
@@ -19,11 +19,11 @@ public record MemoResponse(
     List<String> tags
 ) {
 
-    public static MemoResponse from(MemoResponseBridge memoResponseBridge) {
-        return new MemoResponse(
-            memoResponseBridge.getId(),
-            memoResponseBridge.getContent(),
-            memoResponseBridge.getTags()
+    public static CreateMemoResponse from(Memo memo) {
+        return new CreateMemoResponse(
+            memo.getId(),
+            memo.getContent(),
+            memo.getTags()
         );
     }
 }

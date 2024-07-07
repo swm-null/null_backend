@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.memo.memo.models.MemoRequest;
-import com.example.memo.memo.models.MemoResponse;
+import com.example.memo.memo.models.CreateMemoRequest;
+import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.SearchMemoRequest;
+import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 
@@ -34,8 +36,8 @@ public interface MemoApi {
     )
     @Operation(summary = "메모 생성")
     @PostMapping("/memos")
-    ResponseEntity<MemoResponse> createMemo(
-        @RequestBody @Valid MemoRequest memoRequest
+    ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest
     );
 
     @ApiResponses(
@@ -47,8 +49,8 @@ public interface MemoApi {
     )
     @Operation(summary = "메모 검색")
     @PostMapping("/memos/search")
-    ResponseEntity<List<MemoResponse>> searchMemos(
-        @RequestBody @Valid MemoRequest memoRequest
+    ResponseEntity<List<SearchMemoResponse>> searchMemos(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest
     );
 
     @ApiResponses(

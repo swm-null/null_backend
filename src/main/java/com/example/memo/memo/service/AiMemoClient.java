@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.service.models.AiSaveResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
-import com.example.memo.memo.service.models.bridge.MemoRequestBridge;
 
 @Service
 public class AiMemoClient {
@@ -15,16 +15,19 @@ public class AiMemoClient {
     private final RestTemplate restTemplate;
     private final String aiUrl;
 
-    public AiMemoClient(RestTemplate restTemplate, @Value("${spring.ai.url}") String aiUrl) {
+    public AiMemoClient(
+        RestTemplate restTemplate,
+        @Value("${spring.ai.url}") String aiUrl
+    ) {
         this.restTemplate = restTemplate;
         this.aiUrl = aiUrl;
     }
 
-    public AiSaveResponse getTags(MemoRequestBridge memoRequestBridge) {
+    public AiSaveResponse getTags(CreateMemoRequest createMemoRequest) {
         final String uri = aiUrl + "/add_memo/";
         ResponseEntity<AiSaveResponse> aiResponse = restTemplate.postForEntity(
             uri,
-            memoRequestBridge,
+            createMemoRequest,
             AiSaveResponse.class
         );
         return aiResponse.getBody();

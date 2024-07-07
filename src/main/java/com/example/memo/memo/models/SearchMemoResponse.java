@@ -6,7 +6,7 @@ import com.example.memo.memo.service.models.Memo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record UpdateMemoResponse(
+public record SearchMemoResponse(
     @Schema(description = "메모 고유 ID", example = "1")
     String id,
 
@@ -19,8 +19,8 @@ public record UpdateMemoResponse(
     List<String> tags
 ) {
 
-    public static UpdateMemoResponse from(Memo memo) {
-        return new UpdateMemoResponse(
+    public static SearchMemoResponse from(Memo memo) {
+        return new SearchMemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getTags()
