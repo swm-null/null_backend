@@ -1,12 +1,16 @@
 package com.example.memo.memo.service;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.memo.memo.models.CreateMemoRequest;
+import com.example.memo.memo.service.models.AiSaveRequest;
 import com.example.memo.memo.service.models.AiSaveResponse;
+import com.example.memo.memo.service.models.AiSearchRequest;
 import com.example.memo.memo.service.models.AiSearchResponse;
 
 @Service
@@ -23,19 +27,35 @@ public class AiMemoClient {
         this.aiUrl = aiUrl;
     }
 
-    public AiSaveResponse getTags(CreateMemoRequest createMemoRequest) {
-        final String uri = aiUrl + "/add_memo/";
+    public AiSaveResponse getTags(String content) {
+        final URI uri = UriComponentsBuilder
+            .fromUriString(aiUrl)
+            .path("/add_memo/")
+            .encode()
+            .build()
+            .toUri();
+        AiSaveRequest aiSaveRequest = new AiSaveRequest(content);
         ResponseEntity<AiSaveResponse> aiResponse = restTemplate.postForEntity(
             uri,
-            createMemoRequest,
+            aiSaveRequest,
             AiSaveResponse.class
         );
         return aiResponse.getBody();
     }
 
     public AiSearchResponse searchMemo(String content) {
-        final String uri = aiUrl + "/user_query?query=" + content;
-        ResponseEntity<AiSearchResponse> aiResponse = restTemplate.getForEntity(uri, AiSearchResponse.class);
+        final URI uri = UriComponentsBuilder
+            .fromUriString(aiUrl)
+            .path("/search/")
+            .encode()
+            .build()
+            .toUri();
+        AiSearchRequest aiSearchRequest = new AiSearchRequest(content);
+        ResponseEntity<AiSearchResponse> aiResponse = restTemplate.postForEntity(
+            uri,
+            aiSearchRequest,
+            AiSearchResponse.class
+        );
         return aiResponse.getBody();
     }
 }

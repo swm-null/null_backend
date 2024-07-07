@@ -2,7 +2,6 @@ package com.example.memo.memo.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class MemoService {
     private final AiMemoClient aiMemoClient;
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
-        AiSaveResponse aiSaveResponse = aiMemoClient.getTags(createMemoRequest);
+        AiSaveResponse aiSaveResponse = aiMemoClient.getTags(createMemoRequest.content());
         Memo memo = createMemoRequest.toMemo(
             aiSaveResponse.memoId(),
             aiSaveResponse.tags()
