@@ -48,8 +48,8 @@ public class MemoService {
         List<Memo> memos = new ArrayList<>();
         switch (aiSearchResponse.type()) {
             case "similarity" -> memos.addAll(searchMemoByIdList(aiSearchResponse.ids()));
-            case "tag" -> memos.addAll(searchMemoByRegex(aiSearchResponse.regex()));
-            case "regex" -> memos.addAll(searchMemoByTag(aiSearchResponse.tags()));
+            case "regex" -> memos.addAll(searchMemoByRegex(aiSearchResponse.regex()));
+            case "tag" -> memos.addAll(searchMemoByTag(aiSearchResponse.tags()));
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         return SearchMemoResponse.from(aiSearchResponse.processedMessage(), memos);
