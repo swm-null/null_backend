@@ -1,6 +1,5 @@
 .gradle
-build/*
-!build/libs/memo-0.0.1-SNAPSHOT.jar
+!build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
