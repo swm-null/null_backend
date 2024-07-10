@@ -37,8 +37,6 @@ out/
 .vscode/
 .DS_STORE
 
-.env
-
 *adminsdk.json
 
 logs
