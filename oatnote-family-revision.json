@@ -2,23 +2,65 @@
     "family": "oatnote-family",
     "containerDefinitions": [
         {
-            "name": "app",
-            "image": "my-image:latest",
-            "memory": 512,
-            "cpu": 256,
-            "essential": true,
+            "name": "oatnote-container",
+            "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote:latest",
+            "cpu": 1024,
+            "memory": 3072,
+            "memoryReservation": 1024,
             "portMappings": [
                 {
-                    "containerPort": 80,
-                    "hostPort": 80
+                    "name": "oatnote-container-8080-task",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
                 }
-            ]
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "MONGODB_URI",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
+                },
+                {
+                    "name": "AI_URL",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
+                },
+                {
+                    "name": "ALLOWED_ORIGINS",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
+                },
+                {
+                    "name": "SWAGGER_SERVER_URL",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/oatnote-family",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "systemControls": []
         }
     ],
+    "executionRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "volumes": [],
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "networkMode": "awsvpc",
-    "memory": "512",
-    "cpu": "256"
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "tags": []
 }
