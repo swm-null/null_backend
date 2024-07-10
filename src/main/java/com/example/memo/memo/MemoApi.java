@@ -4,13 +4,17 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.memo.memo.models.MemoRequest;
+import com.example.memo.memo.models.CreateMemoRequest;
+import com.example.memo.memo.models.CreateMemoResponse;
 import com.example.memo.memo.models.MemoResponse;
+import com.example.memo.memo.models.SearchMemoRequest;
+import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 
@@ -27,6 +31,15 @@ public interface MemoApi {
 
     @ApiResponses(
         value = {
+            @ApiResponse(responseCode = "200"),
+        }
+    )
+    @Operation(summary = "메모 전체 조회")
+    @GetMapping("/memos")
+    ResponseEntity<List<MemoResponse>> getAllMemos();
+
+    @ApiResponses(
+        value = {
             @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
@@ -34,8 +47,8 @@ public interface MemoApi {
     )
     @Operation(summary = "메모 생성")
     @PostMapping("/memos")
-    ResponseEntity<MemoResponse> createMemo(
-        @RequestBody @Valid MemoRequest memoRequest
+    ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest
     );
 
     @ApiResponses(
@@ -47,8 +60,8 @@ public interface MemoApi {
     )
     @Operation(summary = "메모 검색")
     @PostMapping("/memos/search")
-    ResponseEntity<List<MemoResponse>> searchMemos(
-        @RequestBody @Valid MemoRequest memoRequest
+    ResponseEntity<SearchMemoResponse> searchMemos(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest
     );
 
     @ApiResponses(

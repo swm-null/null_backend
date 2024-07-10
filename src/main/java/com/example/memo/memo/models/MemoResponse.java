@@ -2,7 +2,7 @@ package com.example.memo.memo.models;
 
 import java.util.List;
 
-import com.example.memo.memo.service.models.bridge.MemoResponseBridge;
+import com.example.memo.memo.service.models.Memo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -19,11 +19,11 @@ public record MemoResponse(
     List<String> tags
 ) {
 
-    public static MemoResponse from(MemoResponseBridge memoResponseBridge) {
+    public static MemoResponse from(Memo memo) {
         return new MemoResponse(
-            memoResponseBridge.getId(),
-            memoResponseBridge.getContent(),
-            memoResponseBridge.getTags()
+            memo.getId(),
+            memo.getContent(),
+            memo.getTags()
         );
     }
 }

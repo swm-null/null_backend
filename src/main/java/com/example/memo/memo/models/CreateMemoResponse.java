@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record UpdateMemoResponse(
+public record CreateMemoResponse(
     @Schema(description = "메모 고유 ID", example = "1")
     String id,
 
@@ -23,8 +23,8 @@ public record UpdateMemoResponse(
     List<String> tags
 ) {
 
-    public static UpdateMemoResponse from(Memo memo) {
-        return new UpdateMemoResponse(
+    public static CreateMemoResponse from(Memo memo) {
+        return new CreateMemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getTags()

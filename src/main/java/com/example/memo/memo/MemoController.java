@@ -1,20 +1,22 @@
 package com.example.memo.memo;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.memo.memo.models.MemoRequest;
+import com.example.memo.memo.models.CreateMemoRequest;
+import com.example.memo.memo.models.CreateMemoResponse;
 import com.example.memo.memo.models.MemoResponse;
+import com.example.memo.memo.models.SearchMemoRequest;
+import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 import com.example.memo.memo.service.MemoService;
@@ -28,23 +30,26 @@ public class MemoController implements MemoApi {
 
     private final MemoService memoService;
 
+    @GetMapping("/memos")
+    public ResponseEntity<List<MemoResponse>> getAllMemos() {
+        List<MemoResponse> MemoResponseList = memoService.getAllMemos();
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponseList);
+    }
+
     @PostMapping("/memos")
-    public ResponseEntity<MemoResponse> createMemo(
-        @RequestBody @Valid MemoRequest memoRequest
+    public ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest
     ) {
-        MemoResponse memoResponse = MemoResponse.from(memoService.createMemo(memoRequest.toMemoRequestBridge()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(memoResponse);
+        CreateMemoResponse createMemoResponse = memoService.createMemo(createMemoRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
     @PostMapping("/memos/search")
-    public ResponseEntity<List<MemoResponse>> searchMemos(
-        @RequestBody @Valid MemoRequest memoRequest
+    public ResponseEntity<SearchMemoResponse> searchMemos(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest
     ) {
-        List<MemoResponse> memoResponses = memoService.searchMemo(memoRequest.toMemoRequestBridge())
-            .stream()
-            .map(MemoResponse::from)
-            .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(memoResponses);
+        SearchMemoResponse searchMemoResponse = memoService.searchMemo(searchMemoRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
     @PutMapping("/memos/{id}")
@@ -52,9 +57,7 @@ public class MemoController implements MemoApi {
         @PathVariable("id") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     ) {
-        UpdateMemoResponse updateMemoResponse = UpdateMemoResponse.from(
-            memoService.updateMemo(memoId, updateMemoRequest.toUpdateMemoRequestBridge())
-        );
+        UpdateMemoResponse updateMemoResponse = memoService.updateMemo(memoId, updateMemoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(updateMemoResponse);
     }
 
