@@ -1,0 +1,10 @@
+spring:
+  ai:
+    url: https://ai-memo.com
+
+swagger:
+  server-url: http://localhost:8080
+
+cors:
+  allowedOrigins:
+    - http://localhost:3000
