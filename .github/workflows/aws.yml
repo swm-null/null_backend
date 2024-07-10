@@ -1,5 +1,5 @@
 name: Deploy to Amazon ECS
- 
+
 on:
   push:
     branches: [ "develop" ]
@@ -54,10 +54,10 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login --username ${{ secrets.AWS_ACCESS_KEY_ID }} --password-stdin $ECR_REGISTRY
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_ENV
+        echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login --username ${{ secrets.AWS_ACCESS_KEY_ID }} --password-stdin ${{ env.ECR_REGISTRY }}
+        docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} .
+        docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        echo "image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
@@ -65,7 +65,7 @@ jobs:
       with:
         task-definition: ${{ env.ECS_TASK_DEFINITION }}
         container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ env.image }}
+        image: ${{ steps.build-image.outputs.IMAGE_TAG }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
