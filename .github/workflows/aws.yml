@@ -11,6 +11,7 @@ env:
   ECS_CLUSTER: oatnote-cluster
   ECS_TASK_DEFINITION: oatnote-family-revision.json
   CONTAINER_NAME: oatnote-container
+  AWS_SECRET_NAME: dev/oatnote
 
 permissions:
   contents: read
@@ -37,19 +38,31 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    - name: Read AWS credentials from AWS Secrets Manager
+      id: read-aws-credentials
+      uses: abhilash1in/aws-secrets-manager-action@v1.1.0
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        secrets: |
+          ${{ env.AWS_SECRET_NAME }}
+        parse-json: true
+
+    - name: Set AWS credentials environment variables
+      run: |
+        echo "AWS_ACCESS_KEY_ID=$(echo '${{ steps.read-aws-credentials.outputs.secrets }}' | jq -r '.AWS_ACCESS_KEY_ID')" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=$(echo '${{ steps.read-aws-credentials.outputs.secrets }}' | jq -r '.AWS_SECRET_ACCESS_KEY')" >> $GITHUB_ENV
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
     - name: Read secrets from AWS Secrets Manager into environment variables
       uses: abhilash1in/aws-secrets-manager-action@v1.1.0
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-northeast-2
+        aws-region: ${{ env.AWS_REGION }}
         secrets: |
           /secret/clelab
         parse-json: false
