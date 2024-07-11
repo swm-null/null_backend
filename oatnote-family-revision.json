@@ -23,19 +23,19 @@
             "secrets": [
                 {
                     "name": "MONGODB_URI",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:MONGODB_URI"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
                 },
                 {
                     "name": "AI_URL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:AI_URL"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
                 },
                 {
                     "name": "ALLOWED_ORIGINS",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:ALLOWED_ORIGINS"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
                 },
                 {
                     "name": "SWAGGER_SERVER_URL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:SWAGGER_SERVER_URL"
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
                 }
             ],
             "logConfiguration": {
