@@ -47,13 +47,16 @@ jobs:
           ${{ env.AWS_SECRET_NAME }}
         parse-json: true
 
+    - name: Print variable value
+      run: echo "The value of AWS_REGION is ${{ secrets.AWS_REGION }}"
+
     - name: Set AWS credentials environment variables
       run: |
         echo "AWS_ACCESS_KEY_ID=$(echo '${{ steps.read-aws-credentials.outputs.secrets }}' | jq -r '.AWS_ACCESS_KEY_ID')" >> $GITHUB_ENV
         echo "AWS_SECRET_ACCESS_KEY=$(echo '${{ steps.read-aws-credentials.outputs.secrets }}' | jq -r '.AWS_SECRET_ACCESS_KEY')" >> $GITHUB_ENV
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
