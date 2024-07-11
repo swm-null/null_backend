@@ -23,7 +23,7 @@
             "secrets": [
                 {
                     "name": "MONGODB_URI",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn"
+                    "valueFrom": "MONGODB_URI=mongodb+srv://DBnull:0603@null.elzeun4.mongodb.net/nullNote?retryWrites=true&w=majority&appName=null"
                 },
                 {
                     "name": "AI_URL",
