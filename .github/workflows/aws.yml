@@ -47,8 +47,10 @@ jobs:
           ${{ env.AWS_SECRET_NAME }}
         parse-json: true
 
-    - name: Print variable value
-      run: echo "The value of AWS_REGION is ${{ secrets.AWS_REGION }}"
+    - name: Print AWS credentials
+      run: |
+        echo "AWS_ACCESS_KEY_ID: $(echo '${{ steps.read-aws-credentials.outputs.secrets }}' | jq -r '.AWS_ACCESS_KEY_ID')"
+        echo "AWS_REGION: ${{ env.AWS_REGION }}"
 
     - name: Set AWS credentials environment variables
       run: |
