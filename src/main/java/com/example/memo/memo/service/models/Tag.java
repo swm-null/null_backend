@@ -1,14 +1,13 @@
-package com.example.memo.memo.service.models;
+package com.example.memo.tag.service.models;
 
 import java.util.List;
 
-import jakarta.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,20 +16,22 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@Document(collection = "memos")
+@Document(collection = "tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Memo {
+public class Tag {
 
     @MongoId
     private ObjectId id;
 
     @NotBlank
-    private String content;
+    private String name;
 
     @NotNull
-    private List<ObjectId> tags;
+    private List<ObjectId> memos;
+
+    private ObjectId parent;
 
     @NotNull
-    private List<Double> embedding;
+    private List<ObjectId> child;
 }
