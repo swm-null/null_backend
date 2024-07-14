@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record CreateMemoResponse(
-    @Schema(description = "메모 고유 ID", example = "1")
+    @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
     ObjectId id,
 
     @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해")

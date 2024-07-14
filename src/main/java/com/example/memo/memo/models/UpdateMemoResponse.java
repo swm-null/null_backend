@@ -13,14 +13,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record UpdateMemoResponse(
-    @Schema(description = "메모 고유 ID", example = "1")
+    @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
     ObjectId id,
 
-    @Schema(description = "내용", example = "text")
+    @Schema(description = "내용", example = "소마 근처 맛집 : 맥도날드")
     String content,
 
     @Schema(description = "태그", example = """
-        ["tag1", "tag2"]
+        ["장소", "맛집"]
         """)
     List<ObjectId> tags
 ) {

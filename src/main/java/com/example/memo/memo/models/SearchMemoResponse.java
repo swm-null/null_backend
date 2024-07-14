@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record SearchMemoResponse(
-    @Schema(description = "자연어 응답", example = "자연어 응답입니다.")
+    @Schema(description = "자연어 응답", example = "일정과 관련된 메모를 찾아드리겠습니다.")
     String processedMessage,
 
     @Schema(description = "메모 리스트")
@@ -23,10 +23,10 @@ public record SearchMemoResponse(
 
     @JsonNaming(SnakeCaseStrategy.class)
     public record InnerMemo(
-        @Schema(description = "메모 고유 ID", example = "1")
+        @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
         ObjectId id,
 
-        @Schema(description = "내용", example = "text")
+        @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해")
         String content,
 
         @Schema(description = "태그", example = """
