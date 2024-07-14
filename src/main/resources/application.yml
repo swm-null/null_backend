@@ -9,4 +9,6 @@ swagger:
   server-url: ${SWAGGER_SERVER_URL}
 
 cors:
-  allowedOrigins: ${ALLOWED_ORIGINS}
+  allowedOrigins:
+    - ${ALLOWED_ORIGINS_DEVELOP}
+    - ${ALLOWED_ORIGINS_LOCAL:http://localhost:3000}
