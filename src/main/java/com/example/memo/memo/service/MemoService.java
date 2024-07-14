@@ -18,7 +18,7 @@ import com.example.memo.memo.service.exception.MemoNotFoundException;
 import com.example.memo.memo.service.models.AiCreateResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
-import com.example.memo.tag.service.models.Tag;
+import com.example.memo.memo.service.models.Tag;
 
 import lombok.RequiredArgsConstructor;
 

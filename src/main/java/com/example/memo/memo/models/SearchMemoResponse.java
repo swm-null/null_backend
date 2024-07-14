@@ -7,7 +7,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import com.example.memo.memo.service.models.Memo;
-import com.example.memo.tag.service.models.Tag;
+import com.example.memo.memo.service.models.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;

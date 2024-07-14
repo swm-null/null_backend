@@ -1,4 +1,4 @@
-package com.example.memo.tag.service.models;
+package com.example.memo.memo.service.models;
 
 import java.util.List;
 
