@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import com.example.memo.memo.models.CreateMemoRequest;
@@ -14,7 +15,7 @@ import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 import com.example.memo.memo.service.exception.MemoNotFoundException;
-import com.example.memo.memo.service.models.AiSaveResponse;
+import com.example.memo.memo.service.models.AiCreateResponse;
 import com.example.memo.memo.service.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
 
@@ -34,11 +35,11 @@ public class MemoService {
     }
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
-        AiSaveResponse aiSaveResponse = aiMemoClient.getTags(createMemoRequest.content());
-        Memo memo = createMemoRequest.toMemo(
-            aiSaveResponse.memoId(),
-            aiSaveResponse.tags()
-        );
+        Memo memo = createMemoRequest.toMemo();
+        /** TODO
+         * 메모 저장
+         * AI 태그,임베딩 받기 -> 태그 저장 -> 메모 저장?
+         */
         Memo savedMemo = memoRepository.save(memo);
         return CreateMemoResponse.from(savedMemo);
     }
@@ -55,22 +56,22 @@ public class MemoService {
         return SearchMemoResponse.from(aiSearchResponse.processedMessage(), memos);
     }
 
-    public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
+    public UpdateMemoResponse updateMemo(ObjectId memoId, UpdateMemoRequest updateMemoRequest) {
         Memo memo = memoRepository.getById(memoId);
-        memo.update(
-            updateMemoRequest.content(),
-            updateMemoRequest.tags()
-        );
+        /** TODO
+         * 메모 업데이트
+         * 메모와 태그 수정. 태그 수정 시 태그 저장.
+         */
         Memo updatedMemo = memoRepository.save(memo);
         return UpdateMemoResponse.from(updatedMemo);
     }
 
-    public void deleteMemo(String memoId) {
+    public void deleteMemo(ObjectId memoId) {
         Memo memo = memoRepository.getById(memoId);
         memoRepository.delete(memo);
     }
 
-    private List<Memo> searchMemoByIdList(List<String> ids) {
+    private List<Memo> searchMemoByIdList(List<ObjectId> ids) {
         return ids.stream()
             .map(memoRepository::getById)
             .collect(Collectors.toList());
@@ -80,7 +81,7 @@ public class MemoService {
         return memoRepository.getByContentRegex(regex);
     }
 
-    private List<Memo> searchMemoByTag(List<String> tags) {
+    private List<Memo> searchMemoByTag(List<ObjectId> tags) {
         return tags.stream()
             .flatMap(tag -> memoRepository.getByTagsContaining(tag).stream())
             .collect(Collectors.toList());

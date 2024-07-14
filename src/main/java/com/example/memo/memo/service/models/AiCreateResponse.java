@@ -8,12 +8,16 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import org.bson.types.ObjectId;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AiSearchResponse(
-    String type, // "similarity" | "regex" | "tag" | "unspecified"
-    String processedMessage,
-    List<ObjectId> ids,
-    String regex,
-    List<ObjectId> tags
+public record AiCreateResponse(
+        List<Double> memoEmbeddings,
+        List<ObjectId> existingTagIds,
+        List<InnerTag> newTags
 ) {
 
+    public record InnerTag(
+            String name,
+            List<Double> embedding
+    ) {
+
+    }
 }

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.memo.memo.service.models.AiSaveRequest;
-import com.example.memo.memo.service.models.AiSaveResponse;
+import com.example.memo.memo.service.models.AiCreateRequest;
+import com.example.memo.memo.service.models.AiCreateResponse;
 import com.example.memo.memo.service.models.AiSearchRequest;
 import com.example.memo.memo.service.models.AiSearchResponse;
 
@@ -27,18 +27,18 @@ public class AiMemoClient {
         this.aiUrl = aiUrl;
     }
 
-    public AiSaveResponse getTags(String content) {
+    public AiCreateResponse getTags(String content) {
         final URI uri = UriComponentsBuilder
             .fromUriString(aiUrl)
             .path("/add_memo/")
             .encode()
             .build()
             .toUri();
-        AiSaveRequest aiSaveRequest = new AiSaveRequest(content);
-        ResponseEntity<AiSaveResponse> aiResponse = restTemplate.postForEntity(
+        AiCreateRequest aiCreateRequest = new AiCreateRequest(content);
+        ResponseEntity<AiCreateResponse> aiResponse = restTemplate.postForEntity(
             uri,
-            aiSaveRequest,
-            AiSaveResponse.class
+                aiCreateRequest,
+            AiCreateResponse.class
         );
         return aiResponse.getBody();
     }

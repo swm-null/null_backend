@@ -8,6 +8,7 @@ import com.example.memo.memo.service.models.Memo;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.bson.types.ObjectId;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record SearchMemoResponse(
@@ -21,7 +22,7 @@ public record SearchMemoResponse(
     @JsonNaming(SnakeCaseStrategy.class)
     public record InnerMemo(
         @Schema(description = "메모 고유 ID", example = "1")
-        String id,
+        ObjectId id,
 
         @Schema(description = "내용", example = "text")
         String content,
@@ -29,7 +30,7 @@ public record SearchMemoResponse(
         @Schema(description = "태그", example = """
             ["tag1", "tag2"]
             """)
-        List<String> tags
+        List<ObjectId> tags
     ) {
         public static InnerMemo from(Memo memo) {
             return new InnerMemo(
