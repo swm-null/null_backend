@@ -15,8 +15,8 @@ public record AiCreateResponse(
 ) {
 
     public record InnerTag(
-            String name,
-            List<Double> embedding
+        String name,
+        List<Double> embedding
     ) {
 
     }

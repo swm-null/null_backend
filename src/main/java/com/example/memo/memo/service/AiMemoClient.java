@@ -27,7 +27,7 @@ public class AiMemoClient {
         this.aiUrl = aiUrl;
     }
 
-    public AiCreateResponse getTags(String content) {
+    public AiCreateResponse createMemo(String content) {
         final URI uri = UriComponentsBuilder
             .fromUriString(aiUrl)
             .path("/add_memo/")
@@ -37,7 +37,7 @@ public class AiMemoClient {
         AiCreateRequest aiCreateRequest = new AiCreateRequest(content);
         ResponseEntity<AiCreateResponse> aiResponse = restTemplate.postForEntity(
             uri,
-                aiCreateRequest,
+            aiCreateRequest,
             AiCreateResponse.class
         );
         return aiResponse.getBody();

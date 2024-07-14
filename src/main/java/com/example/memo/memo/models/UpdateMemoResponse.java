@@ -4,11 +4,12 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.example.memo.memo.service.models.Memo;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.bson.types.ObjectId;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record UpdateMemoResponse(

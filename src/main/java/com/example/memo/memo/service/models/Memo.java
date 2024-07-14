@@ -2,13 +2,12 @@ package com.example.memo.memo.service.models;
 
 import java.util.List;
 
-import jakarta.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +32,8 @@ public class Memo {
 
     @NotNull
     private List<Double> embedding;
+
+    public void updateTags(List<ObjectId> tagIds) {
+        this.tags = tagIds;
+    }
 }

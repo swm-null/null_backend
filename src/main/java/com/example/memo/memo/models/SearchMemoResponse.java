@@ -4,11 +4,13 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.example.memo.memo.service.models.Memo;
+import com.example.memo.tag.service.models.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.bson.types.ObjectId;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record SearchMemoResponse(
@@ -28,23 +30,38 @@ public record SearchMemoResponse(
         String content,
 
         @Schema(description = "태그", example = """
-            ["tag1", "tag2"]
+            [
+                {"id": "60c72b3e9b1e8b1e4c8b4568", "name": "일정"},
+                {"id": "60c72b4f9b1e8b1e4c8b4569", "name": "멘토링"}
+            ]
             """)
-        List<ObjectId> tags
+        List<InnerTag> tags
     ) {
-        public static InnerMemo from(Memo memo) {
+
+        public record InnerTag(
+            @Schema(description = "태그 ID", example = "60c72b3e9b1e8b1e4c8b4568")
+            ObjectId id,
+
+            @Schema(description = "태그 이름", example = "일정")
+            String name
+        ) {
+        }
+
+        public static InnerMemo from(Memo memo, List<Tag> tags) {
             return new InnerMemo(
                 memo.getId(),
                 memo.getContent(),
-                memo.getTags()
+                tags.stream()
+                    .map(tag -> new InnerTag(tag.getId(), tag.getName()))
+                    .toList()
             );
         }
     }
 
-    public static SearchMemoResponse from(String processedMessage, List<Memo> memos) {
-        return new SearchMemoResponse(
-            processedMessage,
-            memos.stream().map(InnerMemo::from).toList()
-        );
+    public static SearchMemoResponse from(String processedMessage, List<Memo> memos, List<List<Tag>> tagsList) {
+        List<InnerMemo> innerMemos = memos.stream()
+            .map(memo -> InnerMemo.from(memo, tagsList.get(memos.indexOf(memo))))
+            .toList();
+        return new SearchMemoResponse(processedMessage, innerMemos);
     }
 }

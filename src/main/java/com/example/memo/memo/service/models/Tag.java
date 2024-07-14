@@ -34,4 +34,11 @@ public class Tag {
 
     @NotNull
     private List<ObjectId> child;
+
+    @NotNull
+    private List<Double> embedding;
+
+    public void addMemoId(ObjectId memoId) {
+        memos.add(memoId);
+    }
 }

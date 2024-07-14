@@ -4,8 +4,9 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AiSearchResponse(

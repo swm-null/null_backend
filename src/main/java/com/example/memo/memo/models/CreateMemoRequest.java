@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import org.bson.types.ObjectId;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record CreateMemoRequest(
@@ -19,11 +18,10 @@ public record CreateMemoRequest(
     String content
 ) {
 
-    public Memo toMemo() {
+    public Memo toMemo(List<Double> embedding) {
         return Memo.builder()
-            .id(id)
-            .content(this.content)
-            .tags(tags)
+            .content(content)
+            .embedding(embedding)
             .build();
     }
 }

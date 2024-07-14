@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+
 import org.bson.types.ObjectId;
 
 @JsonNaming(SnakeCaseStrategy.class)
@@ -17,10 +18,10 @@ public record UpdateMemoRequest(
     @NotBlank(message = "내용은 비워둘 수 없습니다.")
     String content,
 
-    @Schema(description = "태그", example = """
-        ["tag1", "tag2"]
+    @Schema(description = "태그 이름", example = """
+        ["일정", "멘토링"]
         """, requiredMode = REQUIRED)
-    List<ObjectId> tags
+    List<String> tagNames
 ) {
 
 }
