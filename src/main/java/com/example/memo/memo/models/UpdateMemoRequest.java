@@ -12,14 +12,14 @@ import jakarta.validation.constraints.NotBlank;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record UpdateMemoRequest(
-    @Schema(description = "내용", example = "text", requiredMode = REQUIRED)
+    @Schema(description = "내용", example = "내일은 5시에 멘토링을 들어야해", requiredMode = REQUIRED)
     @NotBlank(message = "내용은 비워둘 수 없습니다.")
     String content,
 
-    @Schema(description = "태그", example = """
-        ["tag1", "tag2"]
+    @Schema(description = "태그 이름", example = """
+        ["일정", "멘토링"]
         """, requiredMode = REQUIRED)
-    List<String> tags
+    List<String> tagNames
 ) {
 
 }

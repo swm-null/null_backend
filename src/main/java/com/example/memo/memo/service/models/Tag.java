@@ -18,24 +18,29 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@Document(collection = "memos")
+@Document(collection = "tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Memo {
+public class Tag {
 
     @Id
     private String id;
 
     @NotBlank
-    private String content;
+    private String name;
 
     @NotNull
-    private List<String> tags;
+    private List<String> memos;
+
+    private String parent;
+
+    @NotNull
+    private List<String> child;
 
     @NotNull
     private List<Double> embedding;
 
-    public void updateTags(List<String> tagIds) {
-        this.tags = tagIds;
+    public void addMemoId(String memoId) {
+        memos.add(memoId);
     }
 }
