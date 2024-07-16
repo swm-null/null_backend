@@ -10,8 +10,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-import org.bson.types.ObjectId;
-
 @JsonNaming(SnakeCaseStrategy.class)
 public record UpdateMemoRequest(
     @Schema(description = "내용", example = "내일은 5시에 멘토링을 들어야해", requiredMode = REQUIRED)

@@ -2,9 +2,11 @@ package com.example.memo.memo.service.models;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,24 +23,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
 
-    @MongoId
-    private ObjectId id;
+    @Id
+    private String id;
 
     @NotBlank
     private String name;
 
     @NotNull
-    private List<ObjectId> memos;
+    private List<String> memos;
 
-    private ObjectId parent;
+    private String parent;
 
     @NotNull
-    private List<ObjectId> child;
+    private List<String> child;
 
     @NotNull
     private List<Double> embedding;
 
-    public void addMemoId(ObjectId memoId) {
+    public void addMemoId(String memoId) {
         memos.add(memoId);
     }
 }

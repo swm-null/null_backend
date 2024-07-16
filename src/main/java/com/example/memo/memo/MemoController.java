@@ -2,7 +2,6 @@ package com.example.memo.memo;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,7 +54,7 @@ public class MemoController implements MemoApi {
 
     @PutMapping("/memos/{id}")
     public ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("id") ObjectId memoId,
+        @PathVariable("id") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     ) {
         UpdateMemoResponse updateMemoResponse = memoService.updateMemo(memoId, updateMemoRequest);
@@ -64,7 +63,7 @@ public class MemoController implements MemoApi {
 
     @DeleteMapping("/memos/{id}")
     public ResponseEntity<Void> deleteMemo(
-        @PathVariable("id") ObjectId memoId
+        @PathVariable("id") String memoId
     ) {
         memoService.deleteMemo(memoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

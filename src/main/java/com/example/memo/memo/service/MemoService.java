@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import com.example.memo.memo.models.CreateMemoRequest;
@@ -45,17 +44,16 @@ public class MemoService {
         List<Tag> tags = new ArrayList<>();
 
         // 이미 존재하는 태그들 : 필드에 메모 id 추가
-        for (ObjectId tagId : aiCreateResponse.existingTagIds()) {
+        for (String tagId : aiCreateResponse.existingTagIds()) {
             Tag existingTag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new MemoNotFoundException("태그를 찾지 못했습니다: " + tagId));
             existingTag.addMemoId(savedMemo.getId());
             Tag savedTag = tagRepository.save(existingTag);
-
             tags.add(savedTag);
         }
 
         // 새로운 태그들 : 필드에 메모 id 추가, 메모에 tag ids 추가
-        List<ObjectId> tagIds = new ArrayList<>(aiCreateResponse.existingTagIds());
+        List<String> tagIds = new ArrayList<>(aiCreateResponse.existingTagIds());
         for (AiCreateResponse.InnerTag tag : aiCreateResponse.newTags()) {
             Tag newTag = Tag.builder()
                 .name(tag.name())
@@ -64,13 +62,10 @@ public class MemoService {
                 .build();
             Tag savedTag = tagRepository.save(newTag);
             tagIds.add(savedTag.getId());
-
             tags.add(savedTag);
         }
-
         savedMemo.updateTags(tagIds);
         memoRepository.save(savedMemo);
-
         return CreateMemoResponse.from(savedMemo, tags);
     }
 
@@ -91,7 +86,7 @@ public class MemoService {
         return SearchMemoResponse.from(aiSearchResponse.processedMessage(), memos, tags);
     }
 
-    public UpdateMemoResponse updateMemo(ObjectId memoId, UpdateMemoRequest updateMemoRequest) {
+    public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
         Memo memo = memoRepository.getById(memoId);
         /* TODO 업데이트 기능 논의 필요
         memo.update(updateMemoRequest);
@@ -106,24 +101,27 @@ public class MemoService {
         return UpdateMemoResponse.from(memo);
     }
 
-    public void deleteMemo(ObjectId memoId) {
+    public void deleteMemo(String memoId) {
         Memo memo = memoRepository.getById(memoId);
         memoRepository.delete(memo);
     }
 
-    private List<Memo> searchMemoByIdList(List<ObjectId> ids) {
+    private List<Memo> searchMemoByIdList(List<String> ids) {
+        for (String id : ids) {
+            System.out.println(id);
+        }
         return ids.stream()
             .map(memoRepository::getById)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<Memo> searchMemoByRegex(String regex) {
         return memoRepository.getByContentRegex(regex);
     }
 
-    private List<Memo> searchMemoByTag(List<ObjectId> tags) {
+    private List<Memo> searchMemoByTag(List<String> tags) {
         return tags.stream()
             .flatMap(tag -> memoRepository.getByTagsContaining(tag).stream())
-            .collect(Collectors.toList());
+            .toList();
     }
 }

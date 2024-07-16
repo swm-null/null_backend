@@ -2,7 +2,6 @@ package com.example.memo.memo;
 
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,7 +75,7 @@ public interface MemoApi {
     @Operation(summary = "메모 수정")
     @PutMapping("/memos/{id}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("id") ObjectId memoId,
+        @PathVariable("id") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     );
 
@@ -91,6 +90,6 @@ public interface MemoApi {
     @Operation(summary = "메모 삭제")
     @DeleteMapping("/memos/{id}")
     ResponseEntity<Void> deleteMemo(
-        @PathVariable("id") ObjectId memoId
+        @PathVariable("id") String memoId
     );
 }
