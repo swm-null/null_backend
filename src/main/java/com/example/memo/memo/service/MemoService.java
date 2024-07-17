@@ -107,9 +107,6 @@ public class MemoService {
     }
 
     private List<Memo> searchMemoByIdList(List<String> ids) {
-        for (String id : ids) {
-            System.out.println(id);
-        }
         return ids.stream()
             .map(memoRepository::getById)
             .toList();
