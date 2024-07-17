@@ -35,4 +35,9 @@ public class Memo {
     public void updateTags(List<String> tagIds) {
         this.tags = tagIds;
     }
+
+    public void update(String content, List<Double> embedding) {
+        this.content = content;
+        this.embedding = embedding;
+    }
 }

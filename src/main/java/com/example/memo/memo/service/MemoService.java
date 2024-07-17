@@ -90,18 +90,20 @@ public class MemoService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
-        Memo memo = memoRepository.getById(memoId);
-        /* TODO 업데이트 기능 논의 필요
-        memo.update(updateMemoRequest);
+        Memo memo = memoRepository.findById(memoId)
+            .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));
 
-        List<Tag> tags = updateMemoRequest.getTags().stream()
-                .map(tagId -> tagRepository.getById(tagId))
-                .collect(Collectors.toList());
+        AiCreateResponse aiCreateResponse = aiMemoClient.createMemo(updateMemoRequest.content());
 
-        memo.setTags(tags.stream().map(Tag::getId).collect(Collectors.toList()));
+        memo.update(updateMemoRequest.content(), aiCreateResponse.memoEmbeddings());
         Memo updatedMemo = memoRepository.save(memo);
-         */
-        return UpdateMemoResponse.from(memo);
+
+        List<Tag> tags = updatedMemo.getTags().stream()
+            .map(tagId -> tagRepository.findById(tagId)
+                .orElseThrow(() -> new MemoNotFoundException("태그를 찾지 못했습니다: " + tagId)))
+            .toList();
+
+        return UpdateMemoResponse.from(updatedMemo, tags);
     }
 
     public void deleteMemo(String memoId) {
