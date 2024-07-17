@@ -2,7 +2,6 @@ package com.example.memo.memo.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -30,9 +29,13 @@ public class MemoService {
     private final AiMemoClient aiMemoClient;
 
     public List<MemoResponse> getAllMemos() {
-        return memoRepository.findAll().stream()
-            .map(MemoResponse::from)
-            .collect(Collectors.toList());
+        List<Memo> memos = memoRepository.findAll();
+        return memos.stream()
+            .map(memo -> {
+                List<Tag> tags = tagRepository.findAllById(memo.getTags());
+                return MemoResponse.from(memo, tags);
+            })
+            .toList();
     }
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
@@ -102,7 +105,20 @@ public class MemoService {
     }
 
     public void deleteMemo(String memoId) {
-        Memo memo = memoRepository.getById(memoId);
+        Memo memo = memoRepository.findById(memoId)
+            .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));
+
+        List<String> tagIds = memo.getTags();
+        for (String tagId : tagIds) {
+            Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new MemoNotFoundException("태그를 찾지 못했습니다: " + tagId));
+            tag.deleteMemoId(memoId);
+            if (tag.getMemos().isEmpty()) {
+                tagRepository.delete(tag);
+            } else {
+                tagRepository.save(tag);
+            }
+        }
         memoRepository.delete(memo);
     }
 
