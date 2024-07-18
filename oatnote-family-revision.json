@@ -51,7 +51,17 @@
           "awslogs-stream-prefix": "ecs"
         }
       },
-      "systemControls": []
+      "systemControls": [],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:8080/actuator/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 5,
+        "startPeriod": 60
+      }
     }
   ],
   "executionRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
