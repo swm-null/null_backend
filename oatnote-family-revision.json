@@ -1,74 +1,74 @@
 {
-    "family": "oatnote-family",
-    "containerDefinitions": [
+  "family": "oatnote-family",
+  "containerDefinitions": [
+    {
+      "name": "oatnote-container",
+      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote:latest",
+      "cpu": 1024,
+      "memory": 3072,
+      "memoryReservation": 1024,
+      "portMappings": [
         {
-            "name": "oatnote-container",
-            "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote:latest",
-            "cpu": 1024,
-            "memory": 3072,
-            "memoryReservation": 1024,
-            "portMappings": [
-                {
-                    "name": "oatnote-container-8080-task",
-                    "containerPort": 8080,
-                    "hostPort": 8080,
-                    "protocol": "tcp",
-                    "appProtocol": "http"
-                }
-            ],
-            "essential": true,
-            "environment": [],
-            "mountPoints": [],
-            "volumesFrom": [],
-            "secrets": [
-                {
-                    "name": "MONGODB_URI",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:MONGODB_URI::"
-                },
-                {
-                    "name": "AI_URL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:AI_URL::"
-                },
-                {
-                    "name": "SWAGGER_SERVER_URL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:SWAGGER_SERVER_URL::"
-                },
-                {
-                    "name": "ALLOWED_ORIGINS_PRODUCT",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_PRODUCT::"
-                },
-                {
-                    "name": "ALLOWED_ORIGINS_DEVELOP",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_DEVELOP::"
-                },
-                {
-                    "name": "ALLOWED_ORIGINS_LOCAL",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_LOCAL::"
-                }
-            ],
-            "logConfiguration": {
-                "logDriver": "awslogs",
-                "options": {
-                    "awslogs-group": "/ecs/oatnote-family",
-                    "awslogs-create-group": "true",
-                    "awslogs-region": "ap-northeast-2",
-                    "awslogs-stream-prefix": "ecs"
-                }
-            },
-            "systemControls": []
+          "name": "oatnote-container-8080-task",
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "appProtocol": "http"
         }
-    ],
-    "executionRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
-    "networkMode": "awsvpc",
-    "volumes": [],
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "cpu": "1024",
-    "memory": "3072",
-    "runtimePlatform": {
-        "cpuArchitecture": "X86_64",
-        "operatingSystemFamily": "LINUX"
-    },
-    "tags": []
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "MONGODB_URI",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:MONGODB_URI::"
+        },
+        {
+          "name": "AI_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:AI_URL::"
+        },
+        {
+          "name": "SWAGGER_SERVER_URL",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:SWAGGER_SERVER_URL::"
+        },
+        {
+          "name": "ALLOWED_ORIGINS_PRODUCT",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_PRODUCT::"
+        },
+        {
+          "name": "ALLOWED_ORIGINS_DEVELOP",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_DEVELOP::"
+        },
+        {
+          "name": "ALLOWED_ORIGINS_LOCAL",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_LOCAL::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/oatnote-family",
+          "awslogs-create-group": "true",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "systemControls": []
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "3072",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "tags": []
 }
