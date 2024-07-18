@@ -38,10 +38,6 @@
           "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_PRODUCT::"
         },
         {
-          "name": "ALLOWED_ORIGINS_DEVELOP",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_DEVELOP::"
-        },
-        {
           "name": "ALLOWED_ORIGINS_LOCAL",
           "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_LOCAL::"
         }
