@@ -5,9 +5,6 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -37,5 +34,10 @@ public class Memo {
 
     public void updateTags(List<String> tagIds) {
         this.tags = tagIds;
+    }
+
+    public void update(String content, List<Double> embedding) {
+        this.content = content;
+        this.embedding = embedding;
     }
 }
