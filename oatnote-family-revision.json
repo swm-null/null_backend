@@ -55,7 +55,7 @@
       "healthCheck": {
         "command": [
           "CMD-SHELL",
-          "curl -f https://oatnote.kro.kr/actuator/health || exit 1"
+          "curl -f http://oatnote.kro.kr:8080/actuator/health || exit 1"
         ],
         "interval": 30,
         "timeout": 5,
