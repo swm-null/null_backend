@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class MemoTagController implements MemoTagInterface {
+public class MemoTagController implements MemoTagApiDoc {
 
     private final MemoTagService memoTagService;
 

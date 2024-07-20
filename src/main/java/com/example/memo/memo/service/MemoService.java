@@ -15,12 +15,12 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
 
-    public List<Memo> getAllMemos() {
-        return memoRepository.findAll();
-    }
-
     public Memo saveMemo(Memo memo) {
         return memoRepository.save(memo);
+    }
+
+    public List<Memo> getAllMemos() {
+        return memoRepository.findAll();
     }
 
     public Memo getMemoById(String memoId) {
@@ -28,23 +28,29 @@ public class MemoService {
             .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));
     }
 
+    public List<Memo> getAllMemosByIds(List<String> memoIds) {
+        return memoIds.stream()
+            .map(this::getMemoById)
+            .toList();
+    }
+
+    public List<Memo> getAllMemosContainingRegex(String regex) {
+        List<Memo> memos = memoRepository.findAllByContentRegex(regex);
+        if (memos.isEmpty()) {
+            throw new MemoNotFoundException("존재하지 않는 메모 regex 입니다.");
+        }
+        return memos;
+    }
+
+    public List<Memo> getAllMemosContainingTagIds(List<String> tagIds) {
+        List<Memo> memos = memoRepository.findAllByTagIdsIn(tagIds);
+        if (memos.isEmpty()) {
+            throw new MemoNotFoundException("존재하지 않는 태그 id 입니다.");
+        }
+        return memos;
+    }
+
     public void deleteMemo(Memo memo) {
         memoRepository.delete(memo);
-    }
-
-    public List<Memo> searchMemoByIdList(List<String> ids) {
-        return ids.stream()
-            .map(memoRepository::getById)
-            .toList();
-    }
-
-    public List<Memo> searchMemoByRegex(String regex) {
-        return memoRepository.getByContentRegex(regex);
-    }
-
-    public List<Memo> searchMemoByTag(List<String> tags) {
-        return tags.stream()
-            .flatMap(tag -> memoRepository.getByTagsContaining(tag).stream())
-            .toList();
     }
 }

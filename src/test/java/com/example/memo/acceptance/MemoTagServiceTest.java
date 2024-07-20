@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.example.memo.memo.MemoTagService;
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
 import com.example.memo.memo.models.MemoResponse;
@@ -23,10 +24,9 @@ import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
-import com.example.memo.memo.service.client.AiMemoClient;
 import com.example.memo.memo.service.MemoRepository;
-import com.example.memo.memo.MemoTagService;
 import com.example.memo.memo.service.TagRepository;
+import com.example.memo.memo.service.client.AiMemoClient;
 import com.example.memo.memo.service.client.models.AiCreateResponse;
 import com.example.memo.memo.service.client.models.AiCreateResponse.InnerTag;
 import com.example.memo.memo.service.client.models.AiSearchResponse;
@@ -35,7 +35,7 @@ import com.example.memo.memo.service.models.Tag;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class MemoTagServiceTest { //TODO
+public class MemoTagServiceTest {
 
     @Mock
     private MemoRepository memoRepository;
@@ -59,14 +59,14 @@ public class MemoTagServiceTest { //TODO
         memo = Memo.builder()
             .id("메모1")
             .content("내일 일정 : 5시 멘토링")
-            .tags(List.of("태그1"))
+            .tagIds(List.of("태그1"))
             .embedding(List.of(0.1, 0.2, 0.3))
             .build();
 
         tag = Tag.builder()
             .id("태그1")
             .name("일정")
-            .memos(List.of("메모1"))
+            .memoIds(List.of("메모1"))
             .embedding(List.of(0.1, 0.2))
             .build();
     }
@@ -74,8 +74,8 @@ public class MemoTagServiceTest { //TODO
     @Test
     @DisplayName("모든 메모를 불러온다.")
     void getAllMemos() {
-        when(memoRepository.findAll()).thenReturn(List.of(memo));
-        when(tagRepository.findAllById(memo.getTags())).thenReturn(List.of(tag));
+        doReturn(List.of(memo)).when(memoRepository).findAll();
+        doReturn(List.of(tag)).when(tagRepository).findAllById(memo.getTagIds());
 
         List<MemoResponse> responses = memoTagService.getAllMemos();
 
@@ -90,31 +90,36 @@ public class MemoTagServiceTest { //TODO
     void testCreateMemo() {
         CreateMemoRequest request = new CreateMemoRequest("content");
         AiCreateResponse aiResponse = new AiCreateResponse(
-            List.of(0.1, 0.2),
+            List.of(0.1, 0.2, 0.3),
             List.of("existingTagId"),
             List.of(new InnerTag("newTag", List.of(0.1, 0.2)))
         );
+
+        Memo savedMemo = Memo.builder()
+            .id("메모1")
+            .content("content")
+            .tagIds(List.of("existingTagId", "newTagId"))
+            .embedding(List.of(0.1, 0.2, 0.3))
+            .build();
+
         Tag existingTag = Tag.builder()
             .id("existingTagId")
             .name("existingTag")
-            .memos(List.of("1"))
-            .parent("parent")
-            .child(List.of())
-            .embedding(List.of(0.1, 0.2))
-            .build();
-        Tag newTag = Tag.builder()
-            .id("newTagId")
-            .name("newTag")
-            .memos(List.of("1"))
-            .parent("parent")
-            .child(List.of())
+            .memoIds(List.of("메모1"))
             .embedding(List.of(0.1, 0.2))
             .build();
 
-        when(aiMemoClient.createMemo("content")).thenReturn(aiResponse);
-        when(memoRepository.save(any(Memo.class))).thenReturn(memo);
-        when(tagRepository.findById("existingTagId")).thenReturn(Optional.of(existingTag));
-        when(tagRepository.save(any(Tag.class))).thenReturn(newTag);
+        Tag newTag = Tag.builder()
+            .id("newTagId")
+            .name("newTag")
+            .memoIds(List.of("메모1"))
+            .embedding(List.of(0.1, 0.2))
+            .build();
+
+        doReturn(aiResponse).when(aiMemoClient).createMemo("content");
+        doReturn(savedMemo).when(memoRepository).save(any(Memo.class));
+        doReturn(Optional.of(existingTag)).when(tagRepository).findById("existingTagId");
+        doReturn(newTag).when(tagRepository).save(any(Tag.class));
 
         CreateMemoResponse response = memoTagService.createMemo(request);
 
@@ -129,16 +134,16 @@ public class MemoTagServiceTest { //TODO
         AiSearchResponse aiResponse = new AiSearchResponse(
             "similarity",
             "",
-            List.of("1"), // IDs
+            List.of("1"),
             "",
-            List.of("tag1") // Tags
+            List.of("tag1")
         );
 
         SearchMemoRequest request = new SearchMemoRequest("content");
 
-        when(aiMemoClient.searchMemo("content")).thenReturn(aiResponse);
-        when(memoRepository.findById("1")).thenReturn(Optional.of(memo));
-        when(tagRepository.findAllById(List.of("tag1"))).thenReturn(List.of(tag));
+        doReturn(aiResponse).when(aiMemoClient).searchMemo("content");
+        doReturn(Optional.of(memo)).when(memoRepository).findById("1");
+        doReturn(List.of(tag)).when(tagRepository).findAllById(List.of("tag1"));
 
         SearchMemoResponse response = memoTagService.searchMemo(request);
 
@@ -152,31 +157,31 @@ public class MemoTagServiceTest { //TODO
     void updateMemo() {
         UpdateMemoRequest request = new UpdateMemoRequest("updated content");
         AiCreateResponse aiResponse = new AiCreateResponse(
-            List.of(0.1, 0.2),
+            List.of(0.1, 0.2, 0.3),
             List.of(),
             List.of(new InnerTag("updatedTag", List.of(0.1, 0.2)))
         );
+
         Memo updatedMemo = Memo.builder()
-            .id("1")
+            .id("메모1")
             .content("updated content")
-            .tags(List.of("updatedTagId"))
-            .embedding(List.of(0.1, 0.2))
+            .tagIds(List.of("updatedTagId"))
+            .embedding(List.of(0.1, 0.2, 0.3))
             .build();
+
         Tag updatedTag = Tag.builder()
             .id("updatedTagId")
             .name("updatedTag")
-            .memos(List.of("1"))
-            .parent("parent")
-            .child(List.of())
+            .memoIds(List.of("메모1"))
             .embedding(List.of(0.1, 0.2))
             .build();
 
-        when(memoRepository.findById("1")).thenReturn(Optional.of(memo));
-        when(aiMemoClient.createMemo("updated content")).thenReturn(aiResponse);
-        when(memoRepository.save(any(Memo.class))).thenReturn(updatedMemo);
-        when(tagRepository.save(any(Tag.class))).thenReturn(updatedTag);
+        doReturn(Optional.of(memo)).when(memoRepository).findById("메모1");
+        doReturn(aiResponse).when(aiMemoClient).createMemo("updated content");
+        doReturn(updatedMemo).when(memoRepository).save(any(Memo.class));
+        doReturn(updatedTag).when(tagRepository).save(any(Tag.class));
 
-        UpdateMemoResponse response = memoTagService.updateMemo("1", request);
+        UpdateMemoResponse response = memoTagService.updateMemo("메모1", request);
 
         assertThat(response.content()).isEqualTo("updated content");
         assertThat(response.tags()).hasSize(1);
@@ -186,7 +191,8 @@ public class MemoTagServiceTest { //TODO
     @Test
     @DisplayName("메모를 삭제한다.")
     void testDeleteMemo() {
-        doReturn(memo).when(memoRepository).findById(eq("메모1"));
+        doReturn(Optional.of(memo)).when(memoRepository).findById("메모1");
+        doReturn(Optional.of(tag)).when(tagRepository).findById("태그1");
 
         memoTagService.deleteMemo("메모1");
 

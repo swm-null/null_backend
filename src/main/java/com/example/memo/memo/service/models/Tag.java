@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,11 +28,14 @@ public class Tag {
     private String name;
 
     @NotNull
+    @Field("memos")
     private List<String> memoIds;
 
+    @Field("parent")
     private String parentId;
 
     @NotNull
+    @Field("child")
     private List<String> childIds;
 
     @NotNull

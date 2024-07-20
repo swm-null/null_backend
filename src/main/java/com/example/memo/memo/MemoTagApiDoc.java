@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @Tag(name = "Memo", description = "메모 관리 API")
-public interface MemoTagInterface {
+public interface MemoTagApiDoc {
 
     @ApiResponses(
         value = {

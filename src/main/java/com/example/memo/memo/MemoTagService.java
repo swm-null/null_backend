@@ -77,11 +77,11 @@ public class MemoTagService {
 
     public SearchMemoResponse searchMemo(SearchMemoRequest searchMemoRequest) {
         AiSearchResponse aiSearchResponse = aiMemoClient.searchMemo(searchMemoRequest.content());
-        List<Memo> memos = new ArrayList<>();
+        List<Memo> memos;
         switch (aiSearchResponse.type()) {
-            case "similarity" -> memos.addAll(memoService.searchMemoByIdList(aiSearchResponse.ids()));
-            case "regex" -> memos.addAll(memoService.searchMemoByRegex(aiSearchResponse.regex()));
-            case "tag" -> memos.addAll(memoService.searchMemoByTag(aiSearchResponse.tags()));
+            case "similarity" -> memos = memoService.getAllMemosByIds(aiSearchResponse.ids());
+            case "regex" -> memos = memoService.getAllMemosContainingRegex(aiSearchResponse.regex());
+            case "tag" -> memos = memoService.getAllMemosContainingTagIds(aiSearchResponse.tagIds());
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
 
@@ -93,10 +93,9 @@ public class MemoTagService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
-        Memo memo = memoService.getMemoById(memoId);
-
         AiCreateResponse aiCreateResponse = aiMemoClient.createMemo(updateMemoRequest.content());
 
+        Memo memo = memoService.getMemoById(memoId);
         memo.update(updateMemoRequest.content(), aiCreateResponse.memoEmbeddings());
         Memo updatedMemo = memoService.saveMemo(memo);
 
@@ -110,8 +109,7 @@ public class MemoTagService {
     public void deleteMemo(String memoId) {
         Memo memo = memoService.getMemoById(memoId);
 
-        List<String> tagIds = memo.getTagIds();
-        for (String tagId : tagIds) {
+        for (String tagId : memo.getTagIds()) {
             Tag tag = tagService.getTagById(tagId);
             tag.deleteMemoId(memoId);
             if (tag.getMemoIds().isEmpty()) {
