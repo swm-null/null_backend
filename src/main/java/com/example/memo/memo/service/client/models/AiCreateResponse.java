@@ -1,4 +1,4 @@
-package com.example.memo.memo.service.models;
+package com.example.memo.memo.service.client.models;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 

@@ -27,21 +27,21 @@ public class Tag {
     private String name;
 
     @NotNull
-    private List<String> memos;
+    private List<String> memoIds;
 
-    private String parent;
+    private String parentId;
 
     @NotNull
-    private List<String> child;
+    private List<String> childIds;
 
     @NotNull
     private List<Double> embedding;
 
     public void addMemoId(String memoId) {
-        memos.add(memoId);
+        memoIds.add(memoId);
     }
 
     public void deleteMemoId(String memoId) {
-        memos.remove(memoId);
+        memoIds.remove(memoId);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.memo.memo.service;
+package com.example.memo.memo.service.client;
 
 import java.net.URI;
 
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.memo.memo.service.models.AiCreateRequest;
-import com.example.memo.memo.service.models.AiCreateResponse;
-import com.example.memo.memo.service.models.AiSearchRequest;
-import com.example.memo.memo.service.models.AiSearchResponse;
+import com.example.memo.memo.service.client.models.AiCreateRequest;
+import com.example.memo.memo.service.client.models.AiCreateResponse;
+import com.example.memo.memo.service.client.models.AiSearchRequest;
+import com.example.memo.memo.service.client.models.AiSearchResponse;
 
 @Service
 public class AiMemoClient {

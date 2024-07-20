@@ -27,13 +27,13 @@ public class Memo {
     private String content;
 
     @NotNull
-    private List<String> tags;
+    private List<String> tagIds;
 
     @NotNull
     private List<Double> embedding;
 
     public void updateTags(List<String> tagIds) {
-        this.tags = tagIds;
+        this.tagIds = tagIds;
     }
 
     public void update(String content, List<Double> embedding) {

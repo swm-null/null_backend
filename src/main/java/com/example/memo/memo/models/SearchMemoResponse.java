@@ -36,6 +36,7 @@ public record SearchMemoResponse(
         List<InnerTag> tags
     ) {
 
+        @JsonNaming(SnakeCaseStrategy.class)
         public record InnerTag(
             @Schema(description = "태그 ID", example = "60c72b3e9b1e8b1e4c8b4568")
             String id,

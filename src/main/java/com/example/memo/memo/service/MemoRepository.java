@@ -13,7 +13,7 @@ public interface MemoRepository extends MongoRepository<Memo, String> {
     @Query("{ 'content' : { $regex: ?0, $options: 'i' } }")
     List<Memo> findByContentRegex(String regex);
 
-    List<Memo> findByTagsContaining(String tagId);
+    List<Memo> findByTagIdsContaining(String tagId);
 
     default Memo getById(String id) {
         return findById(id)
@@ -29,7 +29,7 @@ public interface MemoRepository extends MongoRepository<Memo, String> {
     }
 
     default List<Memo> getByTagsContaining(String tagId) {
-        List<Memo> memos = findByTagsContaining(tagId);
+        List<Memo> memos = findByTagIdsContaining(tagId);
         if (memos.isEmpty()) {
             throw new MemoNotFoundException("존재하지 않는 메모 tag id 입니다.");
         }
