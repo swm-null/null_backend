@@ -1,5 +1,6 @@
 package com.example.memo.memo.service.models;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,10 +31,12 @@ public class Memo {
 
     @NotNull
     @Field("tags")
+    @Builder.Default
     private List<String> tagIds = new LinkedList<>();
 
     @NotNull
-    private List<Double> embedding;
+    @Builder.Default
+    private List<Double> embedding = new ArrayList<>();
 
     public void updateTags(List<String> tagIds) {
         this.tagIds = tagIds;

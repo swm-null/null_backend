@@ -30,6 +30,7 @@ public class Tag {
 
     @NotNull
     @Field("memos")
+    @Builder.Default
     private List<String> memoIds = new LinkedList<>();
 
     @Field("parent")
@@ -37,9 +38,11 @@ public class Tag {
 
     @NotNull
     @Field("child")
+    @Builder.Default
     private List<String> childTagIds = new LinkedList<>();
 
     @NotNull
+    @Builder.Default
     private List<Double> embedding;
 
     public void addMemoId(String memoId) {
