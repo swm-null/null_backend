@@ -69,10 +69,10 @@ public class MemoTagController implements MemoTagApiDoc {
     }
 
     @GetMapping("/memos/tags/{tagId}")
-    public ResponseEntity<List<MemoResponse>> getAllMemosByTagId(
+    public ResponseEntity<List<MemoResponse>> getMemosByTagId(
         @PathVariable("tagId") String tagId
     ) {
-        List<MemoResponse> MemoResponses = memoTagService.getAllMemosByTag(tagId);
+        List<MemoResponse> MemoResponses = memoTagService.getMemosByTag(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 }

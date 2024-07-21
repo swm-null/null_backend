@@ -19,7 +19,7 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public List<Tag> getAllTagsById(List<String> tagIds) {
+    public List<Tag> getTagsById(List<String> tagIds) {
         return tagRepository.findAllById(tagIds);
     }
 

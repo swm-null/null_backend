@@ -35,7 +35,7 @@ public class MemoTagService {
         List<MemoResponse> memoResponses = new ArrayList<>();
         List<Memo> memos = memoService.getAllMemos();
         for (Memo memo : memos) {
-            List<Tag> tags = tagService.getAllTagsById(memo.getTagIds());
+            List<Tag> tags = tagService.getTagsById(memo.getTagIds());
             MemoResponse memoResponse = MemoResponse.from(memo, tags);
             memoResponses.add(memoResponse);
         }
@@ -83,14 +83,14 @@ public class MemoTagService {
         AiSearchResponse aiSearchResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content());
         List<Memo> memos;
         switch (aiSearchResponse.type()) {
-            case SIMILARITY -> memos = memoService.getAllMemosByIds(aiSearchResponse.ids());
-            case REGEX -> memos = memoService.getAllMemosContainingRegex(aiSearchResponse.regex());
-            case TAG -> memos = memoService.getAllMemosContainingTagIds(aiSearchResponse.tags());
+            case SIMILARITY -> memos = memoService.getMemosByIds(aiSearchResponse.ids());
+            case REGEX -> memos = memoService.getMemosContainingRegex(aiSearchResponse.regex());
+            case TAG -> memos = memoService.getMemosContainingTagIds(aiSearchResponse.tags());
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
 
         List<List<Tag>> tags = memos.stream()
-            .map(memo -> tagService.getAllTagsById(memo.getTagIds()))
+            .map(memo -> tagService.getTagsById(memo.getTagIds()))
             .toList();
 
         return SearchMemoResponse.from(aiSearchResponse.processedMessage(), memos, tags);
@@ -126,12 +126,12 @@ public class MemoTagService {
         memoService.deleteMemo(memo);
     }
 
-    public List<MemoResponse> getAllMemosByTag(String tagId) {
+    public List<MemoResponse> getMemosByTag(String tagId) {
         Tag tag = tagService.getTagById(tagId);
-        List<Memo> memos = memoService.getAllMemosByIds(tag.getMemoIds());
+        List<Memo> memos = memoService.getMemosByIds(tag.getMemoIds());
         List<MemoResponse> memoResponses = new ArrayList<>();
         for (Memo memo : memos) {
-            List<Tag> tags = tagService.getAllTagsById(memo.getTagIds());
+            List<Tag> tags = tagService.getTagsById(memo.getTagIds());
             MemoResponse memoResponse = MemoResponse.from(memo, tags);
             memoResponses.add(memoResponse);
         }

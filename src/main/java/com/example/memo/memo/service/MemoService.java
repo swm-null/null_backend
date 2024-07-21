@@ -28,22 +28,22 @@ public class MemoService {
             .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));
     }
 
-    public List<Memo> getAllMemosByIds(List<String> memoIds) {
+    public List<Memo> getMemosByIds(List<String> memoIds) {
         return memoIds.stream()
             .map(this::getMemoById)
             .toList();
     }
 
-    public List<Memo> getAllMemosContainingRegex(String regex) {
-        List<Memo> memos = memoRepository.findAllByContentRegex(regex);
+    public List<Memo> getMemosContainingRegex(String regex) {
+        List<Memo> memos = memoRepository.findByContentRegex(regex);
         if (memos.isEmpty()) {
             throw new MemoNotFoundException("존재하지 않는 메모 regex 입니다.");
         }
         return memos;
     }
 
-    public List<Memo> getAllMemosContainingTagIds(List<String> tagIds) {
-        List<Memo> memos = memoRepository.findAllByTagIdsIn(tagIds);
+    public List<Memo> getMemosContainingTagIds(List<String> tagIds) {
+        List<Memo> memos = memoRepository.findByTagIdsIn(tagIds);
         if (memos.isEmpty()) {
             throw new MemoNotFoundException("존재하지 않는 태그 id 입니다.");
         }
