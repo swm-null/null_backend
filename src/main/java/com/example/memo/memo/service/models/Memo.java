@@ -1,5 +1,6 @@
 package com.example.memo.memo.service.models;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -29,7 +30,7 @@ public class Memo {
 
     @NotNull
     @Field("tags")
-    private List<String> tagIds;
+    private List<String> tagIds = new LinkedList<>();
 
     @NotNull
     private List<Double> embedding;

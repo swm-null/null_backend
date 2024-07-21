@@ -14,12 +14,12 @@ import com.example.memo.memo.service.client.models.AiSearchRequest;
 import com.example.memo.memo.service.client.models.AiSearchResponse;
 
 @Service
-public class AiMemoClient {
+public class AiMemoTagClient {
 
     private final RestTemplate restTemplate;
     private final String aiUrl;
 
-    public AiMemoClient(
+    public AiMemoTagClient(
         RestTemplate restTemplate,
         @Value("${spring.ai.url}") String aiUrl
     ) {

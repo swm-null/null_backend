@@ -1,5 +1,6 @@
 package com.example.memo.memo.service.models;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -29,14 +30,14 @@ public class Tag {
 
     @NotNull
     @Field("memos")
-    private List<String> memoIds;
+    private List<String> memoIds = new LinkedList<>();
 
     @Field("parent")
     private String parentId;
 
     @NotNull
     @Field("child")
-    private List<String> childIds;
+    private List<String> childIds = new LinkedList<>();
 
     @NotNull
     private List<Double> embedding;
@@ -47,5 +48,13 @@ public class Tag {
 
     public void deleteMemoId(String memoId) {
         memoIds.remove(memoId);
+    }
+
+    public void addChildId(String childId) {
+        childIds.add(childId);
+    }
+
+    public void deleteChildId(String childId) {
+        childIds.remove(childId);
     }
 }

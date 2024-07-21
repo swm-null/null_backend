@@ -14,8 +14,10 @@ public record AiCreateResponse(
 ) {
 
     public record InnerTag(
+        String id,
         String name,
-        List<Double> embedding
+        List<Double> embedding,
+        String parent
     ) {
 
     }

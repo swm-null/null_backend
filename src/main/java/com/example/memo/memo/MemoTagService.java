@@ -14,7 +14,7 @@ import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 import com.example.memo.memo.service.MemoService;
 import com.example.memo.memo.service.TagService;
-import com.example.memo.memo.service.client.AiMemoClient;
+import com.example.memo.memo.service.client.AiMemoTagClient;
 import com.example.memo.memo.service.client.models.AiCreateResponse;
 import com.example.memo.memo.service.client.models.AiSearchResponse;
 import com.example.memo.memo.service.exception.MemoNotFoundException;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemoTagService {
 
-    private final AiMemoClient aiMemoClient;
+    private final AiMemoTagClient aiMemoTagClient;
     private final MemoService memoService;
     private final TagService tagService;
 
@@ -43,7 +43,7 @@ public class MemoTagService {
     }
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
-        AiCreateResponse aiCreateResponse = aiMemoClient.createMemo(createMemoRequest.content());
+        AiCreateResponse aiCreateResponse = aiMemoTagClient.createMemo(createMemoRequest.content());
 
         Memo memo = createMemoRequest.toMemo(aiCreateResponse.memoEmbeddings());
         Memo savedMemo = memoService.saveMemo(memo);
@@ -62,11 +62,15 @@ public class MemoTagService {
         List<String> tagIds = new ArrayList<>(aiCreateResponse.existingTagIds());
         for (AiCreateResponse.InnerTag tag : aiCreateResponse.newTags()) {
             Tag newTag = Tag.builder()
+                .id(tag.id())
                 .name(tag.name())
                 .memoIds(List.of(savedMemo.getId()))
                 .embedding(tag.embedding())
+                .parentId(tag.parent())
                 .build();
             Tag savedTag = tagService.saveTag(newTag);
+            parentTagUpdate(tag.parent(), savedTag.getId());
+
             tagIds.add(savedTag.getId());
             tags.add(savedTag);
         }
@@ -76,12 +80,12 @@ public class MemoTagService {
     }
 
     public SearchMemoResponse searchMemo(SearchMemoRequest searchMemoRequest) {
-        AiSearchResponse aiSearchResponse = aiMemoClient.searchMemo(searchMemoRequest.content());
+        AiSearchResponse aiSearchResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content());
         List<Memo> memos;
         switch (aiSearchResponse.type()) {
             case "similarity" -> memos = memoService.getAllMemosByIds(aiSearchResponse.ids());
             case "regex" -> memos = memoService.getAllMemosContainingRegex(aiSearchResponse.regex());
-            case "tag" -> memos = memoService.getAllMemosContainingTagIds(aiSearchResponse.tagIds());
+            case "tag" -> memos = memoService.getAllMemosContainingTagIds(aiSearchResponse.tags());
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
 
@@ -93,7 +97,7 @@ public class MemoTagService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
-        AiCreateResponse aiCreateResponse = aiMemoClient.createMemo(updateMemoRequest.content());
+        AiCreateResponse aiCreateResponse = aiMemoTagClient.createMemo(updateMemoRequest.content());
 
         Memo memo = memoService.getMemoById(memoId);
         memo.update(updateMemoRequest.content(), aiCreateResponse.memoEmbeddings());
@@ -113,11 +117,30 @@ public class MemoTagService {
             Tag tag = tagService.getTagById(tagId);
             tag.deleteMemoId(memoId);
             if (tag.getMemoIds().isEmpty()) {
+                checkParentTag(tag);
                 tagService.deleteTag(tag);
             } else {
                 tagService.saveTag(tag);
             }
         }
         memoService.deleteMemo(memo);
+    }
+
+    private void checkParentTag(Tag tag) {
+        if(tag.getParentId() != null) {
+            Tag parentTag = tagService.getTagById(tag.getParentId());
+            parentTag.deleteChildId(tag.getId());
+            if (parentTag.getChildIds().isEmpty()){
+                tagService.deleteTag(parentTag);
+            } else {
+                tagService.saveTag(tag);
+            }
+        }
+    }
+
+    private void parentTagUpdate(String parentId, String childId) {
+        Tag parentTag = tagService.getTagById(parentId);
+        parentTag.addChildId(childId);
+        tagService.saveTag(parentTag);
     }
 }

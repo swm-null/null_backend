@@ -1,10 +1,15 @@
 spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
   ai:
-    url: https://ai-memo.com
+    url: ${AI_URL}
 
 swagger:
-  server-url: http://localhost:8080
+  server-url: ${SWAGGER_SERVER_URL}
 
 cors:
   allowedOrigins:
-    - http://localhost:3000
+    - ${SWAGGER_SERVER_URL}
+    - ${ALLOWED_ORIGINS_DEVELOP}
+    - ${ALLOWED_ORIGINS_LOCAL:http://localhost:3000}

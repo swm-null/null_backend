@@ -12,7 +12,7 @@ public record AiSearchResponse(
     String processedMessage,
     List<String> ids,
     String regex,
-    List<String> tagIds
+    List<String> tags
 ) {
 
 }

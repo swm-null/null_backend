@@ -74,9 +74,9 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "메모 수정")
-    @PutMapping("/memos/{id}")
+    @PutMapping("/memos/{memoId}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("id") String memoId,
+        @PathVariable("memoId") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     );
 
@@ -89,8 +89,8 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "메모 삭제")
-    @DeleteMapping("/memos/{id}")
+    @DeleteMapping("/memos/{memoId}")
     ResponseEntity<Void> deleteMemo(
-        @PathVariable("id") String memoId
+        @PathVariable("memoId") String memoId
     );
 }

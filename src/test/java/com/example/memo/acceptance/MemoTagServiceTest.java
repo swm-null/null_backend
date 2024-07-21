@@ -4,15 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -24,27 +22,27 @@ import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
-import com.example.memo.memo.service.MemoRepository;
-import com.example.memo.memo.service.TagRepository;
-import com.example.memo.memo.service.client.AiMemoClient;
+import com.example.memo.memo.service.MemoService;
+import com.example.memo.memo.service.TagService;
+import com.example.memo.memo.service.client.AiMemoTagClient;
 import com.example.memo.memo.service.client.models.AiCreateResponse;
 import com.example.memo.memo.service.client.models.AiCreateResponse.InnerTag;
 import com.example.memo.memo.service.client.models.AiSearchResponse;
 import com.example.memo.memo.service.models.Memo;
 import com.example.memo.memo.service.models.Tag;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ExtendWith(SpringExtension.class)
 public class MemoTagServiceTest {
 
-    @Mock
-    private MemoRepository memoRepository;
+    @MockBean
+    private MemoService memoService;
 
-    @Mock
-    private TagRepository tagRepository;
+    @MockBean
+    private TagService tagService;
 
-    @Mock
-    private AiMemoClient aiMemoClient;
+    @MockBean
+    private AiMemoTagClient aiMemoTagClient;
 
     @SpyBean
     private MemoTagService memoTagService;
@@ -54,8 +52,6 @@ public class MemoTagServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         memo = Memo.builder()
             .id("메모1")
             .content("내일 일정 : 5시 멘토링")
@@ -74,8 +70,8 @@ public class MemoTagServiceTest {
     @Test
     @DisplayName("모든 메모를 불러온다.")
     void getAllMemos() {
-        doReturn(List.of(memo)).when(memoRepository).findAll();
-        doReturn(List.of(tag)).when(tagRepository).findAllById(memo.getTagIds());
+        doReturn(List.of(memo)).when(memoService).getAllMemos();
+        doReturn(List.of(tag)).when(tagService).getAllTagsById(memo.getTagIds());
 
         List<MemoResponse> responses = memoTagService.getAllMemos();
 
@@ -92,7 +88,7 @@ public class MemoTagServiceTest {
         AiCreateResponse aiResponse = new AiCreateResponse(
             List.of(0.1, 0.2, 0.3),
             List.of("existingTagId"),
-            List.of(new InnerTag("newTag", List.of(0.1, 0.2)))
+            List.of(new InnerTag("메모id", "newTag", List.of(0.1, 0.2), "부모태그"))
         );
 
         Memo savedMemo = Memo.builder()
@@ -116,10 +112,10 @@ public class MemoTagServiceTest {
             .embedding(List.of(0.1, 0.2))
             .build();
 
-        doReturn(aiResponse).when(aiMemoClient).createMemo("content");
-        doReturn(savedMemo).when(memoRepository).save(any(Memo.class));
-        doReturn(Optional.of(existingTag)).when(tagRepository).findById("existingTagId");
-        doReturn(newTag).when(tagRepository).save(any(Tag.class));
+        doReturn(aiResponse).when(aiMemoTagClient).createMemo("content");
+        doReturn(savedMemo).when(memoService).saveMemo(any(Memo.class));
+        doReturn(existingTag).when(tagService).getTagById("existingTagId");
+        doReturn(newTag).when(tagService).saveTag(any(Tag.class));
 
         CreateMemoResponse response = memoTagService.createMemo(request);
 
@@ -141,9 +137,9 @@ public class MemoTagServiceTest {
 
         SearchMemoRequest request = new SearchMemoRequest("content");
 
-        doReturn(aiResponse).when(aiMemoClient).searchMemo("content");
-        doReturn(Optional.of(memo)).when(memoRepository).findById("1");
-        doReturn(List.of(tag)).when(tagRepository).findAllById(List.of("tag1"));
+        doReturn(aiResponse).when(aiMemoTagClient).searchMemo("content");
+        doReturn(memo).when(memoService).getMemoById("1");
+        doReturn(List.of(tag)).when(tagService).getAllTagsById(List.of("tag1"));
 
         SearchMemoResponse response = memoTagService.searchMemo(request);
 
@@ -159,7 +155,7 @@ public class MemoTagServiceTest {
         AiCreateResponse aiResponse = new AiCreateResponse(
             List.of(0.1, 0.2, 0.3),
             List.of(),
-            List.of(new InnerTag("updatedTag", List.of(0.1, 0.2)))
+            List.of(new InnerTag("메모id", "updatedTag", List.of(0.1, 0.2), "부모태그"))
         );
 
         Memo updatedMemo = Memo.builder()
@@ -176,10 +172,10 @@ public class MemoTagServiceTest {
             .embedding(List.of(0.1, 0.2))
             .build();
 
-        doReturn(Optional.of(memo)).when(memoRepository).findById("메모1");
-        doReturn(aiResponse).when(aiMemoClient).createMemo("updated content");
-        doReturn(updatedMemo).when(memoRepository).save(any(Memo.class));
-        doReturn(updatedTag).when(tagRepository).save(any(Tag.class));
+        doReturn(memo).when(memoService).getMemoById("메모1");
+        doReturn(aiResponse).when(aiMemoTagClient).createMemo("updated content");
+        doReturn(updatedMemo).when(memoService).saveMemo(any(Memo.class));
+        doReturn(updatedTag).when(tagService).saveTag(any(Tag.class));
 
         UpdateMemoResponse response = memoTagService.updateMemo("메모1", request);
 
@@ -191,12 +187,13 @@ public class MemoTagServiceTest {
     @Test
     @DisplayName("메모를 삭제한다.")
     void testDeleteMemo() {
-        doReturn(Optional.of(memo)).when(memoRepository).findById("메모1");
-        doReturn(Optional.of(tag)).when(tagRepository).findById("태그1");
+        doReturn(memo).when(memoService).getMemoById("메모1");
+        doReturn(tag).when(tagService).getTagById("태그1");
 
         memoTagService.deleteMemo("메모1");
 
-        verify(memoRepository, times(1)).delete(memo);
-        verify(tagRepository, times(1)).delete(tag);
+        verify(memoService, times(1)).deleteMemo(memo);
+        verify(tagService, times(1)).saveTag(tag);
+        verify(tagService, times(1)).deleteTag(tag);
     }
 }
