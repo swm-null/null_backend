@@ -31,8 +31,8 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos")
     public ResponseEntity<List<MemoResponse>> getAllMemos() {
-        List<MemoResponse> MemoResponseList = memoTagService.getAllMemos();
-        return ResponseEntity.status(HttpStatus.OK).body(MemoResponseList);
+        List<MemoResponse> MemoResponses = memoTagService.getAllMemos();
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 
     @PostMapping("/memos")
@@ -66,5 +66,13 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         memoTagService.deleteMemo(memoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/memos/tags/{tagId}")
+    public ResponseEntity<List<MemoResponse>> getAllMemosByTagId(
+        @PathVariable("tagId") String tagId
+    ) {
+        List<MemoResponse> MemoResponses = memoTagService.getAllMemosByTag(tagId);
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 }

@@ -3,7 +3,6 @@ package com.example.memo.memo;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -88,9 +87,9 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 삭제")
-    @DeleteMapping("/memos/{memoId}")
-    ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId
+    @Operation(summary = "특정 태그의 메모 검색")
+    @GetMapping("/memos/tags/{tagId}")
+    ResponseEntity<List<MemoResponse>> getAllMemosByTagId(
+        @PathVariable String tagId
     );
 }

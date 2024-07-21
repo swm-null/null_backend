@@ -126,11 +126,23 @@ public class MemoTagService {
         memoService.deleteMemo(memo);
     }
 
+    public List<MemoResponse> getAllMemosByTag(String tagId) {
+        Tag tag = tagService.getTagById(tagId);
+        List<Memo> memos = memoService.getAllMemosByIds(tag.getMemoIds());
+        List<MemoResponse> memoResponses = new ArrayList<>();
+        for (Memo memo : memos) {
+            List<Tag> tags = tagService.getAllTagsById(memo.getTagIds());
+            MemoResponse memoResponse = MemoResponse.from(memo, tags);
+            memoResponses.add(memoResponse);
+        }
+        return memoResponses;
+    }
+
     private void checkParentTag(Tag tag) {
-        if(tag.getParentId() != null) {
+        if (tag.getParentId() != null) {
             Tag parentTag = tagService.getTagById(tag.getParentId());
             parentTag.deleteChildId(tag.getId());
-            if (parentTag.getChildIds().isEmpty()){
+            if (parentTag.getChildIds().isEmpty()) {
                 tagService.deleteTag(parentTag);
             } else {
                 tagService.saveTag(tag);
