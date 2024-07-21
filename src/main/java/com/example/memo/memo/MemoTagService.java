@@ -66,7 +66,7 @@ public class MemoTagService {
                 .name(tag.name())
                 .memoIds(List.of(savedMemo.getId()))
                 .embedding(tag.embedding())
-                .parentId(tag.parent())
+                .parentTagId(tag.parent())
                 .build();
             Tag savedTag = tagService.saveTag(newTag);
             parentTagUpdate(tag.parent(), savedTag.getId());
@@ -83,9 +83,9 @@ public class MemoTagService {
         AiSearchResponse aiSearchResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content());
         List<Memo> memos;
         switch (aiSearchResponse.type()) {
-            case "similarity" -> memos = memoService.getAllMemosByIds(aiSearchResponse.ids());
-            case "regex" -> memos = memoService.getAllMemosContainingRegex(aiSearchResponse.regex());
-            case "tag" -> memos = memoService.getAllMemosContainingTagIds(aiSearchResponse.tags());
+            case SIMILARITY -> memos = memoService.getAllMemosByIds(aiSearchResponse.ids());
+            case REGEX -> memos = memoService.getAllMemosContainingRegex(aiSearchResponse.regex());
+            case TAG -> memos = memoService.getAllMemosContainingTagIds(aiSearchResponse.tags());
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
 
@@ -139,10 +139,10 @@ public class MemoTagService {
     }
 
     private void checkParentTag(Tag tag) {
-        if (tag.getParentId() != null) {
-            Tag parentTag = tagService.getTagById(tag.getParentId());
-            parentTag.deleteChildId(tag.getId());
-            if (parentTag.getChildIds().isEmpty()) {
+        if (tag.getParentTagId() != null) {
+            Tag parentTag = tagService.getTagById(tag.getParentTagId());
+            parentTag.deleteChildTagId(tag.getId());
+            if (parentTag.getChildTagIds().isEmpty()) {
                 tagService.deleteTag(parentTag);
             } else {
                 tagService.saveTag(tag);
@@ -150,9 +150,9 @@ public class MemoTagService {
         }
     }
 
-    private void parentTagUpdate(String parentId, String childId) {
-        Tag parentTag = tagService.getTagById(parentId);
-        parentTag.addChildId(childId);
+    private void parentTagUpdate(String parentTagId, String childTagId) {
+        Tag parentTag = tagService.getTagById(parentTagId);
+        parentTag.addChildTagId(childTagId);
         tagService.saveTag(parentTag);
     }
 }

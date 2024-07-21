@@ -33,11 +33,11 @@ public class Tag {
     private List<String> memoIds = new LinkedList<>();
 
     @Field("parent")
-    private String parentId;
+    private String parentTagId;
 
     @NotNull
     @Field("child")
-    private List<String> childIds = new LinkedList<>();
+    private List<String> childTagIds = new LinkedList<>();
 
     @NotNull
     private List<Double> embedding;
@@ -50,11 +50,11 @@ public class Tag {
         memoIds.remove(memoId);
     }
 
-    public void addChildId(String childId) {
-        childIds.add(childId);
+    public void addChildTagId(String childTagId) {
+        childTagIds.add(childTagId);
     }
 
-    public void deleteChildId(String childId) {
-        childIds.remove(childId);
+    public void deleteChildTagId(String childTagId) {
+        childTagIds.remove(childTagId);
     }
 }
