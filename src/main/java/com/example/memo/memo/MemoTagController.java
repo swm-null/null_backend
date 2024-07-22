@@ -17,6 +17,7 @@ import com.example.memo.memo.models.CreateMemoResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
+import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 
@@ -32,6 +33,14 @@ public class MemoTagController implements MemoTagApiDoc {
     @GetMapping("/memos")
     public ResponseEntity<List<MemoResponse>> getAllMemos() {
         List<MemoResponse> MemoResponses = memoTagService.getAllMemos();
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
+    }
+
+    @GetMapping("/memos/tags/{tagId}")
+    public ResponseEntity<List<MemoResponse>> getMemosByTagId(
+        @PathVariable("tagId") String tagId
+    ) {
+        List<MemoResponse> MemoResponses = memoTagService.getMemosByTag(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 
@@ -68,11 +77,9 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/memos/tags/{tagId}")
-    public ResponseEntity<List<MemoResponse>> getMemosByTagId(
-        @PathVariable("tagId") String tagId
-    ) {
-        List<MemoResponse> MemoResponses = memoTagService.getMemosByTag(tagId);
-        return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
+    @GetMapping("/tags")
+    public ResponseEntity<List<TagResponse>> getAllTags() {
+        List<TagResponse> TagResponses = memoTagService.getAllTags();
+        return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
     }
 }

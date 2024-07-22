@@ -15,6 +15,7 @@ import com.example.memo.memo.models.CreateMemoResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
+import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 
@@ -37,6 +38,20 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 전체 조회")
     @GetMapping("/memos")
     ResponseEntity<List<MemoResponse>> getAllMemos();
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "204"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "특정 태그의 메모 검색")
+    @GetMapping("/memos/tags/{tagId}")
+    ResponseEntity<List<MemoResponse>> getMemosByTagId(
+        @PathVariable String tagId
+    );
 
     @ApiResponses(
         value = {
@@ -96,15 +111,10 @@ public interface MemoTagApiDoc {
 
     @ApiResponses(
         value = {
-            @ApiResponse(responseCode = "204"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "200"),
         }
     )
-    @Operation(summary = "특정 태그의 메모 검색")
-    @GetMapping("/memos/tags/{tagId}")
-    ResponseEntity<List<MemoResponse>> getMemosByTagId(
-        @PathVariable String tagId
-    );
+    @Operation(summary = "태그 전체 조회")
+    @GetMapping("/tags")
+    ResponseEntity<List<TagResponse>> getAllTags();
 }
