@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @Tag(name = "Memo", description = "메모 관리 API")
-public interface MemoApi {
+public interface MemoTagApiDoc {
 
     @ApiResponses(
         value = {
@@ -74,9 +74,9 @@ public interface MemoApi {
         }
     )
     @Operation(summary = "메모 수정")
-    @PutMapping("/memos/{id}")
+    @PutMapping("/memos/{memoId}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("id") String memoId,
+        @PathVariable("memoId") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     );
 
@@ -89,8 +89,22 @@ public interface MemoApi {
         }
     )
     @Operation(summary = "메모 삭제")
-    @DeleteMapping("/memos/{id}")
+    @DeleteMapping("/memos/{memoId}")
     ResponseEntity<Void> deleteMemo(
-        @PathVariable("id") String memoId
+        @PathVariable("memoId") String memoId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "204"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "특정 태그의 메모 검색")
+    @GetMapping("/memos/tags/{tagId}")
+    ResponseEntity<List<MemoResponse>> getMemosByTagId(
+        @PathVariable String tagId
     );
 }

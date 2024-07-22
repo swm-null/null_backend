@@ -19,28 +19,27 @@ import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
-import com.example.memo.memo.service.MemoService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class MemoController implements MemoApi {
+public class MemoTagController implements MemoTagApiDoc {
 
-    private final MemoService memoService;
+    private final MemoTagService memoTagService;
 
     @GetMapping("/memos")
     public ResponseEntity<List<MemoResponse>> getAllMemos() {
-        List<MemoResponse> MemoResponseList = memoService.getAllMemos();
-        return ResponseEntity.status(HttpStatus.OK).body(MemoResponseList);
+        List<MemoResponse> MemoResponses = memoTagService.getAllMemos();
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 
     @PostMapping("/memos")
     public ResponseEntity<CreateMemoResponse> createMemo(
         @RequestBody @Valid CreateMemoRequest createMemoRequest
     ) {
-        CreateMemoResponse createMemoResponse = memoService.createMemo(createMemoRequest);
+        CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
@@ -48,7 +47,7 @@ public class MemoController implements MemoApi {
     public ResponseEntity<SearchMemoResponse> searchMemos(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest
     ) {
-        SearchMemoResponse searchMemoResponse = memoService.searchMemo(searchMemoRequest);
+        SearchMemoResponse searchMemoResponse = memoTagService.searchMemo(searchMemoRequest);
         return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
@@ -57,7 +56,7 @@ public class MemoController implements MemoApi {
         @PathVariable("id") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     ) {
-        UpdateMemoResponse updateMemoResponse = memoService.updateMemo(memoId, updateMemoRequest);
+        UpdateMemoResponse updateMemoResponse = memoTagService.updateMemo(memoId, updateMemoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(updateMemoResponse);
     }
 
@@ -65,7 +64,15 @@ public class MemoController implements MemoApi {
     public ResponseEntity<Void> deleteMemo(
         @PathVariable("id") String memoId
     ) {
-        memoService.deleteMemo(memoId);
+        memoTagService.deleteMemo(memoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/memos/tags/{tagId}")
+    public ResponseEntity<List<MemoResponse>> getMemosByTagId(
+        @PathVariable("tagId") String tagId
+    ) {
+        List<MemoResponse> MemoResponses = memoTagService.getMemosByTag(tagId);
+        return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 }

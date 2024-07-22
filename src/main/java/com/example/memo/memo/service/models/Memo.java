@@ -1,9 +1,12 @@
 package com.example.memo.memo.service.models;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,13 +30,16 @@ public class Memo {
     private String content;
 
     @NotNull
-    private List<String> tags;
+    @Field("tags")
+    @Builder.Default
+    private List<String> tagIds = new LinkedList<>();
 
     @NotNull
-    private List<Double> embedding;
+    @Builder.Default
+    private List<Double> embedding = new ArrayList<>();
 
     public void updateTags(List<String> tagIds) {
-        this.tags = tagIds;
+        this.tagIds = tagIds;
     }
 
     public void update(String content, List<Double> embedding) {

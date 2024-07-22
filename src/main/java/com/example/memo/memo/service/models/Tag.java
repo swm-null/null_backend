@@ -1,9 +1,11 @@
 package com.example.memo.memo.service.models;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,21 +29,35 @@ public class Tag {
     private String name;
 
     @NotNull
-    private List<String> memos;
+    @Field("memos")
+    @Builder.Default
+    private List<String> memoIds = new LinkedList<>();
 
-    private String parent;
+    @Field("parent")
+    private String parentTagId;
 
     @NotNull
-    private List<String> child;
+    @Field("child")
+    @Builder.Default
+    private List<String> childTagIds = new LinkedList<>();
 
     @NotNull
+    @Builder.Default
     private List<Double> embedding;
 
     public void addMemoId(String memoId) {
-        memos.add(memoId);
+        memoIds.add(memoId);
     }
 
     public void deleteMemoId(String memoId) {
-        memos.remove(memoId);
+        memoIds.remove(memoId);
+    }
+
+    public void addChildTagId(String childTagId) {
+        childTagIds.add(childTagId);
+    }
+
+    public void deleteChildTagId(String childTagId) {
+        childTagIds.remove(childTagId);
     }
 }
