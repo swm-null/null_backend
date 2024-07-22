@@ -10,6 +10,7 @@ import com.example.memo.memo.models.CreateMemoResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
+import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
 import com.example.memo.memo.service.MemoService;
@@ -136,6 +137,12 @@ public class MemoTagService {
             memoResponses.add(memoResponse);
         }
         return memoResponses;
+    }
+
+    public List<TagResponse> getAllTags() {
+        return tagService.getAllTags().stream()
+            .map(TagResponse::from)
+            .toList();
     }
 
     private void checkParentTag(Tag tag) {

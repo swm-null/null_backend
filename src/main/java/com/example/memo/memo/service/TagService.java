@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.service.exception.MemoNotFoundException;
 import com.example.memo.memo.service.models.Tag;
 
@@ -17,6 +18,10 @@ public class TagService {
 
     public Tag saveTag(Tag tag) {
         return tagRepository.save(tag);
+    }
+
+    public List<Tag> getAllTags() {
+        return tagRepository.findAll();
     }
 
     public List<Tag> getTagsById(List<String> tagIds) {
