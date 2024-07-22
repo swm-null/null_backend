@@ -1,5 +1,6 @@
 package com.example.memo.memo.service.models;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Tag {
 
     @NotNull
     @Builder.Default
-    private List<Double> embedding;
+    private List<Double> embedding = new ArrayList<>();
 
     public void addMemoId(String memoId) {
         memoIds.add(memoId);
