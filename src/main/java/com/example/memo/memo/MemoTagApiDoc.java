@@ -117,4 +117,15 @@ public interface MemoTagApiDoc {
     @Operation(summary = "태그 전체 조회")
     @GetMapping("/tags")
     ResponseEntity<List<TagResponse>> getAllTags();
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+        }
+    )
+    @Operation(summary = "특정 태그의 자식 태그들 조회")
+    @GetMapping("/tags/{tagId}/childTags")
+    ResponseEntity<List<TagResponse>> getChildTagsByTagId(
+        @PathVariable("tagId") String tagId
+    );
 }
