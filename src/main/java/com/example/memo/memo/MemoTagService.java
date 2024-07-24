@@ -127,7 +127,7 @@ public class MemoTagService {
         memoService.deleteMemo(memo);
     }
 
-    public List<MemoResponse> getMemosByTag(String tagId) {
+    public List<MemoResponse> getMemosByTagId(String tagId) {
         Tag tag = tagService.getTagById(tagId);
         List<Memo> memos = memoService.getMemosByIds(tag.getMemoIds());
         List<MemoResponse> memoResponses = new ArrayList<>();
@@ -141,6 +141,14 @@ public class MemoTagService {
 
     public List<TagResponse> getAllTags() {
         return tagService.getAllTags().stream()
+            .map(TagResponse::from)
+            .toList();
+    }
+
+    public List<TagResponse> getChildTagsById(String tagId) {
+        Tag tag = tagService.getTagById(tagId);
+        List<Tag> childTags = tagService.getTagsById(tag.getChildTagIds());
+        return childTags.stream()
             .map(TagResponse::from)
             .toList();
     }

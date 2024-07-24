@@ -29,9 +29,7 @@ public class MemoService {
     }
 
     public List<Memo> getMemosByIds(List<String> memoIds) {
-        return memoIds.stream()
-            .map(this::getMemoById)
-            .toList();
+        return memoRepository.findAllById(memoIds);
     }
 
     public List<Memo> getMemosContainingRegex(String regex) {

@@ -40,7 +40,7 @@ public class MemoTagController implements MemoTagApiDoc {
     public ResponseEntity<List<MemoResponse>> getMemosByTagId(
         @PathVariable("tagId") String tagId
     ) {
-        List<MemoResponse> MemoResponses = memoTagService.getMemosByTag(tagId);
+        List<MemoResponse> MemoResponses = memoTagService.getMemosByTagId(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
     }
 
@@ -80,6 +80,14 @@ public class MemoTagController implements MemoTagApiDoc {
     @GetMapping("/tags")
     public ResponseEntity<List<TagResponse>> getAllTags() {
         List<TagResponse> TagResponses = memoTagService.getAllTags();
+        return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
+    }
+
+    @GetMapping("/tags/{tagId}/childTags")
+    public ResponseEntity<List<TagResponse>> getChildTagsByTagId(
+        @PathVariable("tagId") String tagId
+    ) {
+        List<TagResponse> TagResponses = memoTagService.getChildTagsById(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
     }
 }
