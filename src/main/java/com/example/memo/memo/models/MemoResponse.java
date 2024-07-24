@@ -20,25 +20,15 @@ public record MemoResponse(
             {"id": "60c72b4f9b1e8b1e4c8b4569", "name": "멘토링"}
         ]
         """)
-    List<InnerTag> tags
+    List<TagResponse> tags
 ) {
-
-    public record InnerTag(
-        @Schema(description = "태그 ID", example = "60c72b3e9b1e8b1e4c8b4568")
-        String id,
-
-        @Schema(description = "태그 이름", example = "일정")
-        String name
-    ) {
-
-    }
 
     public static MemoResponse from(Memo memo, List<Tag> tags) {
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),
             tags.stream()
-                .map(tag -> new MemoResponse.InnerTag(tag.getId(), tag.getName()))
+                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
                 .toList()
         );
     }
