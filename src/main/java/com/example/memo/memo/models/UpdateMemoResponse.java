@@ -15,7 +15,7 @@ public record UpdateMemoResponse(
     @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
     String id,
 
-    @Schema(description = "내용", example = "내일 5시로 멘토링이 변경되었다.")
+    @Schema(description = "내용", example = "내일 10시로 멘토링이 변경됨")
     String content,
 
     @Schema(description = "태그", example = """
@@ -24,25 +24,15 @@ public record UpdateMemoResponse(
             {"id": "60c72b4f9b1e8b1e4c8b4569", "name": "멘토링"}
         ]
         """)
-    List<InnerTag> tags
+    List<TagResponse> tags
 ) {
-
-    public record InnerTag(
-        @Schema(description = "태그 ID", example = "60c72b3e9b1e8b1e4c8b4568")
-        String id,
-
-        @Schema(description = "태그 이름", example = "일정")
-        String name
-    ) {
-
-    }
 
     public static UpdateMemoResponse from(Memo memo, List<Tag> tags) {
         return new UpdateMemoResponse(
             memo.getId(),
             memo.getContent(),
             tags.stream()
-                .map(tag -> new UpdateMemoResponse.InnerTag(tag.getId(), tag.getName()))
+                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
                 .toList()
         );
     }
