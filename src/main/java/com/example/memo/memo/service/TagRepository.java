@@ -8,5 +8,7 @@ import com.example.memo.memo.service.models.Tag;
 
 public interface TagRepository extends MongoRepository<Tag, String> {
 
-    List<Tag> findByDepth(int depth);
+    // List<Tag> findByDepth(int depth);
+
+    List<Tag> findByParentTagIdIsNull();
 }

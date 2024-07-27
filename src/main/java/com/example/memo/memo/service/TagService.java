@@ -27,7 +27,8 @@ public class TagService {
 
 
     public List<Tag> getTagsByDepth(int depth) {
-        return tagRepository.findByDepth(depth);
+        // return tagRepository.findByDepth(depth);
+        return tagRepository.findByParentTagIdIsNull();
     }
 
     public List<Tag> getTagsById(List<String> tagIds) {
