@@ -66,8 +66,9 @@ public class MemoTagService {
                 .id(tag.id())
                 .name(tag.name())
                 .memoIds(List.of(savedMemo.getId()))
-                .embedding(tag.embedding())
+                .depth(tag.depth())
                 .parentTagId(tag.parent())
+                .embedding(tag.embedding())
                 .build();
             Tag savedTag = tagService.saveTag(newTag);
             parentTagUpdate(tag.parent(), savedTag.getId());

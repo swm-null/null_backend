@@ -34,6 +34,10 @@ public class Tag {
     @Builder.Default
     private List<String> memoIds = new LinkedList<>();
 
+    @NotNull
+    @Builder.Default
+    private int depth = 1;
+
     @Field("parent")
     private String parentTagId;
 
