@@ -71,8 +71,9 @@ public class MemoTagService {
                 .embedding(tag.embedding())
                 .build();
             Tag savedTag = tagService.saveTag(newTag);
-            parentTagUpdate(tag.parent(), savedTag.getId());
-
+            if (tag.parent() != null) {
+                parentTagUpdate(tag.parent(), savedTag.getId());
+            }
             tagIds.add(savedTag.getId());
             tags.add(savedTag);
         }
@@ -142,6 +143,12 @@ public class MemoTagService {
 
     public List<TagResponse> getAllTags() {
         return tagService.getAllTags().stream()
+            .map(TagResponse::from)
+            .toList();
+    }
+
+    public List<TagResponse> getTagsByDepth(int depth) {
+        return tagService.getTagsByDepth(depth).stream()
             .map(TagResponse::from)
             .toList();
     }

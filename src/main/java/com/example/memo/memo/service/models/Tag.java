@@ -36,7 +36,7 @@ public class Tag {
 
     @NotNull
     @Builder.Default
-    private int depth = 1;
+    private int depth = 0;
 
     @Field("parent")
     private String parentTagId;
