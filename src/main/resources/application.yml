@@ -11,5 +11,6 @@ swagger:
 cors:
   allowedOrigins:
     - ${SWAGGER_SERVER_URL}
-    - ${ALLOWED_ORIGINS_DEVELOP}
+    - ${ALLOWED_ORIGINS_PRODUCT}
+    - ${ALLOWED_ORIGINS_STAGE}
     - ${ALLOWED_ORIGINS_LOCAL:http://localhost:3000}
