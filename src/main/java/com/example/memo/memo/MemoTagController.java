@@ -83,6 +83,14 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
     }
 
+    @GetMapping("/tags/depth/{depth}")
+    public ResponseEntity<List<TagResponse>> getTagsByDepth(
+        @PathVariable("depth") int depth
+    ) {
+        List<TagResponse> TagResponses = memoTagService.getTagsByDepth(depth);
+        return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
+    }
+
     @GetMapping("/tags/{tagId}/childTags")
     public ResponseEntity<List<TagResponse>> getChildTagsByTagId(
         @PathVariable("tagId") String tagId

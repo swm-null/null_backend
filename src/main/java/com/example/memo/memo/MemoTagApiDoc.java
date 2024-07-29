@@ -121,9 +121,22 @@ public interface MemoTagApiDoc {
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "특정 태그의 자식 태그들 조회")
+    @Operation(summary = "특정 계층의 태그 조회")
+    @GetMapping("/tags/depth/{depth}")
+    ResponseEntity<List<TagResponse>> getTagsByDepth(
+        @PathVariable("depth") int depth
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "특정 태그의 자식 태그 조회")
     @GetMapping("/tags/{tagId}/childTags")
     ResponseEntity<List<TagResponse>> getChildTagsByTagId(
         @PathVariable("tagId") String tagId

@@ -1,5 +1,6 @@
 package com.example.memo.memo.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,6 +23,12 @@ public class TagService {
 
     public List<Tag> getAllTags() {
         return tagRepository.findAll();
+    }
+
+
+    public List<Tag> getTagsByDepth(int depth) {
+        // return tagRepository.findByDepth(depth);
+        return tagRepository.findByParentTagIdIsNull();
     }
 
     public List<Tag> getTagsById(List<String> tagIds) {
