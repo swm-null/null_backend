@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.CreateTagRequest;
+import com.example.memo.memo.models.CreateTagResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
+import com.example.memo.memo.models.UpdateTagRequest;
+import com.example.memo.memo.models.UpdateTagResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -78,6 +82,13 @@ public class MemoTagController implements MemoTagApiDoc {
     }
 
     @GetMapping("/tags")
+    public ResponseEntity<CreateTagResponse> createTag(
+        @RequestBody @Valid CreateTagRequest createTagRequest
+    ) {
+        return null;
+    }
+
+    @GetMapping("/tags")
     public ResponseEntity<List<TagResponse>> getAllTags() {
         List<TagResponse> TagResponses = memoTagService.getAllTags();
         return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
@@ -97,5 +108,20 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         List<TagResponse> TagResponses = memoTagService.getChildTagsById(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
+    }
+
+    @PutMapping("/tags/{tagId}")
+    public ResponseEntity<UpdateTagResponse> updateTag(
+        @PathVariable("tagId") String tagId,
+        @RequestBody @Valid UpdateTagRequest updateTagRequest
+    ) {
+        return null;
+    }
+
+    @DeleteMapping("/tags/{tagId}")
+    public ResponseEntity<Void> deleteTag(
+        @PathVariable("tagId") String tagId
+    ) {
+        return null;
     }
 }

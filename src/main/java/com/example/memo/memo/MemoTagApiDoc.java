@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.CreateTagRequest;
+import com.example.memo.memo.models.CreateTagResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
+import com.example.memo.memo.models.UpdateTagRequest;
+import com.example.memo.memo.models.UpdateTagResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,6 +33,19 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Memo", description = "메모 관리 API")
 public interface MemoTagApiDoc {
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "메모 생성")
+    @PostMapping("/memos")
+    ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest
+    );
 
     @ApiResponses(
         value = {
@@ -55,26 +72,13 @@ public interface MemoTagApiDoc {
 
     @ApiResponses(
         value = {
-            @ApiResponse(responseCode = "201"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "메모 생성")
-    @PostMapping("/memos")
-    ResponseEntity<CreateMemoResponse> createMemo(
-        @RequestBody @Valid CreateMemoRequest createMemoRequest
-    );
-
-    @ApiResponses(
-        value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 검색")
+    @Operation(summary = "AI 메모 검색")
     @PostMapping("/memos/search")
     ResponseEntity<SearchMemoResponse> searchMemos(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest
@@ -85,7 +89,6 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "메모 수정")
@@ -100,13 +103,25 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "204"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "메모 삭제")
     @DeleteMapping("/memos/{memoId}")
     ResponseEntity<Void> deleteMemo(
         @PathVariable("memoId") String memoId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "태그 생성")
+    @PostMapping("/tags")
+    ResponseEntity<CreateTagResponse> createTag(
+        @RequestBody @Valid CreateTagRequest createTagRequest
     );
 
     @ApiResponses(
@@ -122,6 +137,7 @@ public interface MemoTagApiDoc {
         value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "특정 계층의 태그 조회")
@@ -139,6 +155,34 @@ public interface MemoTagApiDoc {
     @Operation(summary = "특정 태그의 자식 태그 조회")
     @GetMapping("/tags/{tagId}/childTags")
     ResponseEntity<List<TagResponse>> getChildTagsByTagId(
+        @PathVariable("tagId") String tagId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "태그 수정")
+    @PutMapping("/tags/{tagId}")
+    ResponseEntity<UpdateTagResponse> updateTag(
+        @PathVariable("tagId") String tagId,
+        @RequestBody @Valid UpdateTagRequest updateTagRequest
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "204"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "태그 삭제")
+    @DeleteMapping("/tags/{tagId}")
+    ResponseEntity<Void> deleteTag(
         @PathVariable("tagId") String tagId
     );
 }
