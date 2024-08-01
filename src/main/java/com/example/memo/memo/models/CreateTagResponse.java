@@ -1,5 +1,7 @@
 package com.example.memo.memo.models;
 
+import com.example.memo.memo.service.models.Tag;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record CreateTagResponse(
@@ -9,4 +11,12 @@ public record CreateTagResponse(
     TagResponse tag
 ) {
 
+    public static CreateTagResponse from(Tag tag) {
+        return new CreateTagResponse(
+            new TagResponse(
+                tag.getId(),
+                tag.getName()
+            )
+        );
+    }
 }

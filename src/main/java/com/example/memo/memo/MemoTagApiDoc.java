@@ -118,9 +118,10 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "태그 생성")
-    @PostMapping("/tags")
+    @Operation(summary = "특정 메모에 태그 생성")
+    @PostMapping("/memos/{memoId}/tags")
     ResponseEntity<CreateTagResponse> createTag(
+        @PathVariable("memoId") String memoId,
         @RequestBody @Valid CreateTagRequest createTagRequest
     );
 

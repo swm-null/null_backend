@@ -8,8 +8,8 @@ import com.example.memo.memo.service.enums.AiSearchType;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AiSearchResponse(
-    AiSearchType type, // "similarity" | "regex" | "tag" | "unspecified"
+public record AiSearchMemoResponse(
+    AiSearchType type, // "similarity" | "regex" | "tag"
     String processedMessage,
     List<String> ids,
     String regex,

@@ -34,6 +34,14 @@ public class MemoTagController implements MemoTagApiDoc {
 
     private final MemoTagService memoTagService;
 
+    @PostMapping("/memos")
+    public ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest
+    ) {
+        CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
+    }
+
     @GetMapping("/memos")
     public ResponseEntity<List<MemoResponse>> getAllMemos() {
         List<MemoResponse> MemoResponses = memoTagService.getAllMemos();
@@ -46,14 +54,6 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         List<MemoResponse> MemoResponses = memoTagService.getMemosByTagId(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
-    }
-
-    @PostMapping("/memos")
-    public ResponseEntity<CreateMemoResponse> createMemo(
-        @RequestBody @Valid CreateMemoRequest createMemoRequest
-    ) {
-        CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
     @PostMapping("/memos/search")
@@ -81,11 +81,13 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/tags")
+    @GetMapping("memos/{memoId}/tags")
     public ResponseEntity<CreateTagResponse> createTag(
+        @PathVariable("memoId") String memoId,
         @RequestBody @Valid CreateTagRequest createTagRequest
     ) {
-        return null;
+        CreateTagResponse createTagResponse = memoTagService.createTag(memoId, createTagRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createTagResponse);
     }
 
     @GetMapping("/tags")
@@ -115,13 +117,15 @@ public class MemoTagController implements MemoTagApiDoc {
         @PathVariable("tagId") String tagId,
         @RequestBody @Valid UpdateTagRequest updateTagRequest
     ) {
-        return null;
+        UpdateTagResponse updateTagResponse = memoTagService.updateTag(updateTagRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updateTagResponse);
     }
 
     @DeleteMapping("/tags/{tagId}")
     public ResponseEntity<Void> deleteTag(
         @PathVariable("tagId") String tagId
     ) {
-        return null;
+        memoTagService.deleteTag();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

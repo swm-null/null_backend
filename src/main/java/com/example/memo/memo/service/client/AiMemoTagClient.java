@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.memo.memo.service.client.models.AiCreateRequest;
-import com.example.memo.memo.service.client.models.AiCreateResponse;
-import com.example.memo.memo.service.client.models.AiSearchRequest;
-import com.example.memo.memo.service.client.models.AiSearchResponse;
+import com.example.memo.memo.service.client.models.AiCreateMemoRequest;
+import com.example.memo.memo.service.client.models.AiCreateMemoResponse;
+import com.example.memo.memo.service.client.models.AiCreateTagRequest;
+import com.example.memo.memo.service.client.models.AiCreateTagResponse;
+import com.example.memo.memo.service.client.models.AiSearchMemoRequest;
+import com.example.memo.memo.service.client.models.AiSearchMemoResponse;
 
 @Service
 public class AiMemoTagClient {
@@ -27,35 +29,51 @@ public class AiMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AiCreateResponse createMemo(String content) {
+    public AiCreateMemoResponse createMemo(String content) {
         final URI uri = UriComponentsBuilder
             .fromUriString(aiUrl)
             .path("/add_memo/")
             .encode()
             .build()
             .toUri();
-        AiCreateRequest aiCreateRequest = new AiCreateRequest(content);
-        ResponseEntity<AiCreateResponse> aiResponse = restTemplate.postForEntity(
+        AiCreateMemoRequest aiCreateMemoRequest = new AiCreateMemoRequest(content);
+        ResponseEntity<AiCreateMemoResponse> aiCreateMemoResponse = restTemplate.postForEntity(
             uri,
-            aiCreateRequest,
-            AiCreateResponse.class
+            aiCreateMemoRequest,
+            AiCreateMemoResponse.class
         );
-        return aiResponse.getBody();
+        return aiCreateMemoResponse.getBody();
     }
 
-    public AiSearchResponse searchMemo(String content) {
+    public AiSearchMemoResponse searchMemo(String content) {
         final URI uri = UriComponentsBuilder
             .fromUriString(aiUrl)
             .path("/search/")
             .encode()
             .build()
             .toUri();
-        AiSearchRequest aiSearchRequest = new AiSearchRequest(content);
-        ResponseEntity<AiSearchResponse> aiResponse = restTemplate.postForEntity(
+        AiSearchMemoRequest aiSearchMemoRequest = new AiSearchMemoRequest(content);
+        ResponseEntity<AiSearchMemoResponse> aiResponse = restTemplate.postForEntity(
             uri,
-            aiSearchRequest,
-            AiSearchResponse.class
+            aiSearchMemoRequest,
+            AiSearchMemoResponse.class
         );
         return aiResponse.getBody();
+    }
+
+    public AiCreateTagResponse createTag(String name) {
+        final URI uri = UriComponentsBuilder
+            .fromUriString(aiUrl)
+            .path("/get_embedding/")
+            .encode()
+            .build()
+            .toUri();
+        AiCreateTagRequest aiCreateTagRequest = new AiCreateTagRequest(name);
+        ResponseEntity<AiCreateTagResponse> aiCreateTagResponse = restTemplate.postForEntity(
+            uri,
+            aiCreateTagRequest,
+            AiCreateTagResponse.class
+        );
+        return aiCreateTagResponse.getBody();
     }
 }
