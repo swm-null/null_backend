@@ -54,15 +54,20 @@ public class Tag {
         memoIds.add(memoId);
     }
 
-    public void deleteMemoId(String memoId) {
-        memoIds.remove(memoId);
-    }
-
     public void addChildTagId(String childTagId) {
         childTagIds.add(childTagId);
     }
 
+    public void deleteMemoId(String memoId) {
+        memoIds.remove(memoId);
+    }
+
     public void deleteChildTagId(String childTagId) {
         childTagIds.remove(childTagId);
+    }
+
+    public void update(String name, List<Double> embedding) {
+        this.name = name;
+        this.embedding = embedding;
     }
 }

@@ -81,7 +81,7 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("memos/{memoId}/tags")
+    @PostMapping("memos/{memoId}/tags")
     public ResponseEntity<CreateTagResponse> createTag(
         @PathVariable("memoId") String memoId,
         @RequestBody @Valid CreateTagRequest createTagRequest
@@ -117,7 +117,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @PathVariable("tagId") String tagId,
         @RequestBody @Valid UpdateTagRequest updateTagRequest
     ) {
-        UpdateTagResponse updateTagResponse = memoTagService.updateTag(updateTagRequest);
+        UpdateTagResponse updateTagResponse = memoTagService.updateTag(tagId, updateTagRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(updateTagResponse);
     }
 
@@ -125,7 +125,7 @@ public class MemoTagController implements MemoTagApiDoc {
     public ResponseEntity<Void> deleteTag(
         @PathVariable("tagId") String tagId
     ) {
-        memoTagService.deleteTag();
+        memoTagService.deleteTag(tagId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

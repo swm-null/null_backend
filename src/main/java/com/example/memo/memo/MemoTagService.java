@@ -22,6 +22,7 @@ import com.example.memo.memo.service.MemoService;
 import com.example.memo.memo.service.TagService;
 import com.example.memo.memo.service.client.AiMemoTagClient;
 import com.example.memo.memo.service.client.models.AiCreateMemoResponse;
+import com.example.memo.memo.service.client.models.AiCreateTagRequest;
 import com.example.memo.memo.service.client.models.AiCreateTagResponse;
 import com.example.memo.memo.service.client.models.AiSearchMemoResponse;
 import com.example.memo.memo.service.exception.MemoNotFoundException;
@@ -181,12 +182,22 @@ public class MemoTagService {
             .toList();
     }
 
-    public UpdateTagResponse updateTag(UpdateTagRequest updateTagRequest) {
-        return null;
+    public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest) {
+        AiCreateTagResponse aiCreateTagResponse = aiMemoTagClient.createTag(updateTagRequest.name());
+        Tag tag = tagService.getTagById(tagId);
+        tag.update(updateTagRequest.name(), aiCreateTagResponse.embedding());
+        Tag updatedTag = tagService.saveTag(tag);
+        return UpdateTagResponse.from(updatedTag);
     }
 
-    public void deleteTag() {
-
+    public void deleteTag(String tagId) {
+        Tag tag = tagService.getTagById(tagId);
+        List<Memo> memos = memoService.getMemosContainingTagIds(List.of(tagId));
+        for(Memo memo : memos) {
+            memo.deleteTagId(tagId);
+            memoService.saveMemo(memo);
+        }
+        tagService.deleteTag(tag);
     }
 
     private void checkParentTag(Tag tag) {
