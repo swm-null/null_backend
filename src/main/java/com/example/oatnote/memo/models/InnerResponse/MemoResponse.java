@@ -14,12 +14,7 @@ public record MemoResponse(
     @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해")
     String content,
 
-    @Schema(description = "태그", example = """
-        [
-            {"id": "60c72b3e9b1e8b1e4c8b4568", "name": "일정"},
-            {"id": "60c72b4f9b1e8b1e4c8b4569", "name": "멘토링"}
-        ]
-        """)
+    @Schema(description = "태그 리스트")
     List<TagResponse> tags
 ) {
 

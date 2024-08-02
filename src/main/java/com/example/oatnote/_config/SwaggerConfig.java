@@ -22,6 +22,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
+            .openapi("3.1.0")
             .info(apiInfo())
             .addServersItem(apiServer());
     }
