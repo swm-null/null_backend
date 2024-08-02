@@ -22,7 +22,6 @@ import com.example.memo.memo.service.MemoService;
 import com.example.memo.memo.service.TagService;
 import com.example.memo.memo.service.client.AiMemoTagClient;
 import com.example.memo.memo.service.client.models.AiCreateMemoResponse;
-import com.example.memo.memo.service.client.models.AiCreateTagRequest;
 import com.example.memo.memo.service.client.models.AiCreateTagResponse;
 import com.example.memo.memo.service.client.models.AiSearchMemoResponse;
 import com.example.memo.memo.service.exception.MemoNotFoundException;
@@ -152,7 +151,7 @@ public class MemoTagService {
         AiCreateTagResponse aiCreateTagResponse = aiMemoTagClient.createTag(createTagRequest.name());
 
         Memo memo = memoService.getMemoById(memoId);
-        Tag tag = createTagRequest.toMemo(aiCreateTagResponse.embedding(), memoId);
+        Tag tag = createTagRequest.toTag(aiCreateTagResponse.embedding(), memoId);
         Tag savedTag = tagService.saveTag(tag);
 
         List<String> tagIds = new LinkedList<>(memo.getTagIds());
@@ -193,7 +192,7 @@ public class MemoTagService {
     public void deleteTag(String tagId) {
         Tag tag = tagService.getTagById(tagId);
         List<Memo> memos = memoService.getMemosContainingTagIds(List.of(tagId));
-        for(Memo memo : memos) {
+        for (Memo memo : memos) {
             memo.deleteTagId(tagId);
             memoService.saveMemo(memo);
         }

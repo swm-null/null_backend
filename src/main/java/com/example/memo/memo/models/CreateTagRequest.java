@@ -12,7 +12,7 @@ public record CreateTagRequest(
     String name
 ) {
 
-    public Tag toMemo(List<Double> embedding, String memoId) {
+    public Tag toTag(List<Double> embedding, String memoId) {
         return Tag.builder()
             .name(name)
             .embedding(embedding)

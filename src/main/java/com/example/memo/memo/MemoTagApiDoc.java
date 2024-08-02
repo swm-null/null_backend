@@ -89,6 +89,7 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "메모 수정")
