@@ -7,7 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AiCreateResponse(
+public record AiCreateMemoResponse(
     List<Double> memoEmbeddings,
     List<String> existingTagIds,
     List<InnerTag> newTags

@@ -46,4 +46,8 @@ public class Memo {
         this.content = content;
         this.embedding = embedding;
     }
+
+    public void deleteTagId(String tagId) {
+        tagIds.remove(tagId);
+    }
 }

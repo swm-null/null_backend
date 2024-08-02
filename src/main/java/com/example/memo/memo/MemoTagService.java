@@ -1,23 +1,29 @@
 package com.example.memo.memo;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.CreateTagRequest;
+import com.example.memo.memo.models.CreateTagResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
+import com.example.memo.memo.models.UpdateTagRequest;
+import com.example.memo.memo.models.UpdateTagResponse;
 import com.example.memo.memo.service.MemoService;
 import com.example.memo.memo.service.TagService;
 import com.example.memo.memo.service.client.AiMemoTagClient;
-import com.example.memo.memo.service.client.models.AiCreateResponse;
-import com.example.memo.memo.service.client.models.AiSearchResponse;
+import com.example.memo.memo.service.client.models.AiCreateMemoResponse;
+import com.example.memo.memo.service.client.models.AiCreateTagResponse;
+import com.example.memo.memo.service.client.models.AiSearchMemoResponse;
 import com.example.memo.memo.service.exception.MemoNotFoundException;
 import com.example.memo.memo.service.models.Memo;
 import com.example.memo.memo.service.models.Tag;
@@ -32,27 +38,16 @@ public class MemoTagService {
     private final MemoService memoService;
     private final TagService tagService;
 
-    public List<MemoResponse> getAllMemos() {
-        List<MemoResponse> memoResponses = new ArrayList<>();
-        List<Memo> memos = memoService.getAllMemos();
-        for (Memo memo : memos) {
-            List<Tag> tags = tagService.getTagsById(memo.getTagIds());
-            MemoResponse memoResponse = MemoResponse.from(memo, tags);
-            memoResponses.add(memoResponse);
-        }
-        return memoResponses;
-    }
-
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
-        AiCreateResponse aiCreateResponse = aiMemoTagClient.createMemo(createMemoRequest.content());
+        AiCreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemo(createMemoRequest.content());
 
-        Memo memo = createMemoRequest.toMemo(aiCreateResponse.memoEmbeddings());
+        Memo memo = createMemoRequest.toMemo(aiCreateMemoResponse.memoEmbeddings());
         Memo savedMemo = memoService.saveMemo(memo);
 
         List<Tag> tags = new ArrayList<>();
 
         // 이미 존재하는 태그들 : 필드에 메모 id 추가
-        for (String tagId : aiCreateResponse.existingTagIds()) {
+        for (String tagId : aiCreateMemoResponse.existingTagIds()) {
             Tag existingTag = tagService.getTagById(tagId);
             existingTag.addMemoId(savedMemo.getId());
             Tag savedTag = tagService.saveTag(existingTag);
@@ -60,8 +55,8 @@ public class MemoTagService {
         }
 
         // 새로운 태그들 : 필드에 메모 id 추가, 메모에 tag ids 추가
-        List<String> tagIds = new ArrayList<>(aiCreateResponse.existingTagIds());
-        for (AiCreateResponse.InnerTag tag : aiCreateResponse.newTags()) {
+        List<String> tagIds = new ArrayList<>(aiCreateMemoResponse.existingTagIds());
+        for (AiCreateMemoResponse.InnerTag tag : aiCreateMemoResponse.newTags()) {
             Tag newTag = Tag.builder()
                 .id(tag.id())
                 .name(tag.name())
@@ -82,13 +77,36 @@ public class MemoTagService {
         return CreateMemoResponse.from(savedMemo, tags);
     }
 
+    public List<MemoResponse> getAllMemos() {
+        List<MemoResponse> memoResponses = new ArrayList<>();
+        List<Memo> memos = memoService.getAllMemos();
+        for (Memo memo : memos) {
+            List<Tag> tags = tagService.getTagsById(memo.getTagIds());
+            MemoResponse memoResponse = MemoResponse.from(memo, tags);
+            memoResponses.add(memoResponse);
+        }
+        return memoResponses;
+    }
+
+    public List<MemoResponse> getMemosByTagId(String tagId) {
+        Tag tag = tagService.getTagById(tagId);
+        List<Memo> memos = memoService.getMemosByIds(tag.getMemoIds());
+        List<MemoResponse> memoResponses = new ArrayList<>();
+        for (Memo memo : memos) {
+            List<Tag> tags = tagService.getTagsById(memo.getTagIds());
+            MemoResponse memoResponse = MemoResponse.from(memo, tags);
+            memoResponses.add(memoResponse);
+        }
+        return memoResponses;
+    }
+
     public SearchMemoResponse searchMemo(SearchMemoRequest searchMemoRequest) {
-        AiSearchResponse aiSearchResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content());
+        AiSearchMemoResponse aiSearchMemoResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content());
         List<Memo> memos;
-        switch (aiSearchResponse.type()) {
-            case SIMILARITY -> memos = memoService.getMemosByIds(aiSearchResponse.ids());
-            case REGEX -> memos = memoService.getMemosContainingRegex(aiSearchResponse.regex());
-            case TAG -> memos = memoService.getMemosContainingTagIds(aiSearchResponse.tags());
+        switch (aiSearchMemoResponse.type()) {
+            case SIMILARITY -> memos = memoService.getMemosByIds(aiSearchMemoResponse.ids());
+            case REGEX -> memos = memoService.getMemosContainingRegex(aiSearchMemoResponse.regex());
+            case TAG -> memos = memoService.getMemosContainingTagIds(aiSearchMemoResponse.tags());
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
 
@@ -96,14 +114,14 @@ public class MemoTagService {
             .map(memo -> tagService.getTagsById(memo.getTagIds()))
             .toList();
 
-        return SearchMemoResponse.from(aiSearchResponse.processedMessage(), memos, tags);
+        return SearchMemoResponse.from(aiSearchMemoResponse.processedMessage(), memos, tags);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
-        AiCreateResponse aiCreateResponse = aiMemoTagClient.createMemo(updateMemoRequest.content());
+        AiCreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemo(updateMemoRequest.content());
 
         Memo memo = memoService.getMemoById(memoId);
-        memo.update(updateMemoRequest.content(), aiCreateResponse.memoEmbeddings());
+        memo.update(updateMemoRequest.content(), aiCreateMemoResponse.memoEmbeddings());
         Memo updatedMemo = memoService.saveMemo(memo);
 
         List<Tag> tags = updatedMemo.getTagIds().stream()
@@ -129,16 +147,18 @@ public class MemoTagService {
         memoService.deleteMemo(memo);
     }
 
-    public List<MemoResponse> getMemosByTagId(String tagId) {
-        Tag tag = tagService.getTagById(tagId);
-        List<Memo> memos = memoService.getMemosByIds(tag.getMemoIds());
-        List<MemoResponse> memoResponses = new ArrayList<>();
-        for (Memo memo : memos) {
-            List<Tag> tags = tagService.getTagsById(memo.getTagIds());
-            MemoResponse memoResponse = MemoResponse.from(memo, tags);
-            memoResponses.add(memoResponse);
-        }
-        return memoResponses;
+    public CreateTagResponse createTag(String memoId, CreateTagRequest createTagRequest) {
+        AiCreateTagResponse aiCreateTagResponse = aiMemoTagClient.createTag(createTagRequest.name());
+
+        Memo memo = memoService.getMemoById(memoId);
+        Tag tag = createTagRequest.toTag(aiCreateTagResponse.embedding(), memoId);
+        Tag savedTag = tagService.saveTag(tag);
+
+        List<String> tagIds = new LinkedList<>(memo.getTagIds());
+        tagIds.add(savedTag.getId());
+        memo.updateTags(tagIds);
+        memoService.saveMemo(memo);
+        return CreateTagResponse.from(savedTag);
     }
 
     public List<TagResponse> getAllTags() {
@@ -159,6 +179,24 @@ public class MemoTagService {
         return childTags.stream()
             .map(TagResponse::from)
             .toList();
+    }
+
+    public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest) {
+        AiCreateTagResponse aiCreateTagResponse = aiMemoTagClient.createTag(updateTagRequest.name());
+        Tag tag = tagService.getTagById(tagId);
+        tag.update(updateTagRequest.name(), aiCreateTagResponse.embedding());
+        Tag updatedTag = tagService.saveTag(tag);
+        return UpdateTagResponse.from(updatedTag);
+    }
+
+    public void deleteTag(String tagId) {
+        Tag tag = tagService.getTagById(tagId);
+        List<Memo> memos = memoService.getMemosContainingTagIds(List.of(tagId));
+        for (Memo memo : memos) {
+            memo.deleteTagId(tagId);
+            memoService.saveMemo(memo);
+        }
+        tagService.deleteTag(tag);
     }
 
     private void checkParentTag(Tag tag) {

@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.memo.memo.models.CreateMemoRequest;
 import com.example.memo.memo.models.CreateMemoResponse;
+import com.example.memo.memo.models.CreateTagRequest;
+import com.example.memo.memo.models.CreateTagResponse;
 import com.example.memo.memo.models.MemoResponse;
 import com.example.memo.memo.models.SearchMemoRequest;
 import com.example.memo.memo.models.SearchMemoResponse;
 import com.example.memo.memo.models.TagResponse;
 import com.example.memo.memo.models.UpdateMemoRequest;
 import com.example.memo.memo.models.UpdateMemoResponse;
+import com.example.memo.memo.models.UpdateTagRequest;
+import com.example.memo.memo.models.UpdateTagResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,14 @@ import lombok.RequiredArgsConstructor;
 public class MemoTagController implements MemoTagApiDoc {
 
     private final MemoTagService memoTagService;
+
+    @PostMapping("/memos")
+    public ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest
+    ) {
+        CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
+    }
 
     @GetMapping("/memos")
     public ResponseEntity<List<MemoResponse>> getAllMemos() {
@@ -42,14 +54,6 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         List<MemoResponse> MemoResponses = memoTagService.getMemosByTagId(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(MemoResponses);
-    }
-
-    @PostMapping("/memos")
-    public ResponseEntity<CreateMemoResponse> createMemo(
-        @RequestBody @Valid CreateMemoRequest createMemoRequest
-    ) {
-        CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
     @PostMapping("/memos/search")
@@ -77,6 +81,15 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PostMapping("memos/{memoId}/tags")
+    public ResponseEntity<CreateTagResponse> createTag(
+        @PathVariable("memoId") String memoId,
+        @RequestBody @Valid CreateTagRequest createTagRequest
+    ) {
+        CreateTagResponse createTagResponse = memoTagService.createTag(memoId, createTagRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createTagResponse);
+    }
+
     @GetMapping("/tags")
     public ResponseEntity<List<TagResponse>> getAllTags() {
         List<TagResponse> TagResponses = memoTagService.getAllTags();
@@ -97,5 +110,22 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         List<TagResponse> TagResponses = memoTagService.getChildTagsById(tagId);
         return ResponseEntity.status(HttpStatus.OK).body(TagResponses);
+    }
+
+    @PutMapping("/tags/{tagId}")
+    public ResponseEntity<UpdateTagResponse> updateTag(
+        @PathVariable("tagId") String tagId,
+        @RequestBody @Valid UpdateTagRequest updateTagRequest
+    ) {
+        UpdateTagResponse updateTagResponse = memoTagService.updateTag(tagId, updateTagRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(updateTagResponse);
+    }
+
+    @DeleteMapping("/tags/{tagId}")
+    public ResponseEntity<Void> deleteTag(
+        @PathVariable("tagId") String tagId
+    ) {
+        memoTagService.deleteTag(tagId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
