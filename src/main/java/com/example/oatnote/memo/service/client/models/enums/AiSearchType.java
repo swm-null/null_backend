@@ -9,7 +9,7 @@ public enum AiSearchType {
     SIMILARITY("similarity"),
     REGEX("regex"),
     TAG("tag"),
-    UNSPECIFIED("unspecified");
+    ;
 
     private final String value;
 
@@ -17,16 +17,8 @@ public enum AiSearchType {
         this.value = value;
     }
 
-    @JsonValue
-    public String getValue() {
+    @Override
+    public String toString() {
         return value;
-    }
-
-    @JsonCreator
-    public static AiSearchType forValue(String value) {
-        return Arrays.stream(AiSearchType.values())
-            .filter(type -> type.value.equals(value))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unknown enum type " + value));
     }
 }
