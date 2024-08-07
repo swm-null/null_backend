@@ -8,7 +8,6 @@ import com.example.oatnote.user.models.LoginUserResponse;
 import com.example.oatnote.user.models.RefreshUserRequest;
 import com.example.oatnote.user.models.RefreshUserResponse;
 import com.example.oatnote.user.models.RegisterUserRequest;
-import com.example.oatnote.user.models.RegisterUserResponse;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.models.User;
@@ -24,7 +23,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
+    public void register(RegisterUserRequest registerUserRequest) {
         if(userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
             throw new AuthIllegalArgumentException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
         }
@@ -32,8 +31,7 @@ public class UserService {
             registerUserRequest.email(),
             passwordEncoder.encode(registerUserRequest.password())
         );
-        User savedUser = userRepository.save(user);
-        return RegisterUserResponse.from(savedUser);
+        userRepository.save(user);
     }
 
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {

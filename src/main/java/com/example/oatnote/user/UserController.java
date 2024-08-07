@@ -11,7 +11,6 @@ import com.example.oatnote.user.models.LoginUserResponse;
 import com.example.oatnote.user.models.RefreshUserRequest;
 import com.example.oatnote.user.models.RefreshUserResponse;
 import com.example.oatnote.user.models.RegisterUserRequest;
-import com.example.oatnote.user.models.RegisterUserResponse;
 import com.example.oatnote.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -24,11 +23,11 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users/register")
-    public ResponseEntity<RegisterUserResponse> register(
+    public ResponseEntity<Void> register(
         @RequestBody @Valid RegisterUserRequest registerUserRequest
     ) {
-        RegisterUserResponse registerUserResponse = userService.register(registerUserRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(registerUserResponse);
+        userService.register(registerUserRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
     @PostMapping("/users/login")
