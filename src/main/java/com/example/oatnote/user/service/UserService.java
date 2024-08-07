@@ -25,6 +25,9 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
+        if(userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
+            throw new AuthIllegalArgumentException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
+        }
         User user = new User(
             registerUserRequest.email(),
             passwordEncoder.encode(registerUserRequest.password())
@@ -37,10 +40,9 @@ public class UserService {
         User user = userRepository.findByEmail(loginUserRequest.email())
             .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + loginUserRequest.email()));
         if (passwordEncoder.matches(loginUserRequest.password(), user.getPassword())) {
-            return new LoginUserResponse(
-                jwtUtil.generateAccessToken(user.getEmail()),
-                jwtUtil.generateRefreshToken(user.getEmail())
-            );
+            String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+            String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+            return LoginUserResponse.of(accessToken, refreshToken);
         } else {
             throw new AuthIllegalArgumentException("비밀번호가 일치하지 않습니다");
         }
@@ -51,7 +53,7 @@ public class UserService {
         if (jwtUtil.validateToken(refreshToken)) {
             String email = jwtUtil.extractEmail(refreshToken);
             String newAccessToken = jwtUtil.generateAccessToken(email);
-            return new RefreshUserResponse(newAccessToken, refreshToken);
+            return RefreshUserResponse.of(newAccessToken, refreshToken);
         } else {
             throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다.");
         }

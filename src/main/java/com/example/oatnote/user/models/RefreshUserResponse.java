@@ -5,4 +5,7 @@ public record RefreshUserResponse(
     String refreshToken
 ) {
 
+    public static RefreshUserResponse of(String newAccessToken, String refreshToken) {
+        return new RefreshUserResponse(newAccessToken, refreshToken);
+    }
 }

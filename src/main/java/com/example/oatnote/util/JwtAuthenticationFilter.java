@@ -3,8 +3,6 @@ package com.example.oatnote.util;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,46 +14,44 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws ServletException, IOException {
-        final String requestTokenHeader = request.getHeader("Authorization");
+        final String authorizationHeader = request.getHeader("Authorization");
 
+        String accessToken = null;
         String email = null;
-        String jwtToken = null;
 
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            accessToken = authorizationHeader.substring(7);
             try {
-                email = jwtUtil.extractEmail(jwtToken);
-            } catch (IllegalArgumentException e) {
-                logger.error("Unable to get JWT Token", e);
+                if (jwtUtil.validateToken(accessToken)) {
+                    email = jwtUtil.extractEmail(accessToken);
+                }
             } catch (ExpiredJwtException e) {
-                logger.warn("JWT Token has expired", e);
+                log.warn("JWT Token has expired", e);
+            } catch (Exception e) {
+                log.error("JWT Token validation error", e);
             }
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtUtil.validateToken(jwtToken)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
-                usernamePasswordAuthenticationToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
+            UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         chain.doFilter(request, response);
     }
 }
