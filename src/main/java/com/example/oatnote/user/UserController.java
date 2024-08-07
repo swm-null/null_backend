@@ -1,31 +1,36 @@
 package com.example.oatnote.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.oatnote.user.models.LoginUserRequest;
 import com.example.oatnote.user.models.LoginUserResponse;
-import com.example.oatnote.user.models.UserRequest;
+import com.example.oatnote.user.models.RegisterUserRequest;
+import com.example.oatnote.user.models.RegisterUserResponse;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/user/signup")
-    public ResponseEntity<String> signUp(@RequestBody UserRequest userRequest) {
-        userService.signUp(userRequest);
-        return ResponseEntity.ok("회원가입 성공");
+    @PostMapping("/user/register")
+    public ResponseEntity<RegisterUserResponse> register(
+        @RequestBody @Valid RegisterUserRequest registerUserRequest
+    ) {
+        RegisterUserResponse registerUserResponse = userService.register(registerUserRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(registerUserResponse);
     }
 
     @PostMapping("/user/login")
-    public ResponseEntity<?> login(@RequestBody UserRequest userRequest) {
-        LoginUserResponse loginResponse = userService.login(userRequest);
-        if (loginResponse != null) {
-            return ResponseEntity.ok(loginResponse);
-        } else {
-            return ResponseEntity.status(401).body("로그인 실패");
-        }
+    public ResponseEntity<LoginUserResponse> login(
+        @RequestBody @Valid LoginUserRequest loginUserRequest
+    ) {
+        LoginUserResponse loginUserResponse = userService.login(loginUserRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(loginUserResponse);
     }
 }

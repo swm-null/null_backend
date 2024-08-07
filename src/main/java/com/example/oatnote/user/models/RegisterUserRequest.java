@@ -1,8 +1,8 @@
 package com.example.oatnote.user.models;
 
-public record UserRequest(
+public record RegisterUserRequest(
+    String id,
     String email,
     String password
 ) {
-
 }

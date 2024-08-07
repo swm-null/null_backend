@@ -4,9 +4,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.user.exception.UserNotFoundException;
+import com.example.oatnote.user.models.LoginUserRequest;
 import com.example.oatnote.user.models.LoginUserResponse;
+import com.example.oatnote.user.models.RegisterUserRequest;
+import com.example.oatnote.user.models.RegisterUserResponse;
 import com.example.oatnote.user.models.User;
-import com.example.oatnote.user.models.UserRequest;
 import com.example.oatnote.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -19,18 +21,18 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public void signUp(UserRequest userRequest) {
+    public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
         User user = new User(
-            userRequest.email(),
-            passwordEncoder.encode(userRequest.password())
+            registerUserRequest.email(),
+            passwordEncoder.encode(registerUserRequest.password())
         );
         userRepository.save(user);
     }
 
-    public LoginUserResponse login(UserRequest userRequest) {
-        User user = userRepository.findByEmail(userRequest.email())
-            .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + userRequest.email()));
-        if (passwordEncoder.matches(userRequest.password(), user.getPassword())) {
+    public LoginUserResponse login(LoginUserRequest loginUserRequest) {
+        User user = userRepository.findByEmail(loginUserRequest.email())
+            .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + loginUserRequest.email()));
+        if (passwordEncoder.matches(loginUserRequest.password(), user.getPassword())) {
             return new LoginUserResponse(
                 jwtUtil.generateAccessToken(user.getEmail()),
                 jwtUtil.generateRefreshToken(user.getEmail())
