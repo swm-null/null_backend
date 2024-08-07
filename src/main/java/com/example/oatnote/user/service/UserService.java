@@ -3,11 +3,14 @@ package com.example.oatnote.user.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.models.LoginUserRequest;
 import com.example.oatnote.user.models.LoginUserResponse;
+import com.example.oatnote.user.models.RefreshUserRequest;
+import com.example.oatnote.user.models.RefreshUserResponse;
 import com.example.oatnote.user.models.RegisterUserRequest;
 import com.example.oatnote.user.models.RegisterUserResponse;
+import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
+import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.models.User;
 import com.example.oatnote.util.JwtUtil;
 
@@ -38,8 +41,20 @@ public class UserService {
                 jwtUtil.generateAccessToken(user.getEmail()),
                 jwtUtil.generateRefreshToken(user.getEmail())
             );
+        } else {
+            throw new AuthIllegalArgumentException("비밀번호가 일치하지 않습니다");
         }
-        return null;
+    }
+
+    public RefreshUserResponse refreshAccessToken(RefreshUserRequest refreshUserRequest) {
+        String refreshToken = refreshUserRequest.refreshToken();
+        if (jwtUtil.validateToken(refreshToken)) {
+            String email = jwtUtil.extractEmail(refreshToken);
+            String newAccessToken = jwtUtil.generateAccessToken(email);
+            return new RefreshUserResponse(newAccessToken, refreshToken);
+        } else {
+            throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다.");
+        }
     }
 }
 

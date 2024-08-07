@@ -7,10 +7,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.oatnote.memo.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memo.service.tag.exception.TagNotFoundException;
+import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AuthIllegalArgumentException.class)
+    public ResponseEntity<String> handleAuthIllegalArgumentException(AuthIllegalArgumentException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleMemoNotFoundException(UserNotFoundException ex) {
