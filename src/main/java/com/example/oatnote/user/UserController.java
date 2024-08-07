@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserApiDoc {
 
     private final UserService userService;
 

@@ -9,6 +9,7 @@ import com.example.oatnote.user.models.RefreshUserRequest;
 import com.example.oatnote.user.models.RefreshUserResponse;
 import com.example.oatnote.user.models.RegisterUserRequest;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
+import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.models.User;
 import com.example.oatnote.util.JwtUtil;
@@ -25,7 +26,7 @@ public class UserService {
 
     public void register(RegisterUserRequest registerUserRequest) {
         if(userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
-            throw new AuthIllegalArgumentException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
+            throw new UserIllegalArgumentException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
         }
         User user = new User(
             registerUserRequest.email(),
