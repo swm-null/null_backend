@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.oatnote.memo.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memo.service.tag.exception.TagNotFoundException;
-import com.example.oatnote.user.exception.UserNotFoundException;
+import com.example.oatnote.user.service.exception.UserNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

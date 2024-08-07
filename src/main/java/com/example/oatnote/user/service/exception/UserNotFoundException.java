@@ -1,4 +1,4 @@
-package com.example.oatnote.user.exception;
+package com.example.oatnote.user.service.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

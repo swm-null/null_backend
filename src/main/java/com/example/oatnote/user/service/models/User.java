@@ -1,4 +1,4 @@
-package com.example.oatnote.user.models;
+package com.example.oatnote.user.service.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

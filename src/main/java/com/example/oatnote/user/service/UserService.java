@@ -1,14 +1,14 @@
-package com.example.oatnote.user;
+package com.example.oatnote.user.service;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.user.exception.UserNotFoundException;
+import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.models.LoginUserRequest;
 import com.example.oatnote.user.models.LoginUserResponse;
 import com.example.oatnote.user.models.RegisterUserRequest;
 import com.example.oatnote.user.models.RegisterUserResponse;
-import com.example.oatnote.user.models.User;
+import com.example.oatnote.user.service.models.User;
 import com.example.oatnote.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,8 @@ public class UserService {
             registerUserRequest.email(),
             passwordEncoder.encode(registerUserRequest.password())
         );
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return RegisterUserResponse.from(savedUser);
     }
 
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {

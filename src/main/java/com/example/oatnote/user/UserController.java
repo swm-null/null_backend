@@ -8,6 +8,7 @@ import com.example.oatnote.user.models.LoginUserRequest;
 import com.example.oatnote.user.models.LoginUserResponse;
 import com.example.oatnote.user.models.RegisterUserRequest;
 import com.example.oatnote.user.models.RegisterUserResponse;
+import com.example.oatnote.user.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/user/register")
+    @PostMapping("/users/register")
     public ResponseEntity<RegisterUserResponse> register(
         @RequestBody @Valid RegisterUserRequest registerUserRequest
     ) {
@@ -26,7 +27,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(registerUserResponse);
     }
 
-    @PostMapping("/user/login")
+    @PostMapping("/users/login")
     public ResponseEntity<LoginUserResponse> login(
         @RequestBody @Valid LoginUserRequest loginUserRequest
     ) {
