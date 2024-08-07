@@ -7,29 +7,40 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "your-secret-key";
-    private final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15분
-    private final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7; // 1주일
+    private final String secretKey;
+    private final Long accessTokenExpirationTime;
+    private final Long refreshTokenExpirationTime;
+
+    public JwtUtil(
+        @Value("${jwt.secret-key}") String secretKey,
+        @Value("${jwt.access-token.expiration-time}") Long accessTokenExpirationTime,
+        @Value("${jwt.refresh-token.expiration-time}") Long refreshTokenExpirationTime
+    ) {
+        this.secretKey = secretKey;
+        this.accessTokenExpirationTime = accessTokenExpirationTime;
+        this.refreshTokenExpirationTime = refreshTokenExpirationTime;
+    }
 
     public String generateAccessToken(String email) {
-        return createToken(email, ACCESS_TOKEN_VALIDITY);
+        return createToken(email, accessTokenExpirationTime);
     }
 
     public String generateRefreshToken(String email) {
-        return createToken(email, REFRESH_TOKEN_VALIDITY);
+        return createToken(email, refreshTokenExpirationTime);
     }
 
-    private String createToken(String subject, long validity) {
+    private String createToken(String subject, long expirationTime) {
         return Jwts.builder()
             .setSubject(subject)
             .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + validity))
-            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+            .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
     }
 
@@ -44,7 +55,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-            .setSigningKey(SECRET_KEY)
+            .setSigningKey(secretKey)
             .parseClaimsJws(token)
             .getBody();
     }
@@ -57,4 +68,3 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 }
-
