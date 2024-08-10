@@ -1,10 +1,14 @@
 package com.example.oatnote.memo.service.tag.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -17,10 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @Document(collection = "tags")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
 
     @Id
@@ -29,37 +30,26 @@ public class Tag {
     @NotBlank
     private String name;
 
-    @NotNull
-    @Field("memos")
-    @Builder.Default
-    private List<String> memoIds = new LinkedList<>();
-
-    @NotNull
-    @Builder.Default
-    private int depth = 0;
-
     @Field("parent")
     private String parentTagId;
 
-    @NotNull
     @Field("child")
-    @Builder.Default
     private List<String> childTagIds = new LinkedList<>();
 
+    @Indexed
+    private String userId;
+
     @NotNull
-    @Builder.Default
     private List<Double> embedding = new ArrayList<>();
 
-    public void addMemoId(String memoId) {
-        memoIds.add(memoId);
-    }
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public void addChildTagId(String childTagId) {
         childTagIds.add(childTagId);
-    }
-
-    public void deleteMemoId(String memoId) {
-        memoIds.remove(memoId);
     }
 
     public void deleteChildTagId(String childTagId) {
