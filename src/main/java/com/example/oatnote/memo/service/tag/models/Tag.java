@@ -39,15 +39,18 @@ public class Tag {
     @NotNull(message = "자식 태그 아이디는 null일 수 없습니다.")
     private List<String> childTagIds = new LinkedList<>();
 
+    @Field("uid")
     @Indexed
     private String userId;
 
     @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     private List<Double> embedding = new ArrayList<>();
 
+    @Field("ca")
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Field("ua")
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
