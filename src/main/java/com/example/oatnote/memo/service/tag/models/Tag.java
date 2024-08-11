@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,25 +22,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @Document(collection = "tags")
 public class Tag {
 
     @Id
     private String id;
 
-    @NotBlank
+    @NotBlank(message = "태그 이름은 비워둘 수 없습니다.")
     private String name;
 
     @Field("parent")
     private String parentTagId;
 
     @Field("child")
+    @NotNull(message = "자식 태그 아이디는 null일 수 없습니다.")
     private List<String> childTagIds = new LinkedList<>();
 
     @Indexed
     private String userId;
 
-    @NotNull
+    @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     private List<Double> embedding = new ArrayList<>();
 
     @CreatedDate
@@ -50,10 +53,6 @@ public class Tag {
 
     public void addChildTagId(String childTagId) {
         childTagIds.add(childTagId);
-    }
-
-    public void deleteChildTagId(String childTagId) {
-        childTagIds.remove(childTagId);
     }
 
     public void update(String name, List<Double> embedding) {

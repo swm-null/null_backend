@@ -11,6 +11,4 @@ public interface MemoRepository extends MongoRepository<Memo, String> {
 
     @Query("{ 'content' : { $regex: ?0, $options: 'i' } }")
     List<Memo> findByContentRegex(String regex);
-
-    List<Memo> findByTagIdsIn(List<String> tagIds);
 }

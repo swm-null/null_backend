@@ -21,9 +21,11 @@ public record SearchMemoResponse(
 ) {
 
     public static SearchMemoResponse from(String processedMessage, List<Memo> memos, List<List<Tag>> tagsList) {
-        List<MemoResponse> innerMemos = memos.stream()
-            .map(memo -> MemoResponse.from(memo, tagsList.get(memos.indexOf(memo))))
-            .toList();
-        return new SearchMemoResponse(processedMessage, innerMemos);
+        return new SearchMemoResponse(
+            processedMessage,
+            memos.stream()
+                .map(memo -> MemoResponse.from(memo, tagsList.get(memos.indexOf(memo))))
+                .toList()
+        );
     }
 }

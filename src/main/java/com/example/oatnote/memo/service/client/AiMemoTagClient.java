@@ -36,7 +36,7 @@ public class AiMemoTagClient {
             .encode()
             .build()
             .toUri();
-        AiCreateMemoRequest aiCreateMemoRequest = new AiCreateMemoRequest(content);
+        AiCreateMemoRequest aiCreateMemoRequest = new AiCreateMemoRequest(content, null); //Todo timestamp
         ResponseEntity<AiCreateMemoResponse> aiCreateMemoResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemoRequest,

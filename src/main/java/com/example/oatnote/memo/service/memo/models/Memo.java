@@ -11,25 +11,29 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @Document(collection = "memos")
 public class Memo {
 
     @Id
     private String id;
 
-    @NotBlank
+    @NotBlank(message = "내용은 비워둘 수 없습니다.")
     private String content;
 
     private List<String> imageUrls = new ArrayList<>();
 
     @Indexed
+    @NotBlank(message = "유저 아이디는 비워둘 수 없습니다.")
     private String userId;
 
-    @NotNull
+    @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     private List<Double> embedding = new ArrayList<>();
 
     @CreatedDate

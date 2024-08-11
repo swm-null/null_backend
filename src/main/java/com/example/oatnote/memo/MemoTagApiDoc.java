@@ -138,15 +138,12 @@ public interface MemoTagApiDoc {
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "특정 계층의 태그 조회")
-    @GetMapping("/tags/depth/{depth}")
-    ResponseEntity<List<TagResponse>> getTagsByDepth(
-        @PathVariable("depth") int depth
-    );
+    @Operation(summary = "루트 태그 조회")
+    @GetMapping("/tags/root")
+    ResponseEntity<List<TagResponse>> getRootTags();
 
     @ApiResponses(
         value = {
@@ -156,7 +153,7 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "특정 태그의 자식 태그 조회")
     @GetMapping("/tags/{tagId}/childTags")
-    ResponseEntity<List<TagResponse>> getChildTagsByTagId(
+    ResponseEntity<List<TagResponse>> getChildTags(
         @PathVariable("tagId") String tagId
     );
 
