@@ -9,6 +9,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,28 +37,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain chain
     ) throws ServletException, IOException {
-        String accessToken = extractAccessToken(request);
 
+        String accessToken = extractAccessToken(request);
         if (accessToken != null) {
             try {
-                if (jwtUtil.validateToken(accessToken)) {
-                    if (jwtUtil.isTokenExpired(accessToken)) {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.getWriter().write(TOKEN_EXPIRED_MESSAGE);
-                        return;
-                    }
-                    String email = jwtUtil.extractEmail(accessToken);
-                    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                        UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-                } else {
+                jwtUtil.validateToken(accessToken);
+                if (jwtUtil.isTokenExpired(accessToken)) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write(TOKEN_INVALID_MESSAGE);
+                    response.getWriter().write(TOKEN_EXPIRED_MESSAGE);
                     return;
                 }
+                String email = jwtUtil.extractEmail(accessToken);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (JwtException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write(TOKEN_INVALID_MESSAGE);
+                return;
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write(ERROR_PROCESSING_TOKEN_MESSAGE);

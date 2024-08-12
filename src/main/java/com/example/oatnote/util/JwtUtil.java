@@ -71,12 +71,11 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            throw new JwtException("Invalid JWT token", e);
         }
     }
 }

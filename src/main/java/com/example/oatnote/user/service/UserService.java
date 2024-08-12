@@ -14,6 +14,7 @@ import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.models.User;
 import com.example.oatnote.util.JwtUtil;
 
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -49,11 +50,12 @@ public class UserService {
 
     public RefreshUserResponse refreshAccessToken(RefreshUserRequest refreshUserRequest) {
         String refreshToken = refreshUserRequest.refreshToken();
-        if (jwtUtil.validateToken(refreshToken)) {
+        try {
+            jwtUtil.validateToken(refreshToken);
             String email = jwtUtil.extractEmail(refreshToken);
             String newAccessToken = jwtUtil.generateAccessToken(email);
             return RefreshUserResponse.of(newAccessToken, refreshToken);
-        } else {
+        } catch (JwtException e) {
             throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다.");
         }
     }
