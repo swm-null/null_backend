@@ -5,6 +5,13 @@ spring:
   ai:
     url: ${AI_URL}
 
+jwt:
+  secret-key: cd06f8c2b0dd065faf6ef910c7f15934363df71c33740fd245590665286ed268
+  access-token:
+    expiration-time: 600000
+  refresh-token:
+    expiration-time: 86400000
+
 swagger:
   server-url: ${SWAGGER_SERVER_URL}
 
