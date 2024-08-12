@@ -10,11 +10,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
-    private final String secretKey;
+    private final byte[] secretKey;
     private final Long accessTokenExpirationTime;
     private final Long refreshTokenExpirationTime;
 
@@ -23,7 +24,7 @@ public class JwtUtil {
         @Value("${jwt.access-token.expiration-time}") Long accessTokenExpirationTime,
         @Value("${jwt.refresh-token.expiration-time}") Long refreshTokenExpirationTime
     ) {
-        this.secretKey = secretKey;
+        this.secretKey = secretKey.getBytes();
         this.accessTokenExpirationTime = accessTokenExpirationTime;
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
@@ -41,7 +42,7 @@ public class JwtUtil {
             .setSubject(subject)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .signWith(Keys.hmacShaKeyFor(secretKey), SignatureAlgorithm.HS256)
             .compact();
     }
 
