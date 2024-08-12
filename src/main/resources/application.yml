@@ -6,7 +6,7 @@ spring:
     url: ${AI_URL}
 
 jwt:
-  secret-key: cd06f8c2b0dd065faf6ef910c7f15934363df71c33740fd245590665286ed268
+  secret-key: ${JWT_SECRET_KEY}
   access-token:
     expiration-time: 600000
   refresh-token:
