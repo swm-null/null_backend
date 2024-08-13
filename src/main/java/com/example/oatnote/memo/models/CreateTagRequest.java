@@ -1,6 +1,5 @@
 package com.example.oatnote.memo.models;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import com.example.oatnote.memo.service.tag.models.Tag;
@@ -12,11 +11,10 @@ public record CreateTagRequest(
     String name
 ) {
 
-    public Tag toTag(List<Double> embedding, String memoId) {
+    public Tag toTag(List<Double> embedding) {
         return Tag.builder()
             .name(name)
             .embedding(embedding)
-            .memoIds(new LinkedList<>(List.of(memoId)))
             .build();
     }
 }

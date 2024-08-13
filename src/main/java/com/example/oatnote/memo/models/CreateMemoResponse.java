@@ -5,7 +5,6 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import java.util.List;
 
 import com.example.oatnote.memo.models.InnerResponse.MemoResponse;
-import com.example.oatnote.memo.models.InnerResponse.TagResponse;
 import com.example.oatnote.memo.service.memo.models.Memo;
 import com.example.oatnote.memo.service.tag.models.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -20,13 +19,7 @@ public record CreateMemoResponse(
 
     public static CreateMemoResponse from(Memo memo, List<Tag> tags) {
         return new CreateMemoResponse(
-            new MemoResponse(
-                memo.getId(),
-                memo.getContent(),
-                tags.stream()
-                    .map(tag -> new TagResponse(tag.getId(), tag.getName()))
-                    .toList()
-            )
+            MemoResponse.from(memo, tags)
         );
     }
 }

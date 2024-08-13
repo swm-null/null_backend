@@ -1,53 +1,54 @@
 package com.example.oatnote.memo.service.memo.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
 @Document(collection = "memos")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Memo {
 
     @Id
     private String id;
 
-    @NotBlank
+    @NotBlank(message = "내용은 비워둘 수 없습니다.")
     private String content;
 
-    @NotNull
-    @Field("tags")
-    @Builder.Default
-    private List<String> tagIds = new LinkedList<>();
+    @Field("images")
+    private List<String> imageUrls = new ArrayList<>();
 
-    @NotNull
-    @Builder.Default
+    @Indexed
+    @Field("uid")
+    @NotBlank(message = "유저 아이디는 비워둘 수 없습니다.")
+    private String userId;
+
+    @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     private List<Double> embedding = new ArrayList<>();
 
-    public void updateTags(List<String> tagIds) {
-        this.tagIds = tagIds;
-    }
+    @Field("ca")
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Field("ua")
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public void update(String content, List<Double> embedding) {
         this.content = content;
         this.embedding = embedding;
-    }
-
-    public void deleteTagId(String tagId) {
-        tagIds.remove(tagId);
     }
 }

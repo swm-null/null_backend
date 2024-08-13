@@ -1,4 +1,4 @@
-package com.example.oatnote.exception;
+package com.example.oatnote.web.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

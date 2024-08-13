@@ -22,9 +22,7 @@ public record MemoResponse(
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),
-            tags.stream()
-                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
-                .toList()
+            tags.stream().map(TagResponse::from).toList()
         );
     }
 }

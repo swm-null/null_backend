@@ -23,16 +23,15 @@ public class TagService {
         return tagRepository.findAll();
     }
 
-    public List<Tag> getTagsByDepth(int depth) {
-        // return tagRepository.findByDepth(depth);
+    public List<Tag> getRootTags() {
         return tagRepository.findByParentTagIdIsNull();
     }
 
-    public List<Tag> getTagsById(List<String> tagIds) {
+    public List<Tag> getTags(List<String> tagIds) {
         return tagRepository.findAllById(tagIds);
     }
 
-    public Tag getTagById(String tagId) {
+    public Tag getTag(String tagId) {
         return tagRepository.findById(tagId)
             .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + tagId));
     }
