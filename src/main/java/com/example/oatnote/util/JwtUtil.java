@@ -1,7 +1,5 @@
 package com.example.oatnote.util;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -9,18 +7,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
-    private final Key secretKey;
+    private final byte[] secretKey;
     private final Long accessTokenExpirationTime;
     private final Long refreshTokenExpirationTime;
 
@@ -29,26 +24,25 @@ public class JwtUtil {
         @Value("${jwt.access-token.expiration-time}") Long accessTokenExpirationTime,
         @Value("${jwt.refresh-token.expiration-time}") Long refreshTokenExpirationTime
     ) {
-        this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        this.secretKey = secretKey.getBytes();
         this.accessTokenExpirationTime = accessTokenExpirationTime;
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
     public String generateAccessToken(String email) {
-        return createToken(email, accessTokenExpirationTime, "ACCESS");
+        return createToken(email, accessTokenExpirationTime);
     }
 
     public String generateRefreshToken(String email) {
-        return createToken(email, refreshTokenExpirationTime, "REFRESH");
+        return createToken(email, refreshTokenExpirationTime);
     }
 
-    private String createToken(String subject, long expirationTime, String tokenType) {
+    private String createToken(String subject, long expirationTime) {
         return Jwts.builder()
             .setSubject(subject)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-            .claim("token_type", tokenType)
-            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .signWith(Keys.hmacShaKeyFor(secretKey), SignatureAlgorithm.HS256)
             .compact();
     }
 
@@ -80,16 +74,8 @@ public class JwtUtil {
     public void validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-        } catch (ExpiredJwtException e) {
-            throw new JwtException("JWT token has expired", e);
-        } catch (UnsupportedJwtException e) {
-            throw new JwtException("Unsupported JWT token", e);
-        } catch (MalformedJwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             throw new JwtException("Invalid JWT token", e);
-        } catch (SecurityException e) {
-            throw new JwtException("Invalid JWT signature", e);
-        } catch (IllegalArgumentException e) {
-            throw new JwtException("JWT claims string is empty", e);
         }
     }
 }
