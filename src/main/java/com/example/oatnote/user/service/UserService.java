@@ -56,7 +56,7 @@ public class UserService {
             String newAccessToken = jwtUtil.generateAccessToken(email);
             return RefreshUserResponse.of(newAccessToken, refreshToken);
         } catch (JwtException e) {
-            throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다.");
+            throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다." + e);
         }
     }
 }
