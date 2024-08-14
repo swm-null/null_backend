@@ -19,6 +19,7 @@ import com.example.oatnote.memo.models.UpdateMemoResponse;
 import com.example.oatnote.memo.models.UpdateTagRequest;
 import com.example.oatnote.memo.models.UpdateTagResponse;
 import com.example.oatnote.memo.service.client.AiMemoTagClient;
+import com.example.oatnote.memo.service.client.models.AiCreateKakaoMemosResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateMemoResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateTagResponse;
 import com.example.oatnote.memo.service.client.models.AiSearchMemoResponse;
@@ -55,9 +56,10 @@ public class MemoTagService {
     }
 
     public List<CreateMemoResponse> createKakaoMemos(MultipartFile file) {
+        AiCreateKakaoMemosResponse aiCreateKakaoMemosResponse = aiMemoTagClient.createKakaoMemos(file);
+
         List<CreateMemoResponse> createMemoResponses = new ArrayList<>();
-        List<AiCreateMemoResponse> aiCreateMemoResponses = aiMemoTagClient.createKakaoMemos(file);
-        for (AiCreateMemoResponse aiCreateMemoResponse : aiCreateMemoResponses) {
+        for (AiCreateMemoResponse aiCreateMemoResponse : aiCreateKakaoMemosResponse.kakao()) {
             Memo memo = Memo.builder()
                 .content(aiCreateMemoResponse.content())
                 .embedding(aiCreateMemoResponse.memoEmbeddings())
@@ -65,7 +67,6 @@ public class MemoTagService {
                 .updatedAt(aiCreateMemoResponse.timestamp())
                 .build();
             Memo savedMemo = memoService.saveMemo(memo);
-
             List<Tag> tags = processTags(
                 savedMemo.getId(),
                 aiCreateMemoResponse.existingTagIds(),
@@ -76,8 +77,11 @@ public class MemoTagService {
         return createMemoResponses;
     }
 
-    private List<Tag> processTags(String memoId, List<String> existingTagIds,
-        List<AiCreateMemoResponse.InnerTag> newTags) {
+    private List<Tag> processTags(
+        String memoId,
+        List<String> existingTagIds,
+        List<AiCreateMemoResponse.Tag> newTags
+    ) {
         List<Tag> tags = new ArrayList<>();
 
         // 이미 존재하는 태그 처리
@@ -88,8 +92,8 @@ public class MemoTagService {
         }
 
         // 새로운 태그 생성 및 처리
-        for (AiCreateMemoResponse.InnerTag newTag : newTags) {
-            Tag tag = Tag.builder()
+        for (AiCreateMemoResponse.Tag newTag : newTags) {
+            Tag tag = com.example.oatnote.memo.service.tag.models.Tag.builder()
                 .id(newTag.id())
                 .name(newTag.name())
                 .parentTagId(newTag.parent())

@@ -12,4 +12,7 @@ public record AiSearchMemoRequest(
     String content
 ) {
 
+    public static AiSearchMemoRequest from(String content) {
+        return new AiSearchMemoRequest(content);
+    }
 }

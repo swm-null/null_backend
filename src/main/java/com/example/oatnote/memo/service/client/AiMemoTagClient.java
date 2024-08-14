@@ -1,7 +1,7 @@
 package com.example.oatnote.memo.service.client;
 
 import java.net.URI;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +10,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.oatnote.memo.service.client.exception.InvalidFileException;
+import com.example.oatnote.memo.service.client.models.AiCreateKakaoMemosRequest;
+import com.example.oatnote.memo.service.client.models.AiCreateKakaoMemosResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateMemoRequest;
 import com.example.oatnote.memo.service.client.models.AiCreateMemoResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateTagRequest;
@@ -31,14 +34,18 @@ public class AiMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AiCreateMemoResponse createMemo(String content) {
-        final URI uri = UriComponentsBuilder
+    private URI buildUri(String path) {
+        return UriComponentsBuilder
             .fromUriString(aiUrl)
-            .path("/add_memo/")
+            .path(path)
             .encode()
             .build()
             .toUri();
-        AiCreateMemoRequest aiCreateMemoRequest = new AiCreateMemoRequest(content, null); //Todo timestamp
+    }
+
+    public AiCreateMemoResponse createMemo(String content) {
+        final URI uri = buildUri("/add_memo/");
+        AiCreateMemoRequest aiCreateMemoRequest = AiCreateMemoRequest.from(content);
         ResponseEntity<AiCreateMemoResponse> aiCreateMemoResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemoRequest,
@@ -47,41 +54,57 @@ public class AiMemoTagClient {
         return aiCreateMemoResponse.getBody();
     }
 
-    public List<AiCreateMemoResponse> createKakaoMemos(MultipartFile file) {
-        final URI uri = UriComponentsBuilder
-            .fromUriString(aiUrl)
-            .path("/kakao-parser/")
-            .encode()
-            .build()
-            .toUri();
-        //Todo
-        return null;
+    public AiCreateKakaoMemosResponse createKakaoMemos(MultipartFile file) {
+        final URI uri = buildUri("/kakao-parser/");
+        String fileContent = getFileContent(file);
+        String fileType = getFileType(file.getOriginalFilename());
+
+        System.out.println("fileContent: " + fileContent);
+        System.out.println("fileType: " + fileType);
+
+        AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(fileType, fileContent);
+        ResponseEntity<AiCreateKakaoMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
+            uri,
+            aiCreateKakaoMemosRequest,
+            AiCreateKakaoMemosResponse.class
+        );
+        return aiCreateKakaoMemosResponse.getBody();
+    }
+
+    private String getFileContent(MultipartFile file) {
+        try {
+            return new String(file.getBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new InvalidFileException("파일을 읽는 중 오류가 발생했습니다.");
+        }
+    }
+
+    private String getFileType(String originalFilename) {
+        if (originalFilename == null) {
+            throw new InvalidFileException("파일 이름이 없습니다.");
+        } else if (originalFilename.endsWith(".csv")) {
+            return "csv";
+        } else if (originalFilename.endsWith(".txt")) {
+            return "txt";
+        } else {
+            throw new InvalidFileException("지원하지 않는 파일 형식입니다. csv 또는 txt 파일만 허용됩니다.");
+        }
     }
 
     public AiSearchMemoResponse searchMemo(String content) {
-        final URI uri = UriComponentsBuilder
-            .fromUriString(aiUrl)
-            .path("/search/")
-            .encode()
-            .build()
-            .toUri();
-        AiSearchMemoRequest aiSearchMemoRequest = new AiSearchMemoRequest(content);
-        ResponseEntity<AiSearchMemoResponse> aiResponse = restTemplate.postForEntity(
+        final URI uri = buildUri("/search/");
+        AiSearchMemoRequest aiSearchMemoRequest = AiSearchMemoRequest.from(content);
+        ResponseEntity<AiSearchMemoResponse> aiSearchMemoResponse = restTemplate.postForEntity(
             uri,
             aiSearchMemoRequest,
             AiSearchMemoResponse.class
         );
-        return aiResponse.getBody();
+        return aiSearchMemoResponse.getBody();
     }
 
     public AiCreateTagResponse createTag(String name) {
-        final URI uri = UriComponentsBuilder
-            .fromUriString(aiUrl)
-            .path("/get_embedding/")
-            .encode()
-            .build()
-            .toUri();
-        AiCreateTagRequest aiCreateTagRequest = new AiCreateTagRequest(name);
+        final URI uri = buildUri("/get_embedding/");
+        AiCreateTagRequest aiCreateTagRequest = AiCreateTagRequest.from(name);
         ResponseEntity<AiCreateTagResponse> aiCreateTagResponse = restTemplate.postForEntity(
             uri,
             aiCreateTagRequest,
