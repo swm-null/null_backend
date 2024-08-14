@@ -1,11 +1,13 @@
 package com.example.oatnote.memo.service.client;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.oatnote.memo.service.client.models.AiCreateMemoRequest;
@@ -43,6 +45,17 @@ public class AiMemoTagClient {
             AiCreateMemoResponse.class
         );
         return aiCreateMemoResponse.getBody();
+    }
+
+    public List<AiCreateMemoResponse> createKakaoMemos(MultipartFile file) {
+        final URI uri = UriComponentsBuilder
+            .fromUriString(aiUrl)
+            .path("/kakao-parser/")
+            .encode()
+            .build()
+            .toUri();
+        //Todo
+        return null;
     }
 
     public AiSearchMemoResponse searchMemo(String content) {

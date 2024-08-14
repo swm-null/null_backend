@@ -13,6 +13,9 @@ import jakarta.validation.constraints.NotNull;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AiCreateMemoResponse(
+    @NotBlank(message = "내용은 비워둘 수 없습니다.")
+    String content,
+
     @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     List<Double> memoEmbeddings,
 
