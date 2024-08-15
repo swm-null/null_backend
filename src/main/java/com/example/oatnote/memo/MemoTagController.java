@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.oatnote.memo.models.CreateMemoRequest;
 import com.example.oatnote.memo.models.CreateMemoResponse;
@@ -40,6 +42,14 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
+    }
+
+    @PostMapping("/memos/kakao")
+    public ResponseEntity<List<CreateMemoResponse>> createKakaoMemos(
+        @RequestParam("file") MultipartFile file
+    ) {
+        List<CreateMemoResponse> createKakaoMemoResponses = memoTagService.createKakaoMemos(file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createKakaoMemoResponses);
     }
 
     @GetMapping("/memos")

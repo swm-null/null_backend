@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.oatnote.memo.models.CreateMemoRequest;
 import com.example.oatnote.memo.models.CreateMemoResponse;
@@ -45,6 +47,19 @@ public interface MemoTagApiDoc {
     @PostMapping("/memos")
     ResponseEntity<CreateMemoResponse> createMemo(
         @RequestBody @Valid CreateMemoRequest createMemoRequest
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "카카오톡으로 메모 리스트 생성")
+    @PostMapping("/memos/kakao")
+    ResponseEntity<List<CreateMemoResponse>> createKakaoMemos(
+        @RequestParam("file") MultipartFile file
     );
 
     @ApiResponses(

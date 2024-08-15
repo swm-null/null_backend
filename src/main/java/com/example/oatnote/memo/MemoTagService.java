@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.oatnote.memo.models.CreateMemoRequest;
 import com.example.oatnote.memo.models.CreateMemoResponse;
@@ -18,6 +19,7 @@ import com.example.oatnote.memo.models.UpdateMemoResponse;
 import com.example.oatnote.memo.models.UpdateTagRequest;
 import com.example.oatnote.memo.models.UpdateTagResponse;
 import com.example.oatnote.memo.service.client.AiMemoTagClient;
+import com.example.oatnote.memo.service.client.models.AiCreateKakaoMemosResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateMemoResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateTagResponse;
 import com.example.oatnote.memo.service.client.models.AiSearchMemoResponse;
@@ -45,16 +47,53 @@ public class MemoTagService {
         Memo memo = createMemoRequest.toMemo(aiCreateMemoResponse.memoEmbeddings());
         Memo savedMemo = memoService.saveMemo(memo);
 
+        List<Tag> tags = processTags(
+            savedMemo.getId(),
+            aiCreateMemoResponse.existingTagIds(),
+            aiCreateMemoResponse.newTags()
+        );
+        return CreateMemoResponse.from(savedMemo, tags);
+    }
+
+    public List<CreateMemoResponse> createKakaoMemos(MultipartFile file) {
+        AiCreateKakaoMemosResponse aiCreateKakaoMemosResponse = aiMemoTagClient.createKakaoMemos(file);
+
+        List<CreateMemoResponse> createMemoResponses = new ArrayList<>();
+        for (AiCreateMemoResponse aiCreateMemoResponse : aiCreateKakaoMemosResponse.kakao()) {
+            Memo memo = Memo.builder()
+                .content(aiCreateMemoResponse.content())
+                .embedding(aiCreateMemoResponse.memoEmbeddings())
+                .createdAt(aiCreateMemoResponse.timestamp())
+                .updatedAt(aiCreateMemoResponse.timestamp())
+                .build();
+            Memo savedMemo = memoService.saveMemo(memo);
+            List<Tag> tags = processTags(
+                savedMemo.getId(),
+                aiCreateMemoResponse.existingTagIds(),
+                aiCreateMemoResponse.newTags()
+            );
+            createMemoResponses.add(CreateMemoResponse.from(savedMemo, tags));
+        }
+        return createMemoResponses;
+    }
+
+    private List<Tag> processTags(
+        String memoId,
+        List<String> existingTagIds,
+        List<AiCreateMemoResponse.Tag> newTags
+    ) {
         List<Tag> tags = new ArrayList<>();
-        // 이미 존재하는 태그들
-        for (String tagId : aiCreateMemoResponse.existingTagIds()) {
+
+        // 이미 존재하는 태그 처리
+        for (String tagId : existingTagIds) {
             Tag existingTag = tagService.getTag(tagId);
-            memoTagRelationService.createRelation(savedMemo.getId(), existingTag.getId());
+            memoTagRelationService.createRelation(memoId, existingTag.getId());
             tags.add(existingTag);
         }
-        // 새로운 태그들 생성
-        for (AiCreateMemoResponse.InnerTag newTag : aiCreateMemoResponse.newTags()) {
-            Tag tag = Tag.builder()
+
+        // 새로운 태그 생성 및 처리
+        for (AiCreateMemoResponse.Tag newTag : newTags) {
+            Tag tag = com.example.oatnote.memo.service.tag.models.Tag.builder()
                 .id(newTag.id())
                 .name(newTag.name())
                 .parentTagId(newTag.parent())
@@ -62,14 +101,15 @@ public class MemoTagService {
                 .embedding(newTag.embedding())
                 .build();
             Tag savedTag = tagService.saveTag(tag);
-            parentTagUpdate(newTag.parent(), savedTag.getId());
-            memoTagRelationService.createRelation(savedMemo.getId(), savedTag.getId());
+            updateParentTag(newTag.parent(), savedTag.getId());
+            memoTagRelationService.createRelation(memoId, savedTag.getId());
             tags.add(savedTag);
         }
-        return CreateMemoResponse.from(savedMemo, tags);
+
+        return tags;
     }
 
-    private void parentTagUpdate(String parentTagId, String childTagId) {
+    private void updateParentTag(String parentTagId, String childTagId) {
         if (parentTagId != null) {
             Tag parentTag = tagService.getTag(parentTagId);
             parentTag.addChildTagId(childTagId);

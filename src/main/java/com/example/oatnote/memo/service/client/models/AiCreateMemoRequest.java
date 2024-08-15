@@ -18,4 +18,7 @@ public record AiCreateMemoRequest(
     LocalDateTime timestamp
 ) {
 
+    public static AiCreateMemoRequest from(String content) {
+        return new AiCreateMemoRequest(content, null);
+    }
 }

@@ -7,4 +7,7 @@ public record AiCreateTagRequest(
     String content
 ) {
 
+    public static AiCreateTagRequest from(String name) {
+        return new AiCreateTagRequest(name);
+    }
 }
