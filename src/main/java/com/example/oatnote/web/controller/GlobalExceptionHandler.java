@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.example.oatnote.memo.service.client.exception.InvalidFileException;
 import com.example.oatnote.memo.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memo.service.tag.exception.TagNotFoundException;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
@@ -37,6 +38,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TagNotFoundException.class)
     public ResponseEntity<String> handleTagNotFoundException(TagNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidFileException.class)
+    public ResponseEntity<String> handleInvalidFileException(InvalidFileException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
