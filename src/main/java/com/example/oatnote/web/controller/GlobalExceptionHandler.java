@@ -1,9 +1,14 @@
 package com.example.oatnote.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.oatnote.memo.service.client.exception.InvalidFileException;
 import com.example.oatnote.memo.service.memo.exception.MemoNotFoundException;
@@ -12,7 +17,7 @@ import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthIllegalArgumentException.class)
@@ -43,6 +48,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidFileException.class)
     public ResponseEntity<String> handleInvalidFileException(InvalidFileException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleMethodArgumentNotValidException(
+        MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError)error).getField();
+            String defaultMessage = error.getDefaultMessage();
+            errors.put(fieldName, defaultMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

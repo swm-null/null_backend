@@ -77,7 +77,7 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public void validateToken(String token) {
+    public void validateToken(String token) throws JwtException {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
