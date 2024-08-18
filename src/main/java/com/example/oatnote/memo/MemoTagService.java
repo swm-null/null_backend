@@ -1,7 +1,9 @@
 package com.example.oatnote.memo;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,11 +79,7 @@ public class MemoTagService {
         return createMemoResponses;
     }
 
-    private List<Tag> processTags(
-        String memoId,
-        List<String> existingTagIds,
-        List<AiCreateMemoResponse.Tag> newTags
-    ) {
+    private List<Tag> processTags(String memoId, List<String> existingTagIds, List<AiCreateMemoResponse.Tag> newTags) {
         List<Tag> tags = new ArrayList<>();
 
         // 이미 존재하는 태그 처리
@@ -124,10 +122,19 @@ public class MemoTagService {
     }
 
     public List<MemoResponse> getMemos(String tagId) {
+        Set<String> allMemoIdsSet = new HashSet<>();
+        collectMemoIds(tagId, allMemoIdsSet);
+        List<Memo> memos = memoService.getMemos(new ArrayList<>(allMemoIdsSet));
+        return getMemoResponses(new ArrayList<>(), memos);
+    }
+
+    private void collectMemoIds(String tagId, Set<String> allMemoIdsSet) {
         List<String> memoIds = memoTagRelationService.getMemoIds(tagId);
-        List<Memo> memos = memoService.getMemos(memoIds);
-        List<MemoResponse> memoResponses = new ArrayList<>();
-        return getMemoResponses(memoResponses, memos);
+        allMemoIdsSet.addAll(memoIds);
+        Tag tag = tagService.getTag(tagId);
+        for (String childTagId : tag.getChildTagIds()) {
+            collectMemoIds(childTagId, allMemoIdsSet);
+        }
     }
 
     private List<MemoResponse> getMemoResponses(List<MemoResponse> memoResponses, List<Memo> memos) {
@@ -149,7 +156,6 @@ public class MemoTagService {
             case TAG -> memos = memoService.getMemos(memoTagRelationService.getMemoIds(aiSearchMemoResponse.tags()));
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
-
         List<List<Tag>> tagsList = memos.stream()
             .map(memo -> tagService.getTags(memoTagRelationService.getTagIds(memo.getId())))
             .toList();

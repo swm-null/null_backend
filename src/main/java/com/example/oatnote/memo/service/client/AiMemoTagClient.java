@@ -58,10 +58,6 @@ public class AiMemoTagClient {
         final URI uri = buildUri("/kakao-parser/");
         String fileContent = getFileContent(file);
         String fileType = getFileType(file.getOriginalFilename());
-
-        System.out.println("fileContent: " + fileContent);
-        System.out.println("fileType: " + fileType);
-
         AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(fileType, fileContent);
         ResponseEntity<AiCreateKakaoMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
             uri,
