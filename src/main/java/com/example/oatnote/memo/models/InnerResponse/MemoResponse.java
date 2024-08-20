@@ -1,12 +1,16 @@
 package com.example.oatnote.memo.models.InnerResponse;
 
+import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+
 import java.util.List;
 
 import com.example.oatnote.memo.service.memo.models.Memo;
 import com.example.oatnote.memo.service.tag.models.Tag;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@JsonNaming(SnakeCaseStrategy.class)
 public record MemoResponse(
     @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
     String id,
