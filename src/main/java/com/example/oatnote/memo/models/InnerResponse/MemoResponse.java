@@ -2,6 +2,7 @@ package com.example.oatnote.memo.models.InnerResponse;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.oatnote.memo.service.memo.models.Memo;
@@ -18,6 +19,18 @@ public record MemoResponse(
     @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해")
     String content,
 
+    @Schema(
+        description = "이미지 URL 리스트",
+        example = "[\"https://oatnote.com/image1.jpg\", \"https://oatnote.com/image2.jpg\"]"
+    )
+    List<String> imageUrls,
+
+    @Schema(description = "생성일시", example = "2024-08-21T03:47:23.328108")
+    LocalDateTime createdAt,
+
+    @Schema(description = "수정일시", example = "2024-08-21T03:47:23.328108")
+    LocalDateTime updatedAt,
+
     @Schema(description = "태그 리스트")
     List<TagResponse> tags
 ) {
@@ -26,6 +39,9 @@ public record MemoResponse(
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),
+            memo.getImageUrls(),
+            memo.getCreatedAt(),
+            memo.getUpdatedAt(),
             tags.stream().map(TagResponse::from).toList()
         );
     }
