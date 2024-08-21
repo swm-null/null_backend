@@ -21,3 +21,4 @@ cors:
     - ${ALLOWED_ORIGINS_PRODUCT}
     - ${ALLOWED_ORIGINS_STAGE}
     - ${ALLOWED_ORIGINS_LOCAL:http://localhost:3000}
+    - ${ALLOWED_ORIGINS_AI}

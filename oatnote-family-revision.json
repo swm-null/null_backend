@@ -30,6 +30,10 @@
           "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:AI_URL::"
         },
         {
+          "name": "JWT_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:JWT_SECRET_KEY::"
+        },
+        {
           "name": "SWAGGER_SERVER_URL",
           "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:SWAGGER_SERVER_URL::"
         },
@@ -46,8 +50,8 @@
           "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_LOCAL::"
         },
         {
-          "name": "JWT_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:JWT_SECRET_KEY::"
+          "name": "ALLOWED_ORIGINS_AI",
+          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_AI::"
         }
       ],
       "logConfiguration": {
