@@ -166,7 +166,7 @@ public class MemoTagService {
         AiCreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemo(updateMemoRequest.content());
 
         Memo memo = memoService.getMemo(memoId);
-        memo.update(updateMemoRequest.content(), aiCreateMemoResponse.memoEmbeddings());
+        memo.update(updateMemoRequest.content(),updateMemoRequest.imageUrls(), aiCreateMemoResponse.memoEmbeddings());
         Memo updatedMemo = memoService.saveMemo(memo);
 
         List<String> tagIds = memoTagRelationService.getTagIds(memo.getId());
