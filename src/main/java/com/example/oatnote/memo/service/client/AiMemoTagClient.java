@@ -1,16 +1,13 @@
 package com.example.oatnote.memo.service.client;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.oatnote.memo.service.client.exception.InvalidFileException;
 import com.example.oatnote.memo.service.client.models.AiCreateKakaoMemosRequest;
 import com.example.oatnote.memo.service.client.models.AiCreateKakaoMemosResponse;
 import com.example.oatnote.memo.service.client.models.AiCreateMemoRequest;
@@ -63,26 +60,6 @@ public class AiMemoTagClient {
             AiCreateKakaoMemosResponse.class
         );
         return aiCreateKakaoMemosResponse.getBody();
-    }
-
-    private String getFileContent(MultipartFile file) {
-        try {
-            return new String(file.getBytes(), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new InvalidFileException("파일을 읽는 중 오류가 발생했습니다.");
-        }
-    }
-
-    private String getFileType(String originalFilename) {
-        if (originalFilename == null) {
-            throw new InvalidFileException("파일 이름이 없습니다.");
-        } else if (originalFilename.endsWith(".csv")) {
-            return "csv";
-        } else if (originalFilename.endsWith(".txt")) {
-            return "txt";
-        } else {
-            throw new InvalidFileException("지원하지 않는 파일 형식입니다. csv 또는 txt 파일만 허용됩니다.");
-        }
     }
 
     public AiSearchMemoResponse searchMemo(String content) {
