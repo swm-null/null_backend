@@ -54,11 +54,9 @@ public class AiMemoTagClient {
         return aiCreateMemoResponse.getBody();
     }
 
-    public AiCreateKakaoMemosResponse createKakaoMemos(MultipartFile file) {
+    public AiCreateKakaoMemosResponse createKakaoMemos(String content) {
         final URI uri = buildUri("/kakao-parser/");
-        String fileContent = getFileContent(file);
-        String fileType = getFileType(file.getOriginalFilename());
-        AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(fileType, fileContent);
+        AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(content);
         ResponseEntity<AiCreateKakaoMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
             uri,
             aiCreateKakaoMemosRequest,
