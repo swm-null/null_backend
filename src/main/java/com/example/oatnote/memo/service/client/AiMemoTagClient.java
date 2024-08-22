@@ -53,7 +53,8 @@ public class AiMemoTagClient {
 
     public AiCreateKakaoMemosResponse createKakaoMemos(String content) {
         final URI uri = buildUri("/kakao-parser/");
-        AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(content);
+        final String type = content.substring(content.length() - 3);
+        AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(content, type);
         ResponseEntity<AiCreateKakaoMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
             uri,
             aiCreateKakaoMemosRequest,
