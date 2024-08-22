@@ -9,7 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.oatnote.memo.service.client.exception.InvalidFileException;
 import com.example.oatnote.memo.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memo.service.tag.exception.TagNotFoundException;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
@@ -41,11 +40,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TagNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleTagNotFoundException(TagNotFoundException ex) {
         return buildErrorResponse(1005, ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(InvalidFileException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidFileException(InvalidFileException ex) {
-        return buildErrorResponse(1006, ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

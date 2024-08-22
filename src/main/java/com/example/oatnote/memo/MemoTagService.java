@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.example.oatnote.memo.models.CreateKakaoMemosRequest;
 import com.example.oatnote.memo.models.CreateMemoRequest;
 import com.example.oatnote.memo.models.CreateMemoResponse;
 import com.example.oatnote.memo.models.CreateTagRequest;
@@ -57,8 +57,9 @@ public class MemoTagService {
         return CreateMemoResponse.from(savedMemo, tags);
     }
 
-    public List<CreateMemoResponse> createKakaoMemos(MultipartFile file) {
-        AiCreateKakaoMemosResponse aiCreateKakaoMemosResponse = aiMemoTagClient.createKakaoMemos(file);
+    public List<CreateMemoResponse> createKakaoMemos(CreateKakaoMemosRequest createKakaoMemosRequest) {
+        AiCreateKakaoMemosResponse aiCreateKakaoMemosResponse
+            = aiMemoTagClient.createKakaoMemos(createKakaoMemosRequest.content());
 
         List<CreateMemoResponse> createMemoResponses = new ArrayList<>();
         for (AiCreateMemoResponse aiCreateMemoResponse : aiCreateKakaoMemosResponse.kakao()) {
@@ -166,7 +167,7 @@ public class MemoTagService {
         AiCreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemo(updateMemoRequest.content());
 
         Memo memo = memoService.getMemo(memoId);
-        memo.update(updateMemoRequest.content(),updateMemoRequest.imageUrls(), aiCreateMemoResponse.memoEmbeddings());
+        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateMemoResponse.memoEmbeddings());
         Memo updatedMemo = memoService.saveMemo(memo);
 
         List<String> tagIds = memoTagRelationService.getTagIds(memo.getId());
