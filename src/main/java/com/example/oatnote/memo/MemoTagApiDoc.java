@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.oatnote.memo.models.CreateKakaoMemosRequest;
-import com.example.oatnote.memo.models.CreateMemoRequest;
-import com.example.oatnote.memo.models.CreateMemoResponse;
+import com.example.oatnote.memo.models.CreateMemosTagsRequest;
+import com.example.oatnote.memo.models.CreateMemoTagsRequest;
+import com.example.oatnote.memo.models.CreateMemoTagsResponse;
 import com.example.oatnote.memo.models.CreateTagRequest;
 import com.example.oatnote.memo.models.CreateTagResponse;
 import com.example.oatnote.memo.models.InnerResponse.MemoResponse;
@@ -44,8 +44,8 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "메모 생성")
     @PostMapping("/memos")
-    ResponseEntity<CreateMemoResponse> createMemo(
-        @RequestBody @Valid CreateMemoRequest createMemoRequest
+    ResponseEntity<CreateMemoTagsResponse> createMemo(
+        @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest
     );
 
     @ApiResponses(
@@ -57,8 +57,8 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "카카오톡으로 메모 리스트 생성")
     @PostMapping("/memos/kakao")
-    ResponseEntity<List<CreateMemoResponse>> createKakaoMemos(
-        @RequestBody @Valid CreateKakaoMemosRequest createKakaoMemosRequest
+    ResponseEntity<List<CreateMemoTagsResponse>> createKakaoMemos(
+        @RequestBody @Valid CreateMemosTagsRequest createMemosTagsRequest
     );
 
     @ApiResponses(

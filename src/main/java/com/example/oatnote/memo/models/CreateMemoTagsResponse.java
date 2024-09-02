@@ -12,13 +12,13 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record CreateMemoResponse(
+public record CreateMemoTagsResponse(
     @Schema(description = "메모")
     MemoResponse memo
 ) {
 
-    public static CreateMemoResponse from(Memo memo, List<Tag> tags) {
-        return new CreateMemoResponse(
+    public static CreateMemoTagsResponse from(Memo memo, List<Tag> tags) {
+        return new CreateMemoTagsResponse(
             MemoResponse.from(memo, tags)
         );
     }

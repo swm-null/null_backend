@@ -7,9 +7,9 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memo.models.CreateKakaoMemosRequest;
-import com.example.oatnote.memo.models.CreateMemoRequest;
-import com.example.oatnote.memo.models.CreateMemoResponse;
+import com.example.oatnote.memo.models.CreateMemosTagsRequest;
+import com.example.oatnote.memo.models.CreateMemoTagsRequest;
+import com.example.oatnote.memo.models.CreateMemoTagsResponse;
 import com.example.oatnote.memo.models.CreateTagRequest;
 import com.example.oatnote.memo.models.CreateTagResponse;
 import com.example.oatnote.memo.models.InnerResponse.MemoResponse;
@@ -43,10 +43,10 @@ public class MemoTagService {
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
 
-    public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest) {
-        AiCreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemo(createMemoRequest.content());
+    public CreateMemoTagsResponse createMemoTags(CreateMemoTagsRequest createMemoTagsRequest) {
+        AiCreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemo(createMemoTagsRequest.content());
 
-        Memo memo = createMemoRequest.toMemo(aiCreateMemoResponse.memoEmbeddings());
+        Memo memo = createMemoTagsRequest.toMemo(aiCreateMemoResponse.memoEmbeddings());
         Memo savedMemo = memoService.saveMemo(memo);
 
         List<Tag> tags = processTags(
@@ -54,14 +54,14 @@ public class MemoTagService {
             aiCreateMemoResponse.existingTagIds(),
             aiCreateMemoResponse.newTags()
         );
-        return CreateMemoResponse.from(savedMemo, tags);
+        return CreateMemoTagsResponse.from(savedMemo, tags);
     }
 
-    public List<CreateMemoResponse> createKakaoMemos(CreateKakaoMemosRequest createKakaoMemosRequest) {
+    public List<CreateMemoTagsResponse> createMemosTags(CreateMemosTagsRequest createMemosTagsRequest) {
         AiCreateKakaoMemosResponse aiCreateKakaoMemosResponse
-            = aiMemoTagClient.createKakaoMemos(createKakaoMemosRequest.content());
+            = aiMemoTagClient.createKakaoMemos(createMemosTagsRequest.content());
 
-        List<CreateMemoResponse> createMemoResponses = new ArrayList<>();
+        List<CreateMemoTagsResponse> createMemoTagsRespons = new ArrayList<>();
         for (AiCreateMemoResponse aiCreateMemoResponse : aiCreateKakaoMemosResponse.kakao()) {
             Memo memo = Memo.builder()
                 .content(aiCreateMemoResponse.content())
@@ -75,9 +75,9 @@ public class MemoTagService {
                 aiCreateMemoResponse.existingTagIds(),
                 aiCreateMemoResponse.newTags()
             );
-            createMemoResponses.add(CreateMemoResponse.from(savedMemo, tags));
+            createMemoTagsRespons.add(CreateMemoTagsResponse.from(savedMemo, tags));
         }
-        return createMemoResponses;
+        return createMemoTagsRespons;
     }
 
     private List<Tag> processTags(String memoId, List<String> existingTagIds, List<AiCreateMemoResponse.Tag> newTags) {
@@ -148,7 +148,7 @@ public class MemoTagService {
         return memoResponses;
     }
 
-    public SearchMemoResponse searchMemo(SearchMemoRequest searchMemoRequest) {
+    public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest) {
         AiSearchMemoResponse aiSearchMemoResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content());
         List<Memo> memos;
         switch (aiSearchMemoResponse.type()) {
@@ -202,7 +202,7 @@ public class MemoTagService {
             .toList();
     }
 
-    public List<TagResponse> getChildTags(String tagId) {
+    public List<TagResponse> getChildMemosTags(String tagId) {
         Tag tag = tagService.getTag(tagId);
         List<Tag> childTags = tagService.getTags(tag.getChildTagIds());
         return childTags.stream()
