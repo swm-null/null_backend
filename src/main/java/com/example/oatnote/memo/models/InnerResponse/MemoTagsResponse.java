@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record MemoResponse(
+public record MemoTagsResponse(
     @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
     String id,
 
@@ -35,8 +35,8 @@ public record MemoResponse(
     List<TagResponse> tags
 ) {
 
-    public static MemoResponse from(Memo memo, List<Tag> tags) {
-        return new MemoResponse(
+    public static MemoTagsResponse from(Memo memo, List<Tag> tags) {
+        return new MemoTagsResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),

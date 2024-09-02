@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.oatnote.memo.models.ChildMemosTagsResponse;
 import com.example.oatnote.memo.models.CreateMemoTagsRequest;
 import com.example.oatnote.memo.models.CreateMemoTagsResponse;
 import com.example.oatnote.memo.models.CreateMemosTagsRequest;
 import com.example.oatnote.memo.models.CreateTagRequest;
 import com.example.oatnote.memo.models.CreateTagResponse;
+import com.example.oatnote.memo.models.MemosTagsResponse;
+import com.example.oatnote.memo.models.RootMemosTagsResponse;
 import com.example.oatnote.memo.models.SearchMemoRequest;
 import com.example.oatnote.memo.models.SearchMemoResponse;
 import com.example.oatnote.memo.models.UpdateMemoRequest;
@@ -107,7 +110,7 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "특정 태그의 메모 조회")
     @GetMapping("/memos/tag/{tagId}")
-    ResponseEntity<MemosResponse> getMemosByTagId(
+    ResponseEntity<MemosTagsResponse> getMemosByTagId(
         @PathVariable("tagId") String tagId,
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit

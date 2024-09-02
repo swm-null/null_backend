@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.oatnote.memo.models.ChildMemosTagsResponse;
 import com.example.oatnote.memo.models.CreateMemoTagsRequest;
 import com.example.oatnote.memo.models.CreateMemoTagsResponse;
 import com.example.oatnote.memo.models.CreateMemosTagsRequest;
 import com.example.oatnote.memo.models.CreateTagRequest;
 import com.example.oatnote.memo.models.CreateTagResponse;
+import com.example.oatnote.memo.models.MemosTagsResponse;
+import com.example.oatnote.memo.models.RootMemosTagsResponse;
 import com.example.oatnote.memo.models.SearchMemoRequest;
 import com.example.oatnote.memo.models.SearchMemoResponse;
 import com.example.oatnote.memo.models.UpdateMemoRequest;
@@ -62,7 +65,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
     ) {
-        RootMemosTagsResponse rootMemosTagsResponse = memoTagService.getRootMemosTags();
+        RootMemosTagsResponse rootMemosTagsResponse = memoTagService.getRootMemosTags(page, limit);
         return ResponseEntity.status(HttpStatus.OK).body(rootMemosTagsResponse);
     }
 
@@ -72,18 +75,18 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
     ) {
-        ChildMemosTagsResponse childMemosTagsResponse = memoTagService.getChildMemosTags(tagId);
+        ChildMemosTagsResponse childMemosTagsResponse = memoTagService.getChildMemosTags(tagId, page, limit);
         return ResponseEntity.status(HttpStatus.OK).body(childMemosTagsResponse);
     }
 
     @GetMapping("/memos/tag/{tagId}")
-    public ResponseEntity<MemosResponse> getMemosByTagId(
+    public ResponseEntity<MemosTagsResponse> getMemosByTagId( //todo 디자인 확정되면 메모에 태그가 있는지 체크
         @PathVariable("tagId") String tagId,
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
     ) {
-        MemosResponse memosResponse = memoTagService.getMemos(tagId);
-        return ResponseEntity.status(HttpStatus.OK).body(MemosResponse);
+        MemosTagsResponse memosTagsResponse = memoTagService.getMemos(tagId, page, limit);
+        return ResponseEntity.status(HttpStatus.OK).body(memosTagsResponse);
     }
 
     @PostMapping("/memos/tags/search")

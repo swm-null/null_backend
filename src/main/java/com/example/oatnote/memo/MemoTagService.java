@@ -7,12 +7,12 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memo.models.CreateMemosTagsRequest;
 import com.example.oatnote.memo.models.CreateMemoTagsRequest;
 import com.example.oatnote.memo.models.CreateMemoTagsResponse;
+import com.example.oatnote.memo.models.CreateMemosTagsRequest;
 import com.example.oatnote.memo.models.CreateTagRequest;
 import com.example.oatnote.memo.models.CreateTagResponse;
-import com.example.oatnote.memo.models.InnerResponse.MemoResponse;
+import com.example.oatnote.memo.models.InnerResponse.MemoTagsResponse;
 import com.example.oatnote.memo.models.InnerResponse.TagResponse;
 import com.example.oatnote.memo.models.SearchMemoRequest;
 import com.example.oatnote.memo.models.SearchMemoResponse;
@@ -116,13 +116,13 @@ public class MemoTagService {
         }
     }
 
-    public List<MemoResponse> getAllMemos() {
-        List<MemoResponse> memoResponses = new ArrayList<>();
+    public List<MemoTagsResponse> getAllMemos() {
+        List<MemoTagsResponse> memoTagsRespons = new ArrayList<>();
         List<Memo> memos = memoService.getAllMemos();
-        return getMemoResponses(memoResponses, memos);
+        return getMemoResponses(memoTagsRespons, memos);
     }
 
-    public List<MemoResponse> getMemos(String tagId) {
+    public List<MemoTagsResponse> getMemos(String tagId) {
         Set<String> allMemoIdsSet = new HashSet<>();
         collectMemoIds(tagId, allMemoIdsSet);
         List<Memo> memos = memoService.getMemos(new ArrayList<>(allMemoIdsSet));
@@ -138,14 +138,14 @@ public class MemoTagService {
         }
     }
 
-    private List<MemoResponse> getMemoResponses(List<MemoResponse> memoResponses, List<Memo> memos) {
+    private List<MemoTagsResponse> getMemoResponses(List<MemoTagsResponse> memoTagsRespons, List<Memo> memos) {
         for (Memo memo : memos) {
             List<String> tagIds = memoTagRelationService.getTagIds(memo.getId());
             List<Tag> tags = tagService.getTags(tagIds);
-            MemoResponse memoResponse = MemoResponse.from(memo, tags);
-            memoResponses.add(memoResponse);
+            MemoTagsResponse memoTagsResponse = MemoTagsResponse.from(memo, tags);
+            memoTagsRespons.add(memoTagsResponse);
         }
-        return memoResponses;
+        return memoTagsRespons;
     }
 
     public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest) {
