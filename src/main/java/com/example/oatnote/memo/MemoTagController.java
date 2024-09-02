@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.memo.models.CreateMemosTagsRequest;
 import com.example.oatnote.memo.models.CreateMemoTagsRequest;
 import com.example.oatnote.memo.models.CreateMemoTagsResponse;
+import com.example.oatnote.memo.models.CreateMemosTagsRequest;
 import com.example.oatnote.memo.models.CreateTagRequest;
 import com.example.oatnote.memo.models.CreateTagResponse;
 import com.example.oatnote.memo.models.SearchMemoRequest;
