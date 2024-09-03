@@ -1,4 +1,4 @@
-package com.example.oatnote.memoTag.service.memoTagRelation.models;
+package com.example.oatnote.memoTag.service.relation.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

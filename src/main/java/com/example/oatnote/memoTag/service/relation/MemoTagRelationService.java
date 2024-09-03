@@ -1,10 +1,10 @@
-package com.example.oatnote.memoTag.service.memoTagRelation;
+package com.example.oatnote.memoTag.service.relation;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memoTag.service.memoTagRelation.models.MemoTagRelation;
+import com.example.oatnote.memoTag.service.relation.models.MemoTagRelation;
 
 import lombok.RequiredArgsConstructor;
 
