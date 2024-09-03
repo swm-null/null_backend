@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.user.models.LoginUserRequest;
-import com.example.oatnote.user.models.LoginUserResponse;
-import com.example.oatnote.user.models.RefreshUserRequest;
-import com.example.oatnote.user.models.RefreshUserResponse;
-import com.example.oatnote.user.models.RegisterUserRequest;
+import com.example.oatnote.user.dto.LoginUserRequest;
+import com.example.oatnote.user.dto.LoginUserResponse;
+import com.example.oatnote.user.dto.RefreshUserRequest;
+import com.example.oatnote.user.dto.RefreshUserResponse;
+import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.service.UserService;
 
 import jakarta.validation.Valid;

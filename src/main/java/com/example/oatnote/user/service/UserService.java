@@ -3,15 +3,15 @@ package com.example.oatnote.user.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.user.models.LoginUserRequest;
-import com.example.oatnote.user.models.LoginUserResponse;
-import com.example.oatnote.user.models.RefreshUserRequest;
-import com.example.oatnote.user.models.RefreshUserResponse;
-import com.example.oatnote.user.models.RegisterUserRequest;
+import com.example.oatnote.user.dto.LoginUserRequest;
+import com.example.oatnote.user.dto.LoginUserResponse;
+import com.example.oatnote.user.dto.RefreshUserRequest;
+import com.example.oatnote.user.dto.RefreshUserResponse;
+import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
-import com.example.oatnote.user.service.models.User;
+import com.example.oatnote.user.service.model.User;
 import com.example.oatnote.util.JwtUtil;
 
 import io.jsonwebtoken.JwtException;

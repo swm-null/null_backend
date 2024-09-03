@@ -4,11 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.oatnote.user.models.LoginUserRequest;
-import com.example.oatnote.user.models.LoginUserResponse;
-import com.example.oatnote.user.models.RefreshUserRequest;
-import com.example.oatnote.user.models.RefreshUserResponse;
-import com.example.oatnote.user.models.RegisterUserRequest;
+import com.example.oatnote.user.dto.LoginUserRequest;
+import com.example.oatnote.user.dto.LoginUserResponse;
+import com.example.oatnote.user.dto.RefreshUserRequest;
+import com.example.oatnote.user.dto.RefreshUserResponse;
+import com.example.oatnote.user.dto.RegisterUserRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

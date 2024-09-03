@@ -5,20 +5,20 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memoTag.models.ChildMemosTagsResponse;
-import com.example.oatnote.memoTag.models.CreateMemoTagsRequest;
-import com.example.oatnote.memoTag.models.CreateMemoTagsResponse;
-import com.example.oatnote.memoTag.models.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.models.CreateTagRequest;
-import com.example.oatnote.memoTag.models.CreateTagResponse;
-import com.example.oatnote.memoTag.models.MemosTagsResponse;
-import com.example.oatnote.memoTag.models.RootMemosTagsResponse;
-import com.example.oatnote.memoTag.models.SearchMemoRequest;
-import com.example.oatnote.memoTag.models.SearchMemoResponse;
-import com.example.oatnote.memoTag.models.UpdateMemoRequest;
-import com.example.oatnote.memoTag.models.UpdateMemoResponse;
-import com.example.oatnote.memoTag.models.UpdateTagRequest;
-import com.example.oatnote.memoTag.models.UpdateTagResponse;
+import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
+import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
+import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
+import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
+import com.example.oatnote.memoTag.dto.CreateTagRequest;
+import com.example.oatnote.memoTag.dto.CreateTagResponse;
+import com.example.oatnote.memoTag.dto.MemosTagsResponse;
+import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
+import com.example.oatnote.memoTag.dto.SearchMemoRequest;
+import com.example.oatnote.memoTag.dto.SearchMemoResponse;
+import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
+import com.example.oatnote.memoTag.dto.UpdateMemoResponse;
+import com.example.oatnote.memoTag.dto.UpdateTagRequest;
+import com.example.oatnote.memoTag.dto.UpdateTagResponse;
 import com.example.oatnote.memoTag.service.client.AiMemoTagClient;
 import com.example.oatnote.memoTag.service.client.models.AiCreateKakaoMemosResponse;
 import com.example.oatnote.memoTag.service.client.models.AiCreateMemoResponse;
@@ -26,10 +26,10 @@ import com.example.oatnote.memoTag.service.client.models.AiCreateTagResponse;
 import com.example.oatnote.memoTag.service.client.models.AiSearchMemoResponse;
 import com.example.oatnote.memoTag.service.memo.MemoService;
 import com.example.oatnote.memoTag.service.memo.exception.MemoNotFoundException;
-import com.example.oatnote.memoTag.service.memo.models.Memo;
-import com.example.oatnote.memoTag.service.relation.MemoTagRelationService;
+import com.example.oatnote.memoTag.service.memo.model.Memo;
+import com.example.oatnote.memoTag.service.memoTagRelation.MemoTagRelationService;
 import com.example.oatnote.memoTag.service.tag.TagService;
-import com.example.oatnote.memoTag.service.tag.models.Tag;
+import com.example.oatnote.memoTag.service.tag.model.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -160,7 +160,7 @@ public class MemoTagService {
 
         // 새로운 태그 생성 및 처리
         for (AiCreateMemoResponse.Tag newTag : newTags) {
-            Tag tag = com.example.oatnote.memoTag.service.tag.models.Tag.builder()
+            Tag tag = com.example.oatnote.memoTag.service.tag.model.Tag.builder()
                 .id(newTag.id())
                 .name(newTag.name())
                 .parentTagId(newTag.parent())

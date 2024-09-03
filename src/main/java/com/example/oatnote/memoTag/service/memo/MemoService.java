@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memoTag.service.memo.exception.MemoNotFoundException;
-import com.example.oatnote.memoTag.service.memo.models.Memo;
+import com.example.oatnote.memoTag.service.memo.model.Memo;
 
 import lombok.RequiredArgsConstructor;
 
