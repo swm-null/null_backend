@@ -25,6 +25,10 @@ public class Tag {
     @Indexed(unique = true)
     private String name;
 
+    @Field("pTId")
+    @Indexed
+    private String parentTagId;
+
     @Field("uId")
     @Indexed
     private String userId;
