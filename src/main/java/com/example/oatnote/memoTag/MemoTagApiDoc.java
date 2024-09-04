@@ -48,6 +48,7 @@ public interface MemoTagApiDoc {
         @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest
     );
 
+    /* todo 기획 논의 후 삭제 여부 결정
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "201"),
@@ -61,6 +62,7 @@ public interface MemoTagApiDoc {
         @PathVariable("memoId") String memoId,
         @RequestBody @Valid CreateTagRequest createTagRequest
     );
+     */
 
     @ApiResponses(
         value = {
