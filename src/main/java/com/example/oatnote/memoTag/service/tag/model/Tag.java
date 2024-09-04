@@ -22,12 +22,8 @@ public class Tag {
     @Id
     private String id;
 
-    @Indexed(unique = true)
-    private String name;
-
-    @Field("pTId")
     @Indexed
-    private String parentTagId;
+    private String name;
 
     @Field("uId")
     @Indexed

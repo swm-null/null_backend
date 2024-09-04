@@ -10,8 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.oatnote.memoTag.service.client.models.AiCreateKakaoMemosRequest;
 import com.example.oatnote.memoTag.service.client.models.AiCreateKakaoMemosResponse;
-import com.example.oatnote.memoTag.service.client.models.AiCreateMemoRequest;
-import com.example.oatnote.memoTag.service.client.models.AiCreateMemoResponse;
+import com.example.oatnote.memoTag.service.client.models.AiCreateMemoTagsRequest;
+import com.example.oatnote.memoTag.service.client.models.AiCreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AiCreateTagRequest;
 import com.example.oatnote.memoTag.service.client.models.AiCreateTagResponse;
 import com.example.oatnote.memoTag.service.client.models.AiSearchMemoRequest;
@@ -31,28 +31,19 @@ public class AiMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    private URI buildUri(String path) {
-        return UriComponentsBuilder
-            .fromUriString(aiUrl)
-            .path(path)
-            .encode()
-            .build()
-            .toUri();
-    }
-
-    public AiCreateMemoResponse createMemo(String content) {
-        final URI uri = buildUri("/add_memo/");
-        AiCreateMemoRequest aiCreateMemoRequest = AiCreateMemoRequest.from(content);
-        ResponseEntity<AiCreateMemoResponse> aiCreateMemoResponse = restTemplate.postForEntity(
+    public AiCreateMemoTagsResponse createMemo(String content) {
+        final URI uri = buildUri("/memos");
+        AiCreateMemoTagsRequest aiCreateMemoTagsRequest = AiCreateMemoTagsRequest.from(content, null);
+        ResponseEntity<AiCreateMemoTagsResponse> aiCreateMemoResponse = restTemplate.postForEntity(
             uri,
-            aiCreateMemoRequest,
-            AiCreateMemoResponse.class
+            aiCreateMemoTagsRequest,
+            AiCreateMemoTagsResponse.class
         );
         return aiCreateMemoResponse.getBody();
     }
 
     public AiCreateKakaoMemosResponse createKakaoMemos(String content) {
-        final URI uri = buildUri("/kakao-parser/");
+        final URI uri = buildUri("/kakao-parser");
         final String type = content.substring(content.length() - 3);
         AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(content, type);
         ResponseEntity<AiCreateKakaoMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
@@ -64,7 +55,7 @@ public class AiMemoTagClient {
     }
 
     public AiSearchMemoResponse searchMemo(String content) {
-        final URI uri = buildUri("/search/");
+        final URI uri = buildUri("/search");
         AiSearchMemoRequest aiSearchMemoRequest = AiSearchMemoRequest.from(content);
         ResponseEntity<AiSearchMemoResponse> aiSearchMemoResponse = restTemplate.postForEntity(
             uri,
@@ -75,7 +66,7 @@ public class AiMemoTagClient {
     }
 
     public AiCreateTagResponse createTag(String name) {
-        final URI uri = buildUri("/get_embedding/");
+        final URI uri = buildUri("/get_embedding");
         AiCreateTagRequest aiCreateTagRequest = AiCreateTagRequest.from(name);
         ResponseEntity<AiCreateTagResponse> aiCreateTagResponse = restTemplate.postForEntity(
             uri,
@@ -83,5 +74,14 @@ public class AiMemoTagClient {
             AiCreateTagResponse.class
         );
         return aiCreateTagResponse.getBody();
+    }
+
+    private URI buildUri(String path) {
+        return UriComponentsBuilder
+            .fromUriString(aiUrl)
+            .path(path)
+            .encode()
+            .build()
+            .toUri();
     }
 }

@@ -14,12 +14,13 @@ public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
-    public void createRelation(String memoId, String tagId) {
+    public void createRelation(String memoId, String tagId, boolean isLeafTag) {
         MemoTagRelation memoTagRelation = MemoTagRelation.builder()
             .memoId(memoId)
             .tagId(tagId)
+            .isLeafTag(isLeafTag)
             .build();
-        memoTagRelationRepository.insert(memoTagRelation);
+        memoTagRelationRepository.save(memoTagRelation);
     }
 
     public List<String> getMemoIds(String tagId) {
