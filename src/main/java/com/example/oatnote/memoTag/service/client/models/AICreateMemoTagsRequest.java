@@ -14,7 +14,6 @@ public record AICreateMemoTagsRequest(
 
     private record AIMemoTagsRequest(
         String content,
-
         LocalDateTime timestamp
     ) {
 

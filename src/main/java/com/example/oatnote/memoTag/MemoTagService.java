@@ -18,8 +18,9 @@ import com.example.oatnote.memoTag.dto.UpdateMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateTagRequest;
 import com.example.oatnote.memoTag.dto.UpdateTagResponse;
 import com.example.oatnote.memoTag.service.client.AIMemoTagClient;
-import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse.AIMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse;
+import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
+import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse.AIMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateTagResponse;
 import com.example.oatnote.memoTag.service.client.models.AISearchMemoResponse;
 import com.example.oatnote.memoTag.service.memo.MemoService;
@@ -45,7 +46,9 @@ public class MemoTagService {
     private final static boolean IS_LEAF_TAG = true;
 
     public CreateMemoTagsResponse createMemoTags(CreateMemoTagsRequest createMemoTagsRequest) {
-        AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemo(createMemoTagsRequest.content());
+        AICreateMemosTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemoTags(
+            createMemoTagsRequest.content()
+        );
 
         Memo savedMemo = null;
         List<Tag> tags = new ArrayList<>();
@@ -57,11 +60,11 @@ public class MemoTagService {
     }
 
     public void createMemosTags(CreateMemosTagsRequest createMemosTagsRequest) {
-        AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemo(
+        AICreateMemosTagsResponse aiCreateMemosTagsResponse = aiMemoTagClient.createMemosTags(
             createMemosTagsRequest.content()
         );
 
-        for (var aiMemoTagsResponse : aiCreateMemoTagsResponse.processedMemos()) {
+        for (var aiMemoTagsResponse : aiCreateMemosTagsResponse.processedMemos()) {
             Memo savedMemo = saveMemoTags(aiMemoTagsResponse);
             updateMemosTagsRelations(aiMemoTagsResponse, savedMemo);
         }
@@ -112,7 +115,7 @@ public class MemoTagService {
 
         Memo memo = memoService.getMemo(memoId);
         memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(),
-            aiCreateMemoTagsResponse.memoEmbeddings());
+            aiCreateMemoTagsResponse.em());
         Memo updatedMemo = memoService.saveMemo(memo);
 
         List<String> tagIds = memoTagRelationService.getTagIds(memo.getId());
@@ -140,7 +143,7 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    private Memo saveMemoTags(AIMemoTagsResponse aiMemoTagsResponse) {
+    private Memo saveMemoTags(AIMemosTagsResponse aiMemoTagsResponse) {
         Memo memo = Memo.builder()
             .content(aiMemoTagsResponse.content())
             .embedding(aiMemoTagsResponse.embedding())
@@ -156,7 +159,7 @@ public class MemoTagService {
         return memoService.saveMemo(memo);
     }
 
-    private List<Tag> updateMemosTagsRelations(AIMemoTagsResponse aiMemoTagsResponse, Memo savedMemo) {
+    private List<Tag> updateMemosTagsRelations(AIMemosTagsResponse aiMemoTagsResponse, Memo savedMemo) {
         List<Tag> tags = new ArrayList<>();
         for (var parentTagId : aiMemoTagsResponse.parentTagIds()) {
             Tag tag = tagService.getTag(parentTagId);

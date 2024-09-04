@@ -11,8 +11,8 @@ public record AICreateMemosTagsResponse(
         List<Double> embedding,
         String timestamp,
         List<String> parentTagIds,
-        List<AICreateMemoTagsResponse.AIMemoTagsResponse.NewTag> newTags,
-        AICreateMemoTagsResponse.AIMemoTagsResponse.TagRelations tagRelations
+        List<NewTag> newTags,
+        TagRelations tagRelations
     ) {
 
         public record NewTag(
@@ -24,8 +24,8 @@ public record AICreateMemosTagsResponse(
         }
 
         public record TagRelations(
-            List<AICreateMemoTagsResponse.AIMemoTagsResponse.TagRelations.Relation> added,
-            List<AICreateMemoTagsResponse.AIMemoTagsResponse.TagRelations.Relation> deleted
+            List<Relation> added,
+            List<Relation> deleted
         ) {
             public record Relation(
                 String parentId,

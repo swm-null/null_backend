@@ -31,13 +31,13 @@ public class AIMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AICreateMemoTagsResponse createMemo(String content) {
+    public AICreateMemosTagsResponse createMemoTags(String content) {
         final URI uri = buildUri("/memos");
         AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content, null);
-        ResponseEntity<AICreateMemoTagsResponse> aiCreateMemoResponse = restTemplate.postForEntity(
+        ResponseEntity<AICreateMemosTagsResponse> aiCreateMemoResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemoTagsRequest,
-            AICreateMemoTagsResponse.class
+            AICreateMemosTagsResponse.class
         );
         return aiCreateMemoResponse.getBody();
     }
