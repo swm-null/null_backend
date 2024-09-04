@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.oatnote.memoTag.service.client.models.AiCreateKakaoMemosRequest;
-import com.example.oatnote.memoTag.service.client.models.AiCreateKakaoMemosResponse;
+import com.example.oatnote.memoTag.service.client.models.AiCreateMemosTagsRequest;
+import com.example.oatnote.memoTag.service.client.models.AiCreateMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AiCreateMemoTagsRequest;
 import com.example.oatnote.memoTag.service.client.models.AiCreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AiCreateTagRequest;
@@ -42,14 +42,14 @@ public class AiMemoTagClient {
         return aiCreateMemoResponse.getBody();
     }
 
-    public AiCreateKakaoMemosResponse createKakaoMemos(String content) {
+    public AiCreateMemosTagsResponse createMemosTags(String content) {
         final URI uri = buildUri("/kakao-parser");
         final String type = content.substring(content.length() - 3);
-        AiCreateKakaoMemosRequest aiCreateKakaoMemosRequest = AiCreateKakaoMemosRequest.from(content, type);
-        ResponseEntity<AiCreateKakaoMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
+        AiCreateMemosTagsRequest aiCreateMemosTagsRequest = AiCreateMemosTagsRequest.from(content, type);
+        ResponseEntity<AiCreateMemosTagsResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
             uri,
-            aiCreateKakaoMemosRequest,
-            AiCreateKakaoMemosResponse.class
+            aiCreateMemosTagsRequest,
+            AiCreateMemosTagsResponse.class
         );
         return aiCreateKakaoMemosResponse.getBody();
     }

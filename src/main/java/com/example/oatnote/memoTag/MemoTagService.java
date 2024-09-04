@@ -9,8 +9,6 @@ import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.CreateTagRequest;
-import com.example.oatnote.memoTag.dto.CreateTagResponse;
 import com.example.oatnote.memoTag.dto.MemosTagsResponse;
 import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
@@ -20,7 +18,8 @@ import com.example.oatnote.memoTag.dto.UpdateMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateTagRequest;
 import com.example.oatnote.memoTag.dto.UpdateTagResponse;
 import com.example.oatnote.memoTag.service.client.AiMemoTagClient;
-import com.example.oatnote.memoTag.service.client.models.AiCreateKakaoMemosResponse;
+import com.example.oatnote.memoTag.service.client.models.AiCreateMemoTagsResponse.AiMemoTagsResponse;
+import com.example.oatnote.memoTag.service.client.models.AiCreateMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AiCreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AiCreateTagResponse;
 import com.example.oatnote.memoTag.service.client.models.AiSearchMemoResponse;
@@ -52,31 +51,21 @@ public class MemoTagService {
         Memo savedMemo = null;
         List<Tag> tags = new ArrayList<>();
         for (var aiMemoTagsResponse : aiCreateMemoTagsResponse.processedMemos()) {
-            Memo memo = createMemoTagsRequest.toMemo(aiMemoTagsResponse.embedding());
-            savedMemo = memoService.saveMemo(memo);
-
-            for (var newTag : aiMemoTagsResponse.newTags()) {
-                Tag tag = Tag.builder()
-                    .id(newTag.id())
-                    .name(newTag.name())
-                    .embedding(newTag.embedding())
-                    .build();
-                tagService.saveTag(tag);
-            }
-            for (var parentTagId : aiMemoTagsResponse.parentTagIds()) {
-                memoTagRelationService.createRelation(savedMemo.getId(), parentTagId, IS_LEAF_TAG);
-                while ((parentTagId = tagsRelationService.getParentTagId(parentTagId)) != null) {
-                    memoTagRelationService.createRelation(savedMemo.getId(), parentTagId, !IS_LEAF_TAG);
-                }
-            }
-            for (var addRelation : aiMemoTagsResponse.tagRelations().added()) {
-                tagsRelationService.createRelation(addRelation.parentId(), addRelation.childId());
-            }
-            for (var deletedRelation : aiMemoTagsResponse.tagRelations().deleted()) {
-                tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
-            }
+            savedMemo = saveMemoTags(aiMemoTagsResponse);
+            tags.addAll(updateMemosTagsRelations(aiMemoTagsResponse, savedMemo));
         }
         return CreateMemoTagsResponse.from(savedMemo, tags);
+    }
+
+    public void createMemosTags(CreateMemosTagsRequest createMemosTagsRequest) {
+        AiCreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemo(
+            createMemosTagsRequest.content()
+        );
+
+        for (var aiMemoTagsResponse : aiCreateMemoTagsResponse.processedMemos()) {
+            Memo savedMemo = saveMemoTags(aiMemoTagsResponse);
+            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo);
+        }
     }
 
     /* todo 기획 논의 후 삭제 여부 결정
@@ -88,28 +77,6 @@ public class MemoTagService {
         return CreateTagResponse.from(savedTag);
     }
      */
-
-    public void createMemosTags(CreateMemosTagsRequest createMemosTagsRequest) {
-        AiCreateKakaoMemosResponse aiCreateKakaoMemosResponse
-            = aiMemoTagClient.createKakaoMemos(createMemosTagsRequest.content());
-
-        List<CreateMemoTagsResponse> createMemoTagsRespons = new ArrayList<>();
-        for (AiCreateMemoTagsResponse aiCreateMemoTagsResponse : aiCreateKakaoMemosResponse.kakao()) {
-            Memo memo = Memo.builder()
-                .content(aiCreateMemoTagsResponse.content())
-                .embedding(aiCreateMemoTagsResponse.memoEmbeddings())
-                .createdAt(aiCreateMemoTagsResponse.timestamp())
-                .updatedAt(aiCreateMemoTagsResponse.timestamp())
-                .build();
-            Memo savedMemo = memoService.saveMemo(memo);
-            List<Tag> tags = processTags(
-                savedMemo.getId(),
-                aiCreateMemoTagsResponse.existingTagIds(),
-                aiCreateMemoTagsResponse.newTags()
-            );
-            createMemoTagsRespons.add(CreateMemoTagsResponse.from(savedMemo, tags));
-        }
-    }
 
     public RootMemosTagsResponse getRootMemosTags(Integer page, Integer limit) {
 
@@ -174,11 +141,38 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    private void updateParentTag(String parentTagId, String childTagId) {
-        if (parentTagId != null) {
-            Tag parentTag = tagService.getTag(parentTagId);
-            parentTag.addChildTagId(childTagId);
-            tagService.saveTag(parentTag);
+    private Memo saveMemoTags(AiMemoTagsResponse aiMemoTagsResponse) {
+        Memo memo = Memo.builder()
+            .content(aiMemoTagsResponse.content())
+            .embedding(aiMemoTagsResponse.embedding())
+            .build();
+        for (var newTag : aiMemoTagsResponse.newTags()) {
+            Tag tag = Tag.builder()
+                .id(newTag.id())
+                .name(newTag.name())
+                .embedding(newTag.embedding())
+                .build();
+            tagService.saveTag(tag);
         }
+        return memoService.saveMemo(memo);
+    }
+
+    private List<Tag> updateMemosTagsRelations(AiMemoTagsResponse aiMemoTagsResponse, Memo savedMemo) {
+        List<Tag> tags = new ArrayList<>();
+        for (var parentTagId : aiMemoTagsResponse.parentTagIds()) {
+            Tag tag = tagService.getTag(parentTagId);
+            tags.add(tag);
+            memoTagRelationService.createRelation(savedMemo.getId(), parentTagId, IS_LEAF_TAG);
+            while ((parentTagId = tagsRelationService.getParentTagId(parentTagId)) != null) {
+                memoTagRelationService.createRelation(savedMemo.getId(), parentTagId, !IS_LEAF_TAG);
+            }
+        }
+        for (var addRelation : aiMemoTagsResponse.tagRelations().added()) {
+            tagsRelationService.createRelation(addRelation.parentId(), addRelation.childId());
+        }
+        for (var deletedRelation : aiMemoTagsResponse.tagRelations().deleted()) {
+            tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+        }
+        return tags;
     }
 }
