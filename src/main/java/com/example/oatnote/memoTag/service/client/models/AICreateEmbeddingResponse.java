@@ -4,7 +4,7 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotEmpty;
 
-public record AICreateTagResponse(
+public record AICreateEmbeddingResponse(
     @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     List<Double> embedding
 ) {

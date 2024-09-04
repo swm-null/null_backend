@@ -35,8 +35,8 @@ public class MemoTagRelationService {
             .toList();
     }
 
-    public List<String> getTagIds(String memoId) {
-        return memoTagRelationRepository.findByMemoId(memoId).stream()
+    public List<String> getLeafTagIds(String memoId) {
+        return memoTagRelationRepository.findByMemoIdAndIsLeafTagTrue(memoId).stream()
             .map(MemoTagRelation::getTagId)
             .toList();
     }

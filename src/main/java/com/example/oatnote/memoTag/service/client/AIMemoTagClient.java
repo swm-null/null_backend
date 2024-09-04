@@ -11,9 +11,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsRequest;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsRequest;
-import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateTagRequest;
-import com.example.oatnote.memoTag.service.client.models.AICreateTagResponse;
+import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingResponse;
 import com.example.oatnote.memoTag.service.client.models.AISearchMemoRequest;
 import com.example.oatnote.memoTag.service.client.models.AISearchMemoResponse;
 
@@ -65,15 +64,15 @@ public class AIMemoTagClient {
         return aiSearchMemoResponse.getBody();
     }
 
-    public AICreateTagResponse createTag(String name) {
+    public AICreateEmbeddingResponse createEmbedding(String name) {
         final URI uri = buildUri("/get_embedding");
-        AICreateTagRequest aiCreateTagRequest = AICreateTagRequest.from(name);
-        ResponseEntity<AICreateTagResponse> aiCreateTagResponse = restTemplate.postForEntity(
+        AICreateTagRequest aiCreateEmbeddingRequest = AICreateTagRequest.from(name);
+        ResponseEntity<AICreateEmbeddingResponse> aiCreateEmbeddingResponse = restTemplate.postForEntity(
             uri,
-            aiCreateTagRequest,
-            AICreateTagResponse.class
+            aiCreateEmbeddingRequest,
+            AICreateEmbeddingResponse.class
         );
-        return aiCreateTagResponse.getBody();
+        return aiCreateEmbeddingResponse.getBody();
     }
 
     private URI buildUri(String path) {

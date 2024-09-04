@@ -21,7 +21,7 @@ import com.example.oatnote.memoTag.service.client.AIMemoTagClient;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse.AIMemosTagsResponse;
-import com.example.oatnote.memoTag.service.client.models.AICreateTagResponse;
+import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingResponse;
 import com.example.oatnote.memoTag.service.client.models.AISearchMemoResponse;
 import com.example.oatnote.memoTag.service.memo.MemoService;
 import com.example.oatnote.memoTag.service.memo.exception.MemoNotFoundException;
@@ -105,28 +105,29 @@ public class MemoTagService {
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         List<List<Tag>> tagsList = memos.stream()
-            .map(memo -> tagService.getTags(memoTagRelationService.getTagIds(memo.getId())))
+            .map(memo -> tagService.getTags(memoTagRelationService.getLeafTagIds(memo.getId())))
             .toList();
         return SearchMemoResponse.from(aiSearchMemoResponse.processedMessage(), memos, tagsList);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
-        AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemo(updateMemoRequest.content());
+        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(
+            updateMemoRequest.content()
+        );
 
         Memo memo = memoService.getMemo(memoId);
-        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(),
-            aiCreateMemoTagsResponse.em());
+        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateEmbeddingResponse.embedding());
         Memo updatedMemo = memoService.saveMemo(memo);
 
-        List<String> tagIds = memoTagRelationService.getTagIds(memo.getId());
+        List<String> tagIds = memoTagRelationService.getLeafTagIds(memo.getId());
         List<Tag> tags = tagService.getTags(tagIds);
         return UpdateMemoResponse.from(updatedMemo, tags);
     }
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest) {
-        AICreateTagResponse aiCreateTagResponse = aiMemoTagClient.createTag(updateTagRequest.name());
+        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
         Tag tag = tagService.getTag(tagId);
-        tag.update(updateTagRequest.name(), aiCreateTagResponse.embedding());
+        tag.update(updateTagRequest.name(), aiCreateEmbeddingResponse.embedding());
         Tag updatedTag = tagService.saveTag(tag);
         return UpdateTagResponse.from(updatedTag);
     }
