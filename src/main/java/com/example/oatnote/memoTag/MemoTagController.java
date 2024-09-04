@@ -92,7 +92,7 @@ public class MemoTagController implements MemoTagApiDoc {
     }
 
     @PostMapping("/memos/tags/search")
-    public ResponseEntity<SearchMemoResponse> getMemosTagsByAiSearch(
+    public ResponseEntity<SearchMemoResponse> getMemosTagsByAISearch(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest
     ) {
         SearchMemoResponse searchMemoResponse = memoTagService.searchMemosTags(searchMemoRequest);

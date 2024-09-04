@@ -4,15 +4,15 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
-import com.example.oatnote.memoTag.service.client.models.enums.AiSearchType;
+import com.example.oatnote.memoTag.service.client.models.enums.AISearchType;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import jakarta.validation.constraints.NotNull;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AiSearchMemoResponse(
+public record AISearchMemoResponse(
     @NotNull(message = "검색 타입은 비워둘 수 없습니다.")
-    AiSearchType type, // "similarity" | "regex" | "tag"
+    AISearchType type, // "similarity" | "regex" | "tag"
     String processedMessage,
     List<String> ids,
     String regex,

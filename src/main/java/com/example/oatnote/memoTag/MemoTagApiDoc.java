@@ -13,8 +13,6 @@ import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.CreateTagRequest;
-import com.example.oatnote.memoTag.dto.CreateTagResponse;
 import com.example.oatnote.memoTag.dto.MemosTagsResponse;
 import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
@@ -127,7 +125,7 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "AI 검색을 통한 메모 태그 조회")
     @PostMapping("/memos/tags/search")
-    ResponseEntity<SearchMemoResponse> getMemosTagsByAiSearch(
+    ResponseEntity<SearchMemoResponse> getMemosTagsByAISearch(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest
     );
 

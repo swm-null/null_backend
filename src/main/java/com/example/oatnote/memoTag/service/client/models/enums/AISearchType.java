@@ -1,6 +1,6 @@
 package com.example.oatnote.memoTag.service.client.models.enums;
 
-public enum AiSearchType {
+public enum AISearchType {
     SIMILARITY("similarity"),
     REGEX("regex"),
     TAG("tag"),
@@ -8,7 +8,7 @@ public enum AiSearchType {
 
     private final String value;
 
-    AiSearchType(String value) {
+    AISearchType(String value) {
         this.value = value;
     }
 

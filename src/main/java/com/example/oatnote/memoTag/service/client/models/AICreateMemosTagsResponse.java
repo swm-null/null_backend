@@ -1,23 +1,18 @@
 package com.example.oatnote.memoTag.service.client.models;
 
-import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
-
 import java.util.List;
 
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
-@JsonNaming(SnakeCaseStrategy.class)
-public record AiCreateMemoTagsResponse(
-    List<AiMemoTagsResponse> processedMemos
+public record AICreateMemosTagsResponse(
+    List<AIMemosTagsResponse> processedMemos
 ) {
 
-    public record AiMemoTagsResponse(
+    public record AIMemosTagsResponse(
         String content,
         List<Double> embedding,
         String timestamp,
         List<String> parentTagIds,
-        List<NewTag> newTags,
-        TagRelations tagRelations
+        List<AICreateMemoTagsResponse.AIMemoTagsResponse.NewTag> newTags,
+        AICreateMemoTagsResponse.AIMemoTagsResponse.TagRelations tagRelations
     ) {
 
         public record NewTag(
@@ -29,8 +24,8 @@ public record AiCreateMemoTagsResponse(
         }
 
         public record TagRelations(
-            List<Relation> added,
-            List<Relation> deleted
+            List<AICreateMemoTagsResponse.AIMemoTagsResponse.TagRelations.Relation> added,
+            List<AICreateMemoTagsResponse.AIMemoTagsResponse.TagRelations.Relation> deleted
         ) {
             public record Relation(
                 String parentId,
