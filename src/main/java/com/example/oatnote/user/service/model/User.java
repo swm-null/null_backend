@@ -28,7 +28,7 @@ public class User {
     @CreatedDate
     private Instant createdAt;
 
-    @Field(name = "cTime")
+    @Field(name = "uTime")
     @LastModifiedDate
     private Instant updatedAt;
 

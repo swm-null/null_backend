@@ -27,11 +27,4 @@ public record CreateMemoTagsRequest(
     List<String> imageUrls
 ) {
 
-    public Memo toMemo(List<Double> embedding) {
-        return Memo.builder()
-            .content(content)
-            .imageUrls(imageUrls)
-            .embedding(embedding)
-            .build();
-    }
 }

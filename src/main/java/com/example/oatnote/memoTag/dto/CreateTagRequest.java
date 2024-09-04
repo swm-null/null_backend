@@ -15,10 +15,4 @@ public record CreateTagRequest(
     String name
 ) {
 
-    public Tag toTag(List<Double> embedding) {
-        return Tag.builder()
-            .name(name)
-            .embedding(embedding)
-            .build();
-    }
 }

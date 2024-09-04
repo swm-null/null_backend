@@ -19,14 +19,6 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public List<Tag> getAllTags() {
-        return tagRepository.findAll();
-    }
-
-    public List<Tag> getRootTags() {
-        return tagRepository.findByParentTagIdIsNull();
-    }
-
     public List<Tag> getTags(List<String> tagIds) {
         return tagRepository.findAllById(tagIds);
     }

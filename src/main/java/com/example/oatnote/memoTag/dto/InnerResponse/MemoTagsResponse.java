@@ -2,7 +2,6 @@ package com.example.oatnote.memoTag.dto.InnerResponse;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.oatnote.memoTag.service.memo.model.Memo;

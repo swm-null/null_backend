@@ -25,13 +25,13 @@ public class Memo {
     private String content;
 
     @Field("imgs")
-    private List<String> imageUrls = new ArrayList<>();
+    private List<String> imageUrls;
 
     @Indexed
     @Field("uId")
     private String userId;
 
-    private List<Double> embedding = new ArrayList<>();
+    private List<Double> embedding;
 
     @Field("cTime")
     @CreatedDate

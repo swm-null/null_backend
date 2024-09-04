@@ -19,10 +19,6 @@ public class MemoService {
         return memoRepository.save(memo);
     }
 
-    public List<Memo> getAllMemos() {
-        return memoRepository.findAll();
-    }
-
     public Memo getMemo(String memoId) {
         return memoRepository.findById(memoId)
             .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));

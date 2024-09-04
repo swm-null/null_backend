@@ -2,6 +2,10 @@ package com.example.oatnote.memoTag.service.client.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+@JsonNaming(SnakeCaseStrategy.class)
 public record AICreateMemosTagsResponse(
     List<AIMemosTagsResponse> processedMemos
 ) {

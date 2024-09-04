@@ -1,7 +1,6 @@
 package com.example.oatnote.memoTag.service.tag.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -29,7 +28,7 @@ public class Tag {
     @Indexed
     private String userId;
 
-    private List<Double> embedding = new ArrayList<>();
+    private List<Double> embedding;
 
     @Field("cTime")
     @CreatedDate
