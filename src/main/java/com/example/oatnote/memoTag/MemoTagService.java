@@ -18,7 +18,6 @@ import com.example.oatnote.memoTag.dto.UpdateMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateTagRequest;
 import com.example.oatnote.memoTag.dto.UpdateTagResponse;
 import com.example.oatnote.memoTag.service.client.AIMemoTagClient;
-import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse.AIMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingResponse;

@@ -2,6 +2,7 @@ package com.example.oatnote.memoTag.service.tagsRelation;
 
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.memoTag.service.tagsRelation.exception.TagsRelationNotFoundException;
 import com.example.oatnote.memoTag.service.tagsRelation.model.TagsRelation;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,9 @@ public class TagsRelationService {
     }
 
     public String getParentTagId(String parentTagId) {
-        return tagsRelationRepository.findByChildTagId(parentTagId).getParentTagId();
+        return tagsRelationRepository.findByChildTagId(parentTagId)
+            .orElseThrow(() -> new TagsRelationNotFoundException("태그 릴레이션을 찾지 못했습니다. childTagId :" + parentTagId))
+            .getParentTagId();
     }
+
 }

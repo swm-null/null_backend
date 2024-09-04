@@ -10,6 +10,7 @@ public record AICreateMemosTagsResponse(
     List<AIMemosTagsResponse> processedMemos
 ) {
 
+    @JsonNaming(SnakeCaseStrategy.class)
     public record AIMemosTagsResponse(
         String content,
         List<Double> embedding,
@@ -19,6 +20,7 @@ public record AICreateMemosTagsResponse(
         TagRelations tagRelations
     ) {
 
+        @JsonNaming(SnakeCaseStrategy.class)
         public record NewTag(
             String id,
             String name,
@@ -27,10 +29,13 @@ public record AICreateMemosTagsResponse(
 
         }
 
+        @JsonNaming(SnakeCaseStrategy.class)
         public record TagRelations(
             List<Relation> added,
             List<Relation> deleted
         ) {
+
+            @JsonNaming(SnakeCaseStrategy.class)
             public record Relation(
                 String parentId,
                 String childId
