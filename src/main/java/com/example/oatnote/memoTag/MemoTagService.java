@@ -49,7 +49,6 @@ public class MemoTagService {
         AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemoTags(
             createMemoTagsRequest.content()
         );
-
         Memo savedMemo = saveMemoTags(aiCreateMemoTagsResponse.processedMemos());
         List<Tag> tags = updateMemosTagsRelations(aiCreateMemoTagsResponse.processedMemos(), savedMemo);
         return CreateMemoTagsResponse.from(savedMemo, tags);
@@ -59,7 +58,6 @@ public class MemoTagService {
         AICreateMemosTagsResponse aiCreateMemosTagsResponse = aiMemoTagClient.createMemosTags(
             createMemosTagsRequest.content()
         );
-
         for (var aiMemoTagsResponse : aiCreateMemosTagsResponse.processedMemos()) {
             Memo savedMemo = saveMemoTags(aiMemoTagsResponse);
             updateMemosTagsRelations(aiMemoTagsResponse, savedMemo);
@@ -100,11 +98,9 @@ public class MemoTagService {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(
             updateMemoRequest.content()
         );
-
         Memo memo = memoService.getMemo(memoId);
         memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateEmbeddingResponse.embedding());
         Memo updatedMemo = memoService.saveMemo(memo);
-
         List<String> tagIds = memoTagRelationService.getLinkedTagIds(memo.getId());
         List<Tag> tags = tagService.getTags(tagIds);
         return UpdateMemoResponse.from(updatedMemo, tags);
