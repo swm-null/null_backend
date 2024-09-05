@@ -163,12 +163,14 @@ public class MemoTagService {
     private Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse) {
         Memo memo = Memo.builder()
             .content(aiMemoTagsResponse.content())
+            .userId("todoUserId") // todo 유저 아이디
             .embedding(aiMemoTagsResponse.embedding())
             .build();
         for (var newTag : aiMemoTagsResponse.newTags()) {
             Tag tag = Tag.builder()
                 .id(newTag.id())
                 .name(newTag.name())
+                .userId("todoUserId") // todo 유저 아이디
                 .embedding(newTag.embedding())
                 .build();
             tagService.saveTag(tag);

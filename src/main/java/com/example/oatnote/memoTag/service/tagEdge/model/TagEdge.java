@@ -23,6 +23,6 @@ public class TagEdge {
     @Field("uId")
     private String userId;
 
-    @Field("edge")
+    @Field("edges")
     private Map<String, List<String>> tagEdges;
 }
