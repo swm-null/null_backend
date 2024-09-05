@@ -25,6 +25,6 @@ public class MemoTagRelation {
     private String tagId;
 
     @Indexed
-    @Field("isLT")
-    private boolean isLeafTag;
+    @Field("isL")
+    private boolean isLinked;
 }

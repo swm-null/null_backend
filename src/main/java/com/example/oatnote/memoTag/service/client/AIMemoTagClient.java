@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsRequest;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
 import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsRequest;
-import com.example.oatnote.memoTag.service.client.models.AICreateTagRequest;
+import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingRequest;
 import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingResponse;
 import com.example.oatnote.memoTag.service.client.models.AISearchMemoRequest;
 import com.example.oatnote.memoTag.service.client.models.AISearchMemoResponse;
@@ -30,15 +31,15 @@ public class AIMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AICreateMemosTagsResponse createMemoTags(String content) {
+    public AICreateMemoTagsResponse createMemoTags(String content) {
         final URI uri = buildUri("/memos");
-        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content, null);
-        ResponseEntity<AICreateMemosTagsResponse> aiCreateMemoResponse = restTemplate.postForEntity(
+        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content);
+        ResponseEntity<AICreateMemoTagsResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemoTagsRequest,
-            AICreateMemosTagsResponse.class
+            AICreateMemoTagsResponse.class
         );
-        return aiCreateMemoResponse.getBody();
+        return aiCreateMemoTagsResponse.getBody();
     }
 
     public AICreateMemosTagsResponse createMemosTags(String content) {
@@ -66,7 +67,7 @@ public class AIMemoTagClient {
 
     public AICreateEmbeddingResponse createEmbedding(String name) {
         final URI uri = buildUri("/get_embedding");
-        AICreateTagRequest aiCreateEmbeddingRequest = AICreateTagRequest.from(name);
+        AICreateEmbeddingRequest aiCreateEmbeddingRequest = AICreateEmbeddingRequest.from(name);
         ResponseEntity<AICreateEmbeddingResponse> aiCreateEmbeddingResponse = restTemplate.postForEntity(
             uri,
             aiCreateEmbeddingRequest,

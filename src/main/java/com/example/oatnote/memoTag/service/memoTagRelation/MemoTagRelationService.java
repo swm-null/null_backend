@@ -14,11 +14,11 @@ public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
-    public void createRelation(String memoId, String tagId, boolean isLeafTag) {
+    public void createRelation(String memoId, String tagId, boolean isLinked) {
         MemoTagRelation memoTagRelation = MemoTagRelation.builder()
             .memoId(memoId)
             .tagId(tagId)
-            .isLeafTag(isLeafTag)
+            .isLinked(isLinked)
             .build();
         memoTagRelationRepository.save(memoTagRelation);
     }
@@ -35,8 +35,8 @@ public class MemoTagRelationService {
             .toList();
     }
 
-    public List<String> getLeafTagIds(String memoId) {
-        return memoTagRelationRepository.findByMemoIdAndIsLeafTagTrue(memoId).stream()
+    public List<String> getLinkedTagIds(String memoId) {
+        return memoTagRelationRepository.findByMemoId(memoId).stream()
             .map(MemoTagRelation::getTagId)
             .toList();
     }
