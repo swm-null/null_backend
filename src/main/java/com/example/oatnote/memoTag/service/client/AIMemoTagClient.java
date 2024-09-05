@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsResponse;
-import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsRequest;
-import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
-import com.example.oatnote.memoTag.service.client.models.AICreateMemoTagsRequest;
-import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingRequest;
-import com.example.oatnote.memoTag.service.client.models.AICreateEmbeddingResponse;
-import com.example.oatnote.memoTag.service.client.models.AISearchMemoRequest;
-import com.example.oatnote.memoTag.service.client.models.AISearchMemoResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsRequest;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsRequest;
+import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingRequest;
+import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
+import com.example.oatnote.memoTag.service.client.dto.AISearchMemoRequest;
+import com.example.oatnote.memoTag.service.client.dto.AISearchMemoResponse;
 
 @Service
 public class AIMemoTagClient {

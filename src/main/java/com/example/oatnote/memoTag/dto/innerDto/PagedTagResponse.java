@@ -1,4 +1,4 @@
-package com.example.oatnote.memoTag.dto.InnerResponse;
+package com.example.oatnote.memoTag.dto.innerDto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 

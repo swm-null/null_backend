@@ -4,7 +4,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import java.util.List;
 
-import com.example.oatnote.memoTag.dto.InnerResponse.MemoTagsResponse;
+import com.example.oatnote.memoTag.dto.innerDto.MemoTagsResponse;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 

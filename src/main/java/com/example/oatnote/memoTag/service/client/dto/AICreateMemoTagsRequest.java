@@ -1,4 +1,4 @@
-package com.example.oatnote.memoTag.service.client.models;
+package com.example.oatnote.memoTag.service.client.dto;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 

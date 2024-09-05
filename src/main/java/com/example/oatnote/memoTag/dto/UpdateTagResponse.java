@@ -2,7 +2,7 @@ package com.example.oatnote.memoTag.dto;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
-import com.example.oatnote.memoTag.dto.InnerResponse.TagResponse;
+import com.example.oatnote.memoTag.dto.innerDto.TagResponse;
 import com.example.oatnote.memoTag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 

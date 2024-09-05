@@ -4,7 +4,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
-import com.example.oatnote.memoTag.dto.InnerResponse.MemoTagsResponse;
+import com.example.oatnote.memoTag.dto.innerDto.MemoTagsResponse;
 import com.example.oatnote.memoTag.service.memo.model.Memo;
 import com.example.oatnote.memoTag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

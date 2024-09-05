@@ -1,4 +1,4 @@
-package com.example.oatnote.memoTag.dto.InnerResponse;
+package com.example.oatnote.memoTag.dto.innerDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

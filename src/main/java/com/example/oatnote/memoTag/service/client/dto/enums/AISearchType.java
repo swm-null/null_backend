@@ -1,4 +1,4 @@
-package com.example.oatnote.memoTag.service.client.models.enums;
+package com.example.oatnote.memoTag.service.client.dto.enums;
 
 public enum AISearchType {
     SIMILARITY("similarity"),

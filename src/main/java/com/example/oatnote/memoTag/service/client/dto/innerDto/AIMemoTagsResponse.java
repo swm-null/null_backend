@@ -1,8 +1,8 @@
-package com.example.oatnote.memoTag.service.client.models.innerDto;
+package com.example.oatnote.memoTag.service.client.dto.innerDto;
 
 import java.util.List;
 
-import com.example.oatnote.memoTag.service.client.models.AICreateMemosTagsResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 

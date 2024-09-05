@@ -1,10 +1,10 @@
-package com.example.oatnote.memoTag.service.client.models;
+package com.example.oatnote.memoTag.service.client.dto;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
 import java.util.List;
 
-import com.example.oatnote.memoTag.service.client.models.enums.AISearchType;
+import com.example.oatnote.memoTag.service.client.dto.enums.AISearchType;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import jakarta.validation.constraints.NotNull;
