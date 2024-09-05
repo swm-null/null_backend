@@ -32,7 +32,7 @@ public class AIMemoTagClient {
     }
 
     public AICreateMemoTagsResponse createMemoTags(String content) {
-        final URI uri = buildUri("/memos");
+        final URI uri = buildUri("/memo");
         AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content);
         ResponseEntity<AICreateMemoTagsResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
             uri,

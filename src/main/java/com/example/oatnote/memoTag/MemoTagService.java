@@ -24,8 +24,8 @@ import com.example.oatnote.memoTag.service.client.AIMemoTagClient;
 import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
 import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse.AIMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.dto.AISearchMemoResponse;
+import com.example.oatnote.memoTag.service.client.dto.innerDto.ProcessedMemoResponse;
 import com.example.oatnote.memoTag.service.memo.MemoService;
 import com.example.oatnote.memoTag.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memoTag.service.memo.model.Memo;
@@ -53,8 +53,8 @@ public class MemoTagService {
         AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemoTags(
             createMemoTagsRequest.content()
         );
-        Memo savedMemo = createMemoTags(aiCreateMemoTagsResponse.processedMemos());
-        List<Tag> tags = updateMemosTagsRelations(aiCreateMemoTagsResponse.processedMemos(), savedMemo);
+        Memo savedMemo = createMemoTags(aiCreateMemoTagsResponse.processedMemo());
+        List<Tag> tags = updateMemosTagsRelations(aiCreateMemoTagsResponse.processedMemo(), savedMemo);
         return CreateMemoTagsResponse.from(savedMemo, tags);
     }
 
@@ -160,7 +160,7 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    private Memo createMemoTags(AIMemoTagsResponse aiMemoTagsResponse) {
+    private Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse) {
         Memo memo = Memo.builder()
             .content(aiMemoTagsResponse.content())
             .embedding(aiMemoTagsResponse.embedding())
@@ -176,7 +176,7 @@ public class MemoTagService {
         return memoService.saveMemo(memo);
     }
 
-    private List<Tag> updateMemosTagsRelations(AIMemoTagsResponse aiMemoTagsResponse, Memo savedMemo) {
+    private List<Tag> updateMemosTagsRelations(ProcessedMemoResponse aiMemoTagsResponse, Memo savedMemo) {
         List<Tag> tags = new ArrayList<>();
         for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
             tags.add(tagService.getTag(linkedTagId));
