@@ -13,7 +13,6 @@ import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
 import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
-import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
@@ -67,31 +66,6 @@ public class MemoTagService {
             Memo savedMemo = createMemoTags(aiMemoTagsResponse);
             updateMemosTagsRelations(aiMemoTagsResponse, savedMemo);
         }
-    }
-
-    public RootMemosTagsResponse getRootMemosTags(
-        Integer tagPage,
-        Integer tagLimit,
-        Integer memoPage,
-        Integer memoLimit
-    ) {
-        List<Tag> childTags = tagService.getTags(tagsRelationService.getRootChildTagsIds());
-        Integer total = tagsRelationService.countRootTags();
-        Criteria criteria = Criteria.of(tagPage, tagLimit, total);
-        PageRequest pageRequest = PageRequest.of(
-            criteria.getPage(),
-            criteria.getLimit(),
-            Sort.by(Sort.Direction.DESC, "uTime")
-        );
-        Page<Tag> result = tagService.getPagedTags(pageRequest);
-        Page<PagedMemosTagsResponse> pagedMemosTags = result.map(tag ->
-            getMemos(tag.getId(), memoPage, memoLimit)
-        );
-        return RootMemosTagsResponse.from(
-            childTags,
-            pagedMemosTags,
-            criteria
-        );
     }
 
     public ChildMemosTagsResponse getChildMemosTags(

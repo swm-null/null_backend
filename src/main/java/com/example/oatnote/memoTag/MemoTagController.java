@@ -16,7 +16,6 @@ import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
 import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
-import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
@@ -47,22 +46,6 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         memoTagService.createMemosTags(createMemosTagsRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
-    }
-
-    @GetMapping("/memos/tags/root")
-    public ResponseEntity<RootMemosTagsResponse> getRootMemosTags(
-        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
-        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
-        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
-    ) {
-        RootMemosTagsResponse rootMemosTagsResponse = memoTagService.getRootMemosTags(
-            tagPage,
-            tagLimit,
-            memoPage,
-            memoLimit
-        );
-        return ResponseEntity.status(HttpStatus.OK).body(rootMemosTagsResponse);
     }
 
     @GetMapping("/memos/tags/{parentTagId}")

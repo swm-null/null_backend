@@ -14,7 +14,6 @@ import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
 import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
-import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
@@ -57,21 +56,6 @@ public interface MemoTagApiDoc {
     @PostMapping("/memos/tags/email")
     ResponseEntity<Void> createMemosTagsByEmail(
         @RequestBody @Valid CreateMemosTagsRequest createMemosTagsRequest
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "루트 메모 태그 조회")
-    @GetMapping("/memos/tags/root")
-    ResponseEntity<RootMemosTagsResponse> getRootMemosTags(
-        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
-        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
-        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     );
 
     @ApiResponses(

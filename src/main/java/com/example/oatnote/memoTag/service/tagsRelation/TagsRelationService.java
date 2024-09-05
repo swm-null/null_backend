@@ -32,18 +32,10 @@ public class TagsRelationService {
             .toList();
     }
 
-    public List<String> getRootChildTagsIds() {
-        return tagsRelationRepository.findRootChildTagsIds();
-    }
-
     public List<String> getChildTagsIds(String parentTagId) {
         return tagsRelationRepository.findByParentTagId(parentTagId).stream()
             .map(TagsRelation::getChildTagId)
             .toList();
-    }
-
-    public Integer countRootTags() {
-        return tagsRelationRepository.countRootTags();
     }
 
     public Integer countChildTags(String parentTagId) {
