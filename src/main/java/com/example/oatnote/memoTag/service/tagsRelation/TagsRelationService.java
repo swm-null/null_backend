@@ -1,8 +1,9 @@
 package com.example.oatnote.memoTag.service.tagsRelation;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memoTag.service.tagsRelation.exception.TagsRelationNotFoundException;
 import com.example.oatnote.memoTag.service.tagsRelation.model.TagsRelation;
 
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,27 @@ public class TagsRelationService {
         tagsRelationRepository.deleteByParentTagIdAndChildTagId(parentTagId, childTagId);
     }
 
-    public String getParentTagId(String parentTagId) {
-        return tagsRelationRepository.findByChildTagId(parentTagId)
-            .orElseThrow(() -> new TagsRelationNotFoundException("태그 릴레이션을 찾지 못했습니다. childTagId :" + parentTagId))
-            .getParentTagId();
+    public List<String> getParentTagsIds(String childTagId) {
+        return tagsRelationRepository.findByChildTagId(childTagId).stream()
+            .map(TagsRelation::getParentTagId)
+            .toList();
     }
 
+    public List<String> getRootChildTagsIds() {
+        return tagsRelationRepository.findRootChildTagsIds();
+    }
+
+    public List<String> getChildTagsIds(String parentTagId) {
+        return tagsRelationRepository.findByParentTagId(parentTagId).stream()
+            .map(TagsRelation::getChildTagId)
+            .toList();
+    }
+
+    public Integer countRootTags() {
+        return tagsRelationRepository.countRootTags();
+    }
+
+    public Integer countChildTags(String parentTagId) {
+        return tagsRelationRepository.countByParentTagId(parentTagId);
+    }
 }

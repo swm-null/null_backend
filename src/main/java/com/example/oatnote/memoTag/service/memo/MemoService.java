@@ -2,6 +2,8 @@ package com.example.oatnote.memoTag.service.memo;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memoTag.service.memo.exception.MemoNotFoundException;
@@ -28,6 +30,10 @@ public class MemoService {
         return memoRepository.findAllById(memoIds);
     }
 
+    public Page<Memo> getPagedMemos(List<String> memoIds, PageRequest pageRequest) {
+        return memoRepository.findAllByIdIn(memoIds, pageRequest);
+    }
+
     public List<Memo> getMemosContainingRegex(String regex) {
         List<Memo> memos = memoRepository.findByContentRegex(regex);
         if (memos.isEmpty()) {
@@ -38,5 +44,9 @@ public class MemoService {
 
     public void deleteMemo(Memo memo) {
         memoRepository.delete(memo);
+    }
+
+    public Integer countAllMemos() {
+        return (int) memoRepository.count();
     }
 }

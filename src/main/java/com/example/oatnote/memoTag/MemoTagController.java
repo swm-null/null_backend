@@ -15,9 +15,7 @@ import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.CreateTagRequest;
-import com.example.oatnote.memoTag.dto.CreateTagResponse;
-import com.example.oatnote.memoTag.dto.MemosTagsResponse;
+import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
@@ -53,31 +51,46 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/tags/root")
     public ResponseEntity<RootMemosTagsResponse> getRootMemosTags(
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
+        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
+        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     ) {
-        RootMemosTagsResponse rootMemosTagsResponse = memoTagService.getRootMemosTags(page, limit);
+        RootMemosTagsResponse rootMemosTagsResponse = memoTagService.getRootMemosTags(
+            tagPage,
+            tagLimit,
+            memoPage,
+            memoLimit
+        );
         return ResponseEntity.status(HttpStatus.OK).body(rootMemosTagsResponse);
     }
 
-    @GetMapping("/memos/tags/{tagId}")
+    @GetMapping("/memos/tags/{parentTagId}")
     public ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
-        @PathVariable("tagId") String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
+        @PathVariable("parentTagId") String parentTagId,
+        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
+        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     ) {
-        ChildMemosTagsResponse childMemosTagsResponse = memoTagService.getChildMemosTags(tagId, page, limit);
+        ChildMemosTagsResponse childMemosTagsResponse = memoTagService.getChildMemosTags(
+            parentTagId,
+            tagPage,
+            tagLimit,
+            memoPage,
+            memoLimit
+        );
         return ResponseEntity.status(HttpStatus.OK).body(childMemosTagsResponse);
     }
 
     @GetMapping("/memos/tag/{tagId}")
-    public ResponseEntity<MemosTagsResponse> getMemosByTagId( //todo 디자인 확정되면 메모에 태그가 있는지 체크
+    public ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
         @PathVariable("tagId") String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     ) {
-        MemosTagsResponse memosTagsResponse = memoTagService.getMemos(tagId, page, limit);
-        return ResponseEntity.status(HttpStatus.OK).body(memosTagsResponse);
+        PagedMemosTagsResponse pagedMemosTagsResponse = memoTagService.getMemos(tagId, memoPage, memoLimit);
+        return ResponseEntity.status(HttpStatus.OK).body(pagedMemosTagsResponse);
     }
 
     @PostMapping("/memos/tags/search")

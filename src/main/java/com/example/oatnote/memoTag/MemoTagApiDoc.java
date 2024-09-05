@@ -13,7 +13,7 @@ import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
 import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
 import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.MemosTagsResponse;
+import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.RootMemosTagsResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
@@ -68,8 +68,10 @@ public interface MemoTagApiDoc {
     @Operation(summary = "루트 메모 태그 조회")
     @GetMapping("/memos/tags/root")
     ResponseEntity<RootMemosTagsResponse> getRootMemosTags(
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
+        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
+        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     );
 
     @ApiResponses(
@@ -79,11 +81,13 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "자식 메모 태그 조회")
-    @GetMapping("/memos/tags/{tagId}")
+    @GetMapping("/memos/tags/{parentTagId}")
     ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
-        @PathVariable("tagId") String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
+        @PathVariable("parentTagId") String parentTagId,
+        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
+        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     );
 
     @ApiResponses(
@@ -94,10 +98,10 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "특정 태그의 메모 조회")
     @GetMapping("/memos/tag/{tagId}")
-    ResponseEntity<MemosTagsResponse> getMemosByTagId(
+    ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
         @PathVariable("tagId") String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10", required = false) Integer limit
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
     );
 
     @ApiResponses(

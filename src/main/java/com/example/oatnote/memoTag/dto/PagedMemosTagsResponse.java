@@ -4,14 +4,22 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.example.oatnote.memoTag.dto.innerDto.MemoTagsResponse;
+import com.example.oatnote.memoTag.dto.innerDto.TagResponse;
+import com.example.oatnote.memoTag.service.tag.model.Tag;
+import com.example.oatnote.web.models.Criteria;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record MemosTagsResponse(
+public record PagedMemosTagsResponse(
+    @Schema(description = "태그 이름", requiredMode = REQUIRED)
+    TagResponse tag,
+
     @Schema(description = "특정 태그의 총 메모의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
 
@@ -24,23 +32,22 @@ public record MemosTagsResponse(
     @Schema(description = "현재 페이지", example = "2", requiredMode = REQUIRED)
     Integer currentPage,
 
-    @Schema(description = "메모 리스트", requiredMode = REQUIRED)
+    @Schema(description = "메모태그 리스트", requiredMode = REQUIRED)
     List<MemoTagsResponse> memoTags
 ) {
 
-    public static MemosTagsResponse of(
-        Long totalCount,
-        Integer currentCount,
-        Integer totalPage,
-        Integer currentPage,
-        List<MemoTagsResponse> memoTags
+    public static PagedMemosTagsResponse from(
+        Tag tag,
+        Page<MemoTagsResponse> pagedResult,
+        Criteria criteria
     ) {
-        return new MemosTagsResponse(
-            totalCount,
-            currentCount,
-            totalPage,
-            currentPage,
-            memoTags
+        return new PagedMemosTagsResponse(
+            TagResponse.from(tag),
+            pagedResult.getTotalElements(),
+            pagedResult.getContent().size(),
+            pagedResult.getTotalPages(),
+            criteria.getPage() + 1,
+            pagedResult.getContent()
         );
     }
 }

@@ -1,6 +1,6 @@
 package com.example.oatnote.memoTag.service.tagsRelation;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -10,5 +10,9 @@ public interface TagsRelationRepository extends MongoRepository<TagsRelation, St
 
     void deleteByParentTagIdAndChildTagId(String parentTagId, String childTagId);
 
-    Optional<TagsRelation> findByChildTagId(String parentTagId);
+    List<TagsRelation> findByChildTagId(String parentTagId);
+
+    List<TagsRelation> findByParentTagId(String parentTagId);
+
+    Integer countByParentTagId(String parentTagId);
 }

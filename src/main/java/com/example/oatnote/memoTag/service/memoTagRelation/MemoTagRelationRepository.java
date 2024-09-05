@@ -15,4 +15,6 @@ public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelati
     void deleteByMemoId(String memoId);
 
     void deleteByTagId(String tagId);
+
+    Integer countByTagId(String tagId);
 }

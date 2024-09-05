@@ -2,6 +2,8 @@ package com.example.oatnote.memoTag.service.tag;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memoTag.service.tag.exception.TagNotFoundException;
@@ -19,8 +21,16 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public List<Tag> getTags(List<String> tagIds) {
+    public List<Tag> getTags(List<String> childTagsIds) {
+        return tagRepository.findAllById(childTagsIds);
+    }
+
+    public List<Tag> getPagedTags(List<String> tagIds) {
         return tagRepository.findAllById(tagIds);
+    }
+
+    public Page<Tag> getPagedTags(PageRequest pageRequest) {
+        return tagRepository.findAll(pageRequest);
     }
 
     public Tag getTag(String tagId) {
