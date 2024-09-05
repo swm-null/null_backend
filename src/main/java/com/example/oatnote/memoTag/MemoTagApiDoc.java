@@ -46,22 +46,6 @@ public interface MemoTagApiDoc {
         @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest
     );
 
-    /* todo 기획 논의 후 삭제 여부 결정
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "201"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "특정 메모에 태그 생성")
-    @PostMapping("/memo/{memoId}/tag")
-    ResponseEntity<CreateTagResponse> createTag(
-        @PathVariable("memoId") String memoId,
-        @RequestBody @Valid CreateTagRequest createTagRequest
-    );
-     */
-
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "201"),

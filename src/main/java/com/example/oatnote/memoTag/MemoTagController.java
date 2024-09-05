@@ -43,17 +43,6 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoTagsResponse);
     }
 
-    /* todo 기획 논의 후 삭제 여부 결정
-    @PostMapping("memo/{memoId}/tag")
-    public ResponseEntity<CreateTagResponse> createTag(
-        @PathVariable("memoId") String memoId,
-        @RequestBody @Valid CreateTagRequest createTagRequest
-    ) {
-        CreateTagResponse createTagResponse = memoTagService.createTag(memoId, createTagRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createTagResponse);
-    }
-     */
-
     @PostMapping("/memos/tags/email")
     public ResponseEntity<Void> createMemosTagsByEmail(
         @RequestBody @Valid CreateMemosTagsRequest createMemosTagsRequest

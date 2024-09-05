@@ -66,16 +66,6 @@ public class MemoTagService {
         }
     }
 
-    /* todo 기획 논의 후 삭제 여부 결정
-    public CreateTagResponse createTag(String memoId, CreateTagRequest createTagRequest) {
-        AiCreateTagResponse aiCreateTagResponse = aiMemoTagClient.createTag(createTagRequest.name());
-        Tag tag = createTagRequest.toTag(aiCreateTagResponse.embedding());
-        Tag savedTag = tagService.saveTag(tag);
-        memoTagRelationService.createRelation(memoId, savedTag.getId(), IS_LEAF_TAG);
-        return CreateTagResponse.from(savedTag);
-    }
-     */
-
     public RootMemosTagsResponse getRootMemosTags(Integer page, Integer limit) {
 
         return null;
@@ -159,8 +149,7 @@ public class MemoTagService {
     private List<Tag> updateMemosTagsRelations(AIMemoTagsResponse aiMemoTagsResponse, Memo savedMemo) {
         List<Tag> tags = new ArrayList<>();
         for (var parentTagId : aiMemoTagsResponse.parentTagIds()) {
-            Tag tag = tagService.getTag(parentTagId);
-            tags.add(tag);
+            tags.add(tagService.getTag(parentTagId));
             memoTagRelationService.createRelation(savedMemo.getId(), parentTagId, IS_LINKED_MEMO_TAG);
             while ((parentTagId = tagsRelationService.getParentTagId(parentTagId)) != null) {
                 memoTagRelationService.createRelation(savedMemo.getId(), parentTagId, !IS_LINKED_MEMO_TAG);
