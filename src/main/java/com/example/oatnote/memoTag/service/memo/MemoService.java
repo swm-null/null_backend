@@ -45,8 +45,4 @@ public class MemoService {
     public void deleteMemo(Memo memo) {
         memoRepository.delete(memo);
     }
-
-    public Integer countAllMemos() {
-        return (int) memoRepository.count();
-    }
 }
