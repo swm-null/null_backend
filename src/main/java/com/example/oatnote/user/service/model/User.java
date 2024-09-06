@@ -1,6 +1,7 @@
 package com.example.oatnote.user.service.model;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -16,7 +17,7 @@ import lombok.Getter;
 public class User {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Indexed(unique = true)
     private String email;

@@ -2,6 +2,7 @@ package com.example.oatnote.memoTag.service.tag.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -19,7 +20,7 @@ import lombok.Getter;
 public class Tag {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Indexed
     private String name;

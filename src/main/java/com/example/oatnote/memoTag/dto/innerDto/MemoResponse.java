@@ -2,6 +2,7 @@ package com.example.oatnote.memoTag.dto.innerDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.example.oatnote.memoTag.service.memo.model.Memo;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
@@ -12,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @JsonNaming(SnakeCaseStrategy.class)
 public record MemoResponse(
     @Schema(description = "메모 고유 ID", example = "61b72b3e9b1e8b1e4c8b4560")
-    String id,
+    UUID id,
 
     @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해")
     String content,

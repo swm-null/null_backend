@@ -1,5 +1,7 @@
 package com.example.oatnote.memoTag.service.tagsRelation.model;
 
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,7 +16,7 @@ import lombok.Getter;
 public class TagsRelation {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Indexed
     @Field("pTId")

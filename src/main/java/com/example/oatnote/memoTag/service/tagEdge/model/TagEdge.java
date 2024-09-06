@@ -2,6 +2,7 @@ package com.example.oatnote.memoTag.service.tagEdge.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -17,7 +18,7 @@ import lombok.Getter;
 public class TagEdge {
 
     @Id
-    private String id;
+    private UUID id;
 
     @Indexed(unique = true)
     @Field("uId")

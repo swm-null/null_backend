@@ -1,6 +1,7 @@
 package com.example.oatnote.memoTag.service.client.dto.innerDto;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -16,7 +17,7 @@ public record ProcessedMemoResponse(
 ) {
 
     public record NewTag(
-        String id,
+        UUID id,
         String name,
         List<Double> embedding
     ) {
