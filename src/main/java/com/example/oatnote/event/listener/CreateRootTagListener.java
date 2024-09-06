@@ -1,6 +1,7 @@
 package com.example.oatnote.event.listener;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -22,12 +23,12 @@ public class CreateRootTagListener {
         createDummyTagsForNewUser(event.userId());
     }
 
-    private void createDummyTagsForNewUser(String userId) {
-        Tag rootTag = Tag.builder()
-            .name("@")
-            .userId(userId)
-            .embedding(new ArrayList<>())
-            .build();
+    private void createDummyTagsForNewUser(UUID userId) {
+        Tag rootTag = new Tag(
+            "@",
+            userId,
+            new ArrayList<>()
+        );
         tagService.saveTag(rootTag);
     }
 }

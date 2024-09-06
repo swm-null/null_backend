@@ -1,6 +1,7 @@
 package com.example.oatnote.memoTag.service.memoTagRelation;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -14,42 +15,38 @@ public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
-    public void createRelation(String memoId, String tagId, boolean isLinked) {
-        MemoTagRelation memoTagRelation = MemoTagRelation.builder()
-            .memoId(memoId)
-            .tagId(tagId)
-            .isLinked(isLinked)
-            .build();
+    public void createRelation(UUID memoId, UUID tagId, boolean isLinked) {
+        MemoTagRelation memoTagRelation = new MemoTagRelation(memoId, tagId, isLinked);
         memoTagRelationRepository.save(memoTagRelation);
     }
 
-    public List<String> getMemoIds(String tagId) {
+    public List<UUID> getMemoIds(UUID tagId) {
         return memoTagRelationRepository.findByTagId(tagId).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }
 
-    public List<String> getMemoIds(List<String> tagIds) {
+    public List<UUID> getMemoIds(List<UUID> tagIds) {
         return tagIds.stream()
             .flatMap(tagId -> getMemoIds(tagId).stream())
             .toList();
     }
 
-    public List<String> getLinkedTagIds(String memoId) {
+    public List<UUID> getLinkedTagIds(UUID memoId) {
         return memoTagRelationRepository.findByMemoIdAndIsLinkedTrue(memoId).stream()
             .map(MemoTagRelation::getTagId)
             .toList();
     }
 
-    public void deleteRelationsByMemoId(String memoId) {
+    public void deleteRelationsByMemoId(UUID memoId) {
         memoTagRelationRepository.deleteByMemoId(memoId);
     }
 
-    public void deleteRelationsByTagId(String tagId) {
+    public void deleteRelationsByTagId(UUID tagId) {
         memoTagRelationRepository.deleteByTagId(tagId);
     }
 
-    public Integer countMemos(String tagId) {
+    public Integer countMemos(UUID tagId) {
         return memoTagRelationRepository.countByTagId(tagId);
     }
 }

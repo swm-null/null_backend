@@ -11,7 +11,7 @@ public record ProcessedMemoResponse(
     String content,
     List<Double> embedding,
     String timestamp,
-    List<String> parentTagIds,
+    List<UUID> parentTagIds,
     List<NewTag> newTags,
     TagRelations tagRelations
 ) {
@@ -32,8 +32,8 @@ public record ProcessedMemoResponse(
 
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public record Relation(
-            String parentId,
-            String childId
+            UUID parentId,
+            UUID childId
         ) {
 
         }

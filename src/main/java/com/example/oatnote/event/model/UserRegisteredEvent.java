@@ -1,7 +1,9 @@
 package com.example.oatnote.event.model;
 
+import java.util.UUID;
+
 public record UserRegisteredEvent(
-    String userId
+    UUID userId
 ) {
 
 }

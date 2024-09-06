@@ -25,7 +25,7 @@ public class Tag {
 
     @Field("uId")
     @Indexed
-    private String userId;
+    private UUID userId;
 
     private List<Double> embedding;
 
@@ -37,7 +37,7 @@ public class Tag {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Tag(String name, String userId, List<Double> embedding) {
+    public Tag(String name, UUID userId, List<Double> embedding) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.userId = userId;

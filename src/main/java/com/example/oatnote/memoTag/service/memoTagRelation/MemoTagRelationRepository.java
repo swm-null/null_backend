@@ -1,20 +1,21 @@
 package com.example.oatnote.memoTag.service.memoTagRelation;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.example.oatnote.memoTag.service.memoTagRelation.model.MemoTagRelation;
 
-public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelation, String> {
+public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelation, UUID> {
 
-    List<MemoTagRelation> findByMemoIdAndIsLinkedTrue(String memoId);
+    List<MemoTagRelation> findByMemoIdAndIsLinkedTrue(UUID memoId);
 
-    List<MemoTagRelation> findByTagId(String tagId);
+    List<MemoTagRelation> findByTagId(UUID tagId);
 
-    void deleteByMemoId(String memoId);
+    void deleteByMemoId(UUID memoId);
 
-    void deleteByTagId(String tagId);
+    void deleteByTagId(UUID tagId);
 
-    Integer countByTagId(String tagId);
+    Integer countByTagId(UUID tagId);
 }

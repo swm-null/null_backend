@@ -27,7 +27,7 @@ public class Memo {
 
     @Indexed
     @Field("uId")
-    private String userId;
+    private UUID userId;
 
     private List<Double> embedding;
 
@@ -39,7 +39,7 @@ public class Memo {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Memo(String content, List<String> imageUrls, String userId, List<Double> embedding) {
+    public Memo(String content, List<String> imageUrls, UUID userId, List<Double> embedding) {
         this.id = UUID.randomUUID();
         this.content = content;
         this.imageUrls = imageUrls;

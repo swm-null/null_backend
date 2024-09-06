@@ -1,5 +1,7 @@
 package com.example.oatnote.memoTag;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +52,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/tags/{parentTagId}")
     public ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
-        @PathVariable("parentTagId") String parentTagId,
+        @PathVariable("parentTagId") UUID parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
@@ -68,7 +70,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/tag/{tagId}")
     public ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("tagId") UUID tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit
     ) {
@@ -86,7 +88,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @PutMapping("/memo/{memoId}")
     public ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("memoId") UUID memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     ) {
         UpdateMemoResponse updateMemoResponse = memoTagService.updateMemo(memoId, updateMemoRequest);
@@ -95,7 +97,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @PutMapping("/tag/{tagId}")
     public ResponseEntity<UpdateTagResponse> updateTag(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("tagId") UUID tagId,
         @RequestBody @Valid UpdateTagRequest updateTagRequest
     ) {
         UpdateTagResponse updateTagResponse = memoTagService.updateTag(tagId, updateTagRequest);
@@ -104,7 +106,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @DeleteMapping("/memo/{memoId}")
     public ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId
+        @PathVariable("memoId") UUID memoId
     ) {
         memoTagService.deleteMemo(memoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -112,7 +114,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @DeleteMapping("/tag/{tagId}")
     public ResponseEntity<Void> deleteTag(
-        @PathVariable("tagId") String tagId
+        @PathVariable("tagId") UUID tagId
     ) {
         memoTagService.deleteTag(tagId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

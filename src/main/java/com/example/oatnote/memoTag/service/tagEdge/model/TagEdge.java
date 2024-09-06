@@ -20,12 +20,12 @@ public class TagEdge {
 
     @Indexed(unique = true)
     @Field("uId")
-    private String userId;
+    private UUID userId;
 
     @Field("edges")
     private Map<String, List<String>> tagEdges;
 
-    public TagEdge(String userId, Map<String, List<String>> tagEdges) {
+    public TagEdge(UUID userId, Map<String, List<String>> tagEdges) {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.tagEdges = tagEdges;

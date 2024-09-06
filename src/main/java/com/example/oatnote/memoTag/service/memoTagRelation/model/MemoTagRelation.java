@@ -18,17 +18,17 @@ public class MemoTagRelation {
 
     @Indexed
     @Field("mId")
-    private String memoId;
+    private UUID memoId;
 
     @Indexed
     @Field("tId")
-    private String tagId;
+    private UUID tagId;
 
     @Indexed
     @Field("isL")
     private boolean isLinked;
 
-    public MemoTagRelation(String memoId, String tagId, boolean isLinked) {
+    public MemoTagRelation(UUID memoId, UUID tagId, boolean isLinked) {
         this.id = UUID.randomUUID();
         this.memoId = memoId;
         this.tagId = tagId;

@@ -1,6 +1,7 @@
 package com.example.oatnote.memoTag.service.tagsRelation;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -14,31 +15,28 @@ public class TagsRelationService {
 
     private final TagsRelationRepository tagsRelationRepository;
 
-    public void createRelation(String parentTagId, String childTagId) {
-        TagsRelation tagRelation = TagsRelation.builder()
-            .parentTagId(parentTagId)
-            .childTagId(childTagId)
-            .build();
-        tagsRelationRepository.insert(tagRelation);
+    public void createRelation(UUID parentTagId, UUID childTagId) {
+        TagsRelation tagsRelation = new TagsRelation(parentTagId, childTagId);
+        tagsRelationRepository.insert(tagsRelation);
     }
 
-    public void deleteRelation(String parentTagId, String childTagId) {
+    public void deleteRelation(UUID parentTagId, UUID childTagId) {
         tagsRelationRepository.deleteByParentTagIdAndChildTagId(parentTagId, childTagId);
     }
 
-    public List<String> getParentTagsIds(String childTagId) {
+    public List<UUID> getParentTagsIds(UUID childTagId) {
         return tagsRelationRepository.findByChildTagId(childTagId).stream()
             .map(TagsRelation::getParentTagId)
             .toList();
     }
 
-    public List<String> getChildTagsIds(String parentTagId) {
+    public List<UUID> getChildTagsIds(UUID parentTagId) {
         return tagsRelationRepository.findByParentTagId(parentTagId).stream()
             .map(TagsRelation::getChildTagId)
             .toList();
     }
 
-    public Integer countChildTags(String parentTagId) {
+    public Integer countChildTags(UUID parentTagId) {
         return tagsRelationRepository.countByParentTagId(parentTagId);
     }
 }

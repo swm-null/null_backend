@@ -1,5 +1,7 @@
 package com.example.oatnote.memoTag;
 
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +69,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "자식 메모 태그 조회")
     @GetMapping("/memos/tags/{parentTagId}")
     ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
-        @PathVariable("parentTagId") String parentTagId,
+        @PathVariable("parentTagId") UUID parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
@@ -83,7 +85,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "특정 태그의 메모 조회")
     @GetMapping("/memos/tag/{tagId}")
     ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("tagId") UUID tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit
     );
@@ -112,7 +114,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 수정")
     @PutMapping("/memo/{memoId}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("memoId") UUID memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest
     );
 
@@ -126,7 +128,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "태그 수정")
     @PutMapping("/tag/{tagId}")
     ResponseEntity<UpdateTagResponse> updateTag(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("tagId") UUID tagId,
         @RequestBody @Valid UpdateTagRequest updateTagRequest
     );
 
@@ -140,7 +142,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 삭제")
     @DeleteMapping("/memo/{memoId}")
     ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId
+        @PathVariable("memoId") UUID memoId
     );
 
     @ApiResponses(
@@ -153,6 +155,6 @@ public interface MemoTagApiDoc {
     @Operation(summary = "태그 삭제")
     @DeleteMapping("/tag/{tagId}")
     ResponseEntity<Void> deleteTag(
-        @PathVariable("tagId") String tagId
+        @PathVariable("tagId") UUID tagId
     );
 }

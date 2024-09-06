@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import lombok.Getter;
 
 @Getter
-@Document(collection = "tag_relations")
+@Document(collection = "tags_relations")
 public class TagsRelation {
 
     @Id
@@ -18,13 +18,13 @@ public class TagsRelation {
 
     @Indexed
     @Field("pTId")
-    private String parentTagId;
+    private UUID parentTagId;
 
     @Indexed
     @Field("cTId")
-    private String childTagId;
+    private UUID childTagId;
 
-    public TagsRelation(String parentTagId, String childTagId) {
+    public TagsRelation(UUID parentTagId, UUID childTagId) {
         this.id = UUID.randomUUID();
         this.parentTagId = parentTagId;
         this.childTagId = childTagId;
