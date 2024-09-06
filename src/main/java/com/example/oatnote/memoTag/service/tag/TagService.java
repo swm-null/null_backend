@@ -22,16 +22,12 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public List<Tag> getTags(List<UUID> childTagsIds) {
-        return tagRepository.findAllById(childTagsIds);
-    }
-
-    public List<Tag> getPagedTags(List<UUID> tagIds) {
+    public List<Tag> getTags(List<UUID> tagIds) {
         return tagRepository.findAllById(tagIds);
     }
 
-    public Page<Tag> getPagedTags(PageRequest pageRequest) {
-        return tagRepository.findAll(pageRequest);
+    public Page<Tag> getPagedTags(List<UUID> tagsIds, PageRequest pageRequest) {
+        return tagRepository.findAllByIdIn(tagsIds, pageRequest);
     }
 
     public Tag getTag(UUID tagId) {

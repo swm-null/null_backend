@@ -25,7 +25,7 @@ public class MemoTagRelation {
     private UUID tagId;
 
     @Indexed
-    @Field("isL")
+    @Field("isLinked")
     private boolean isLinked;
 
     public MemoTagRelation(UUID memoId, UUID tagId, boolean isLinked) {

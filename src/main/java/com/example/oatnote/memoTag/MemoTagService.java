@@ -76,15 +76,16 @@ public class MemoTagService {
         Integer memoPage,
         Integer memoLimit
     ) {
-        List<Tag> childTags = tagService.getTags(tagsRelationService.getChildTagsIds(parentTagId));
-        Integer total = tagsRelationService.countChildTags(parentTagId);
+        List<UUID> childTagsIds = tagsRelationService.getChildTagsIds(parentTagId);
+        List<Tag> childTags = tagService.getTags(childTagsIds);
+        Integer total = childTags.size();
         Criteria criteria = Criteria.of(tagPage, tagLimit, total);
         PageRequest pageRequest = PageRequest.of(
             criteria.getPage(),
             criteria.getLimit(),
             Sort.by(Sort.Direction.DESC, "uTime")
         );
-        Page<Tag> result = tagService.getPagedTags(pageRequest);
+        Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest);
         Page<PagedMemosTagsResponse> pagedMemosTags = result.map(tag ->
             getMemos(tag.getId(), memoPage, memoLimit)
         );
@@ -108,7 +109,7 @@ public class MemoTagService {
         Page<MemoTagsResponse> memoTagsPage = result.map(memo ->
             MemoTagsResponse.from(
                 memo,
-                tagService.getPagedTags(memoTagRelationService.getLinkedTagIds(memo.getId()))
+                tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()))
             )
         );
         return PagedMemosTagsResponse.from(tag, memoTagsPage, criteria);
@@ -124,7 +125,7 @@ public class MemoTagService {
             default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
         }
         List<List<Tag>> tagsList = memos.stream()
-            .map(memo -> tagService.getPagedTags(memoTagRelationService.getLinkedTagIds(memo.getId())))
+            .map(memo -> tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId())))
             .toList();
         return SearchMemoResponse.from(aiSearchMemoResponse.processedMessage(), memos, tagsList);
     }
@@ -137,7 +138,7 @@ public class MemoTagService {
         memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateEmbeddingResponse.embedding());
         Memo updatedMemo = memoService.saveMemo(memo);
         List<UUID> tagIds = memoTagRelationService.getLinkedTagIds(memo.getId());
-        List<Tag> tags = tagService.getPagedTags(tagIds);
+        List<Tag> tags = tagService.getTags(tagIds);
         return UpdateMemoResponse.from(updatedMemo, tags);
     }
 
