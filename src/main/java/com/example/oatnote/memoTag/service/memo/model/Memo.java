@@ -1,7 +1,6 @@
 package com.example.oatnote.memoTag.service.memo.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,11 +11,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @Document(collection = "memos")
 public class Memo {
 
@@ -41,6 +38,14 @@ public class Memo {
     @Field("uTime")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public Memo(String content, List<String> imageUrls, String userId, List<Double> embedding) {
+        this.id = UUID.randomUUID();
+        this.content = content;
+        this.imageUrls = imageUrls;
+        this.userId = userId;
+        this.embedding = embedding;
+    }
 
     public void update(String content, List<String> imageUrls, List<Double> embedding) {
         this.content = content;

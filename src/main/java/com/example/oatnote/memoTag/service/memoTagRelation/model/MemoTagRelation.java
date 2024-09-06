@@ -7,11 +7,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @Document(collection = "memo_tag_relations")
 public class MemoTagRelation {
 
@@ -29,4 +27,11 @@ public class MemoTagRelation {
     @Indexed
     @Field("isL")
     private boolean isLinked;
+
+    public MemoTagRelation(String memoId, String tagId, boolean isLinked) {
+        this.id = UUID.randomUUID();
+        this.memoId = memoId;
+        this.tagId = tagId;
+        this.isLinked = isLinked;
+    }
 }

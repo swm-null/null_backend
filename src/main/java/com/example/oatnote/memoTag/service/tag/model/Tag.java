@@ -11,11 +11,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @Document(collection = "tags")
 public class Tag {
 
@@ -38,6 +36,13 @@ public class Tag {
     @Field("uTime")
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public Tag(String name, String userId, List<Double> embedding) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.userId = userId;
+        this.embedding = embedding;
+    }
 
     public void update(String name, List<Double> embedding) {
         this.name = name;

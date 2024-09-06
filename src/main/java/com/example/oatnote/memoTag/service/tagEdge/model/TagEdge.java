@@ -9,11 +9,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 @Document(collection = "tag_edges")
 public class TagEdge {
 
@@ -26,4 +24,10 @@ public class TagEdge {
 
     @Field("edges")
     private Map<String, List<String>> tagEdges;
+
+    public TagEdge(String userId, Map<String, List<String>> tagEdges) {
+        this.id = UUID.randomUUID();
+        this.userId = userId;
+        this.tagEdges = tagEdges;
+    }
 }

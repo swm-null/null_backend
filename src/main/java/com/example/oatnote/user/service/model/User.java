@@ -1,6 +1,6 @@
 package com.example.oatnote.user.service.model;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -27,13 +27,14 @@ public class User {
 
     @Field(name = "cTime")
     @CreatedDate
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @Field(name = "uTime")
     @LastModifiedDate
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     public User(String email, String password) {
+        this.id = UUID.randomUUID();
         this.email = email;
         this.password = password;
     }
