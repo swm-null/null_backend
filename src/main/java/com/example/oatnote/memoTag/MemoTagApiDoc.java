@@ -69,9 +69,9 @@ public interface MemoTagApiDoc {
     ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
         @PathVariable("parentTagId") String parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
-        @RequestParam(name = "tagLimit", defaultValue = "10", required = false) Integer tagLimit,
+        @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
+        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit
     );
 
     @ApiResponses(
@@ -85,7 +85,7 @@ public interface MemoTagApiDoc {
     ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
         @PathVariable("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10", required = false) Integer memoLimit
+        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit
     );
 
     @ApiResponses(
