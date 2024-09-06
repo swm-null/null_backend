@@ -1,10 +1,13 @@
 name: Code Review From ChatGPT
+
 permissions:
   contents: read
   pull-requests: write
+
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [ opened, synchronize ]
+
 jobs:
   code-review:
     runs-on: ubuntu-latest
@@ -14,4 +17,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGUAGE: Korean
-          MODEL: gpt-4o
+          MODEL: gpt-4o-mini
+          top_p: 1
+          temperature: 1
+          max_tokens: 7000
+          MAX_PATCH_LENGTH: 7000
