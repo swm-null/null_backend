@@ -1,7 +1,6 @@
 package com.example.oatnote.memoTag.service.memo;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,16 +21,16 @@ public class MemoService {
         return memoRepository.save(memo);
     }
 
-    public Memo getMemo(UUID memoId) {
+    public Memo getMemo(String memoId) {
         return memoRepository.findById(memoId)
             .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));
     }
 
-    public List<Memo> getMemos(List<UUID> memoIds) {
+    public List<Memo> getMemos(List<String> memoIds) {
         return memoRepository.findAllById(memoIds);
     }
 
-    public Page<Memo> getPagedMemos(List<UUID> memoIds, PageRequest pageRequest) {
+    public Page<Memo> getPagedMemos(List<String> memoIds, PageRequest pageRequest) {
         return memoRepository.findAllByIdIn(memoIds, pageRequest);
     }
 

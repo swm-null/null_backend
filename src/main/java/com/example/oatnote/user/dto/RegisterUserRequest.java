@@ -31,7 +31,4 @@ public record RegisterUserRequest(
     String confirmPassword
 ) {
 
-    public boolean isPasswordMatching() {
-        return password != null && password.equals(confirmPassword);
-    }
 }

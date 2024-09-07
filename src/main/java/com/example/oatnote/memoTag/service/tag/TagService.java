@@ -1,7 +1,6 @@
 package com.example.oatnote.memoTag.service.tag;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,15 +21,15 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public List<Tag> getTags(List<UUID> tagIds) {
+    public List<Tag> getTags(List<String> tagIds) {
         return tagRepository.findAllById(tagIds);
     }
 
-    public Page<Tag> getPagedTags(List<UUID> tagsIds, PageRequest pageRequest) {
+    public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest) {
         return tagRepository.findAllByIdIn(tagsIds, pageRequest);
     }
 
-    public Tag getTag(UUID tagId) {
+    public Tag getTag(String tagId) {
         return tagRepository.findById(tagId)
             .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + tagId));
     }

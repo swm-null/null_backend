@@ -16,17 +16,17 @@ import lombok.Getter;
 public class TagEdge {
 
     @Id
-    private UUID id;
+    private String id;
 
     @Indexed(unique = true)
     @Field("uId")
-    private UUID userId;
+    private String userId;
 
     @Field("edges")
     private Map<String, List<String>> tagEdges;
 
-    public TagEdge(UUID userId, Map<String, List<String>> tagEdges) {
-        this.id = UUID.randomUUID();
+    public TagEdge(String userId, Map<String, List<String>> tagEdges) {
+        this.id = UUID.randomUUID().toString();
         this.userId = userId;
         this.tagEdges = tagEdges;
     }

@@ -1,7 +1,6 @@
 package com.example.oatnote.memoTag.service.memoTagRelation;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -15,38 +14,38 @@ public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
-    public void createRelation(UUID memoId, UUID tagId, boolean isLinked) {
+    public void createRelation(String memoId, String tagId, boolean isLinked) {
         MemoTagRelation memoTagRelation = new MemoTagRelation(memoId, tagId, isLinked);
         memoTagRelationRepository.save(memoTagRelation);
     }
 
-    public List<UUID> getMemoIds(UUID tagId) {
+    public List<String> getMemoIds(String tagId) {
         return memoTagRelationRepository.findByTagId(tagId).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }
 
-    public List<UUID> getMemoIds(List<UUID> tagIds) {
+    public List<String> getMemoIds(List<String> tagIds) {
         return tagIds.stream()
             .flatMap(tagId -> getMemoIds(tagId).stream())
             .toList();
     }
 
-    public List<UUID> getLinkedTagIds(UUID memoId) {
+    public List<String> getLinkedTagIds(String memoId) {
         return memoTagRelationRepository.findByMemoIdAndIsLinkedTrue(memoId).stream()
             .map(MemoTagRelation::getTagId)
             .toList();
     }
 
-    public void deleteRelationsByMemoId(UUID memoId) {
+    public void deleteRelationsByMemoId(String memoId) {
         memoTagRelationRepository.deleteByMemoId(memoId);
     }
 
-    public void deleteRelationsByTagId(UUID tagId) {
+    public void deleteRelationsByTagId(String tagId) {
         memoTagRelationRepository.deleteByTagId(tagId);
     }
 
-    public Integer countMemos(UUID tagId) {
+    public Integer countMemos(String tagId) {
         return memoTagRelationRepository.countByTagId(tagId);
     }
 }

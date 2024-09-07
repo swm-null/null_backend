@@ -2,7 +2,6 @@ package com.example.oatnote.memoTag;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +32,8 @@ import com.example.oatnote.memoTag.service.memo.model.Memo;
 import com.example.oatnote.memoTag.service.memoTagRelation.MemoTagRelationService;
 import com.example.oatnote.memoTag.service.tag.TagService;
 import com.example.oatnote.memoTag.service.tag.model.Tag;
+import com.example.oatnote.memoTag.service.tagEdge.TagEdgeService;
+import com.example.oatnote.memoTag.service.tagEdge.model.TagEdge;
 import com.example.oatnote.memoTag.service.tagsRelation.TagsRelationService;
 import com.example.oatnote.web.models.Criteria;
 
@@ -47,11 +48,13 @@ public class MemoTagService {
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
     private final TagsRelationService tagsRelationService;
+    private final TagEdgeService tagEdgeService;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
 
     public CreateMemoTagsResponse createMemoTags(CreateMemoTagsRequest createMemoTagsRequest) {
         AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemoTags(
+            "b973cd66-bc7b-4820-a9e8-78a1edae021c", // todo 유저 아이디
             createMemoTagsRequest.content()
         );
         Memo savedMemo = createMemoTags(aiCreateMemoTagsResponse.processedMemo());
@@ -70,13 +73,13 @@ public class MemoTagService {
     }
 
     public ChildMemosTagsResponse getChildMemosTags(
-        UUID parentTagId,
+        String parentTagId,
         Integer tagPage,
         Integer tagLimit,
         Integer memoPage,
         Integer memoLimit
     ) {
-        List<UUID> childTagsIds = tagsRelationService.getChildTagsIds(parentTagId);
+        List<String> childTagsIds = tagsRelationService.getChildTagsIds(parentTagId);
         List<Tag> childTags = tagService.getTags(childTagsIds);
         Integer total = childTags.size();
         Criteria criteria = Criteria.of(tagPage, tagLimit, total);
@@ -96,7 +99,7 @@ public class MemoTagService {
         );
     }
 
-    public PagedMemosTagsResponse getMemos(UUID tagId, Integer memoPage, Integer memoLimit) {
+    public PagedMemosTagsResponse getMemos(String tagId, Integer memoPage, Integer memoLimit) {
         Tag tag = tagService.getTag(tagId);
         Integer total = memoTagRelationService.countMemos(tagId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
@@ -130,19 +133,19 @@ public class MemoTagService {
         return SearchMemoResponse.from(aiSearchMemoResponse.processedMessage(), memos, tagsList);
     }
 
-    public UpdateMemoResponse updateMemo(UUID memoId, UpdateMemoRequest updateMemoRequest) {
+    public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest) {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(
             updateMemoRequest.content()
         );
         Memo memo = memoService.getMemo(memoId);
         memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateEmbeddingResponse.embedding());
         Memo updatedMemo = memoService.saveMemo(memo);
-        List<UUID> tagIds = memoTagRelationService.getLinkedTagIds(memo.getId());
+        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memo.getId());
         List<Tag> tags = tagService.getTags(tagIds);
         return UpdateMemoResponse.from(updatedMemo, tags);
     }
 
-    public UpdateTagResponse updateTag(UUID tagId, UpdateTagRequest updateTagRequest) {
+    public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest) {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
         Tag tag = tagService.getTag(tagId);
         tag.update(updateTagRequest.name(), aiCreateEmbeddingResponse.embedding());
@@ -150,13 +153,13 @@ public class MemoTagService {
         return UpdateTagResponse.from(updatedTag);
     }
 
-    public void deleteMemo(UUID memoId) {
+    public void deleteMemo(String memoId) {
         memoTagRelationService.deleteRelationsByMemoId(memoId);
         Memo memo = memoService.getMemo(memoId);
         memoService.deleteMemo(memo);
     }
 
-    public void deleteTag(UUID tagId) {
+    public void deleteTag(String tagId) {
         memoTagRelationService.deleteRelationsByTagId(tagId);
         Tag tag = tagService.getTag(tagId);
         tagService.deleteTag(tag);
@@ -166,13 +169,13 @@ public class MemoTagService {
         Memo memo = new Memo(
             aiMemoTagsResponse.content(),
             new ArrayList<>(),
-            UUID.fromString("todoUserId"), // todo 유저 아이디
+            "b973cd66-bc7b-4820-a9e8-78a1edae021c", // todo 유저 아이디
             aiMemoTagsResponse.embedding()
         );
         for (var newTag : aiMemoTagsResponse.newTags()) {
             Tag tag = new Tag(
                 newTag.name(),
-                UUID.fromString("todoUserId"),
+                "b973cd66-bc7b-4820-a9e8-78a1edae021c", // todo 유저 아이디
                 newTag.embedding()
             );
             tagService.saveTag(tag);
@@ -185,7 +188,7 @@ public class MemoTagService {
         for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
             tags.add(tagService.getTag(linkedTagId));
             memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG);
-            List<UUID> parentTagIds = tagsRelationService.getParentTagsIds(linkedTagId);
+            List<String> parentTagIds = tagsRelationService.getParentTagsIds(linkedTagId);
             createParentTagsRelations(savedMemo.getId(), parentTagIds);
         }
         for (var addRelation : aiMemoTagsResponse.tagRelations().added()) {
@@ -194,10 +197,15 @@ public class MemoTagService {
         for (var deletedRelation : aiMemoTagsResponse.tagRelations().deleted()) {
             tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
         }
+        TagEdge tagEdge = new TagEdge(
+            "b973cd66-bc7b-4820-a9e8-78a1edae021c", // todo 유저 아이디
+            aiMemoTagsResponse.newStructure()
+        );
+        tagEdgeService.saveTagEdge(tagEdge);
         return tags;
     }
 
-    private void createParentTagsRelations(UUID memoId, List<UUID> parentTagIds) {
+    private void createParentTagsRelations(String memoId, List<String> parentTagIds) {
         if (parentTagIds != null && !parentTagIds.isEmpty()) {
             for (var tagId : parentTagIds) {
                 memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG);

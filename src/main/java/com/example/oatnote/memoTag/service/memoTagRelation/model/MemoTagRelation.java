@@ -14,22 +14,22 @@ import lombok.Getter;
 public class MemoTagRelation {
 
     @Id
-    private UUID id;
+    private String id;
 
     @Indexed
     @Field("mId")
-    private UUID memoId;
+    private String memoId;
 
     @Indexed
     @Field("tId")
-    private UUID tagId;
+    private String tagId;
 
     @Indexed
-    @Field("isLinked")
+    @Field("isL")
     private boolean isLinked;
 
-    public MemoTagRelation(UUID memoId, UUID tagId, boolean isLinked) {
-        this.id = UUID.randomUUID();
+    public MemoTagRelation(String memoId, String tagId, boolean isLinked) {
+        this.id = UUID.randomUUID().toString();
         this.memoId = memoId;
         this.tagId = tagId;
         this.isLinked = isLinked;

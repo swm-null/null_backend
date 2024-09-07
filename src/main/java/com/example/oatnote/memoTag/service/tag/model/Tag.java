@@ -18,14 +18,14 @@ import lombok.Getter;
 public class Tag {
 
     @Id
-    private UUID id;
+    private String id;
 
     @Indexed
     private String name;
 
     @Field("uId")
     @Indexed
-    private UUID userId;
+    private String userId;
 
     private List<Double> embedding;
 
@@ -37,8 +37,8 @@ public class Tag {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Tag(String name, UUID userId, List<Double> embedding) {
-        this.id = UUID.randomUUID();
+    public Tag(String name, String userId, List<Double> embedding) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.userId = userId;
         this.embedding = embedding;

@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingRequest;
+import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsRequest;
 import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsResponse;
 import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsRequest;
 import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsRequest;
-import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingRequest;
-import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
 import com.example.oatnote.memoTag.service.client.dto.AISearchMemoRequest;
 import com.example.oatnote.memoTag.service.client.dto.AISearchMemoResponse;
 
@@ -31,9 +31,12 @@ public class AIMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AICreateMemoTagsResponse createMemoTags(String content) {
+    public AICreateMemoTagsResponse createMemoTags(String userId, String content) {
         final URI uri = buildUri("/memo");
-        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content);
+        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(
+            userId,
+            content
+        );
         ResponseEntity<AICreateMemoTagsResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemoTagsRequest,

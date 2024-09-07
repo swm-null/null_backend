@@ -1,19 +1,18 @@
 package com.example.oatnote.memoTag.service.tagsRelation;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.example.oatnote.memoTag.service.tagsRelation.model.TagsRelation;
 
-public interface TagsRelationRepository extends MongoRepository<TagsRelation, UUID> {
+public interface TagsRelationRepository extends MongoRepository<TagsRelation, String> {
 
-    void deleteByParentTagIdAndChildTagId(UUID parentTagId, UUID childTagId);
+    void deleteByParentTagIdAndChildTagId(String parentTagId, String childTagId);
 
-    List<TagsRelation> findByChildTagId(UUID parentTagId);
+    List<TagsRelation> findByChildTagId(String parentTagId);
 
-    List<TagsRelation> findByParentTagId(UUID parentTagId);
+    List<TagsRelation> findByParentTagId(String parentTagId);
 
-    Integer countByParentTagId(UUID parentTagId);
+    Integer countByParentTagId(String parentTagId);
 }

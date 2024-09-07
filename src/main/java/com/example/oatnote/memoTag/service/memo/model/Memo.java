@@ -18,7 +18,7 @@ import lombok.Getter;
 public class Memo {
 
     @Id
-    private UUID id;
+    private String id;
 
     private String content;
 
@@ -27,7 +27,7 @@ public class Memo {
 
     @Indexed
     @Field("uId")
-    private UUID userId;
+    private String userId;
 
     private List<Double> embedding;
 
@@ -39,8 +39,8 @@ public class Memo {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Memo(String content, List<String> imageUrls, UUID userId, List<Double> embedding) {
-        this.id = UUID.randomUUID();
+    public Memo(String content, List<String> imageUrls, String userId, List<Double> embedding) {
+        this.id = UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
         this.userId = userId;

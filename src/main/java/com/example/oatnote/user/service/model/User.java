@@ -17,7 +17,7 @@ import lombok.Getter;
 public class User {
 
     @Id
-    private UUID id;
+    private String id;
 
     @Indexed(unique = true)
     private String email;
@@ -34,7 +34,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     public User(String email, String password) {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
         this.email = email;
         this.password = password;
     }

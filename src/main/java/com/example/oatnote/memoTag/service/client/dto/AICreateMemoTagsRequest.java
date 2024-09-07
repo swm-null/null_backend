@@ -2,13 +2,12 @@ package com.example.oatnote.memoTag.service.client.dto;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AICreateMemoTagsRequest(
-    List<AIMemoTagsRequest> memos
+    String userId,
+    AIMemoTagsRequest memo
 ) {
 
     private record AIMemoTagsRequest(
@@ -20,7 +19,7 @@ public record AICreateMemoTagsRequest(
         }
     }
 
-    public static AICreateMemoTagsRequest from(String content) {
-        return new AICreateMemoTagsRequest(List.of(AIMemoTagsRequest.from(content)));
+    public static AICreateMemoTagsRequest from(String userId, String content) {
+        return new AICreateMemoTagsRequest(userId, AIMemoTagsRequest.from(content));
     }
 }

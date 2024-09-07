@@ -29,7 +29,8 @@ public class UserService {
     private final ApplicationEventPublisher eventPublisher;
 
     public void register(RegisterUserRequest registerUserRequest) {
-        if (!registerUserRequest.isPasswordMatching()) {
+        String password = registerUserRequest.password();
+        if (password == null || !password.equals(registerUserRequest.confirmPassword())) {
             throw new UserIllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {

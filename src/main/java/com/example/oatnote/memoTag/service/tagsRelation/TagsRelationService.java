@@ -1,7 +1,6 @@
 package com.example.oatnote.memoTag.service.tagsRelation;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -15,28 +14,24 @@ public class TagsRelationService {
 
     private final TagsRelationRepository tagsRelationRepository;
 
-    public void createRelation(UUID parentTagId, UUID childTagId) {
+    public void createRelation(String parentTagId, String childTagId) {
         TagsRelation tagsRelation = new TagsRelation(parentTagId, childTagId);
         tagsRelationRepository.insert(tagsRelation);
     }
 
-    public void deleteRelation(UUID parentTagId, UUID childTagId) {
+    public void deleteRelation(String parentTagId, String childTagId) {
         tagsRelationRepository.deleteByParentTagIdAndChildTagId(parentTagId, childTagId);
     }
 
-    public List<UUID> getParentTagsIds(UUID childTagId) {
+    public List<String> getParentTagsIds(String childTagId) {
         return tagsRelationRepository.findByChildTagId(childTagId).stream()
             .map(TagsRelation::getParentTagId)
             .toList();
     }
 
-    public List<UUID> getChildTagsIds(UUID parentTagId) {
+    public List<String> getChildTagsIds(String parentTagId) {
         return tagsRelationRepository.findByParentTagId(parentTagId).stream()
             .map(TagsRelation::getChildTagId)
             .toList();
-    }
-
-    public Integer countChildTags(UUID parentTagId) {
-        return tagsRelationRepository.countByParentTagId(parentTagId);
     }
 }

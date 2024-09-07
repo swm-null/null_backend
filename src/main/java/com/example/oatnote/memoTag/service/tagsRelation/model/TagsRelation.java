@@ -14,18 +14,18 @@ import lombok.Getter;
 public class TagsRelation {
 
     @Id
-    private UUID id;
+    private String id;
 
     @Indexed
     @Field("pTId")
-    private UUID parentTagId;
+    private String parentTagId;
 
     @Indexed
     @Field("cTId")
-    private UUID childTagId;
+    private String childTagId;
 
-    public TagsRelation(UUID parentTagId, UUID childTagId) {
-        this.id = UUID.randomUUID();
+    public TagsRelation(String parentTagId, String childTagId) {
+        this.id = UUID.randomUUID().toString();
         this.parentTagId = parentTagId;
         this.childTagId = childTagId;
     }
