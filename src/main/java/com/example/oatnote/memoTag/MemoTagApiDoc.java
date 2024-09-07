@@ -1,6 +1,7 @@
 package com.example.oatnote.memoTag;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,13 +37,16 @@ public interface MemoTagApiDoc {
         value = {
             @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "메모 생성")
     @PostMapping("/memo/tags")
     ResponseEntity<CreateMemoTagsResponse> createMemoTags(
-        @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest
+        @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
@@ -62,6 +66,8 @@ public interface MemoTagApiDoc {
         value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
@@ -72,13 +78,16 @@ public interface MemoTagApiDoc {
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit
+        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
@@ -87,13 +96,16 @@ public interface MemoTagApiDoc {
     ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
         @PathVariable("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit
+        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
@@ -101,13 +113,16 @@ public interface MemoTagApiDoc {
     @Operation(summary = "AI 검색을 통한 메모 태그 조회")
     @PostMapping("/memos/tags/search")
     ResponseEntity<SearchMemoResponse> getMemosTagsByAISearch(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
@@ -116,13 +131,16 @@ public interface MemoTagApiDoc {
     @PutMapping("/memo/{memoId}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
         @PathVariable("memoId") String memoId,
-        @RequestBody @Valid UpdateMemoRequest updateMemoRequest
+        @RequestBody @Valid UpdateMemoRequest updateMemoRequest,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
@@ -130,32 +148,39 @@ public interface MemoTagApiDoc {
     @PutMapping("/tag/{tagId}")
     ResponseEntity<UpdateTagResponse> updateTag(
         @PathVariable("tagId") String tagId,
-        @RequestBody @Valid UpdateTagRequest updateTagRequest
+        @RequestBody @Valid UpdateTagRequest updateTagRequest,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "204"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "메모 삭제")
     @DeleteMapping("/memo/{memoId}")
     ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId
+        @PathVariable("memoId") String memoId,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(
         value = {
             @ApiResponse(responseCode = "204"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
     @Operation(summary = "태그 삭제")
     @DeleteMapping("/tag/{tagId}")
     ResponseEntity<Void> deleteTag(
-        @PathVariable("tagId") String tagId
+        @PathVariable("tagId") String tagId,
+        @AuthenticationPrincipal String userId
     );
 }
