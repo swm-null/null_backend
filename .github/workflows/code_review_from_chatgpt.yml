@@ -31,4 +31,3 @@ jobs:
           temperature: 1
           max_tokens: 5000
           MAX_PATCH_LENGTH: 5000
-          patch_file: combined_diff.txt
