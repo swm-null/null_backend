@@ -15,13 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Get base branch name
+        id: get-base-branch
+        run: echo "BASE_BRANCH=$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
+
       - name: Gather diff of all files
-        run: git diff origin/main -- > combined_diff.txt
+        run: git diff origin/$BASE_BRANCH -- > combined_diff.txt
 
       - name: Perform Code Review
         uses: anc95/ChatGPT-CodeReview@main
-        with:
-          patch_file: combined_diff.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -31,3 +33,4 @@ jobs:
           temperature: 1
           max_tokens: 5000
           MAX_PATCH_LENGTH: 5000
+          patch_file: combined_diff.txt
