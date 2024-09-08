@@ -6,20 +6,29 @@ permissions:
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
 
 jobs:
   code-review:
     runs-on: ubuntu-latest
     steps:
-      - uses: anc95/ChatGPT-CodeReview@main
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Gather diff of all files
+        run: git diff origin/main -- > combined_diff.txt
+
+      - name: Perform Code Review
+        uses: anc95/ChatGPT-CodeReview@main
+        with:
+          patch_file: combined_diff.txt
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGUAGE: Korean
           MODEL: gpt-4o-mini
-          PROMPT: When reviewing the following code, focus only on critical errors. Critical errors refer to issues that may prevent the code from executing, cause serious performance problems, or introduce significant security vulnerabilities. Ignore minor style issues or small optimizations. Do not provide any trivial advice. Only point out clear bugs, inefficiencies in resource management, or potential abnormal behavior in the code. If there are no significant issues in a file, do not proceed with the review for that file.
           top_p: 1
           temperature: 1
           max_tokens: 5000
           MAX_PATCH_LENGTH: 5000
+          patch_file: combined_diff.txt
