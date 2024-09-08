@@ -1,6 +1,7 @@
 package com.example.oatnote.memoTag.service.memo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,8 +12,12 @@ import com.example.oatnote.memoTag.service.memo.model.Memo;
 
 public interface MemoRepository extends MongoRepository<Memo, String> {
 
-    @Query("{ 'content' : { $regex: ?0, $options: 'i' } }")
-    List<Memo> findByContentRegex(String regex);
+    Optional<Memo> findByIdAndUserId(String memoId, String userId);
 
-    Page<Memo> findAllByIdIn(List<String> id, Pageable pageable);
+    List<Memo> findByIdInAndUserId(List<String> memoIds, String userId);
+
+    Page<Memo> findByIdInAndUserId(List<String> memoIds, Pageable pageable, String userId);
+
+    @Query("{ 'content' : { $regex: ?0, $options: 'i' }, 'userId' : ?1 }")
+    List<Memo> findByContentRegexAndUserId(String regex, String userId);
 }

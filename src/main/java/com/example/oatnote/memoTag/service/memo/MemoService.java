@@ -21,21 +21,21 @@ public class MemoService {
         return memoRepository.save(memo);
     }
 
-    public Memo getMemo(String memoId) {
-        return memoRepository.findById(memoId)
+    public Memo getMemo(String memoId, String userId) {
+        return memoRepository.findByIdAndUserId(memoId, userId)
             .orElseThrow(() -> new MemoNotFoundException("메모를 찾지 못했습니다: " + memoId));
     }
 
-    public List<Memo> getMemos(List<String> memoIds) {
-        return memoRepository.findAllById(memoIds);
+    public List<Memo> getMemos(List<String> memoIds, String userId) {
+        return memoRepository.findByIdInAndUserId(memoIds, userId);
     }
 
-    public Page<Memo> getPagedMemos(List<String> memoIds, PageRequest pageRequest) {
-        return memoRepository.findAllByIdIn(memoIds, pageRequest);
+    public Page<Memo> getPagedMemos(List<String> memoIds, PageRequest pageRequest, String userId) {
+        return memoRepository.findByIdInAndUserId(memoIds, pageRequest, userId);
     }
 
-    public List<Memo> getMemosContainingRegex(String regex) {
-        List<Memo> memos = memoRepository.findByContentRegex(regex);
+    public List<Memo> getMemosContainingRegex(String regex, String userId) {
+        List<Memo> memos = memoRepository.findByContentRegexAndUserId(regex, userId);
         if (memos.isEmpty()) {
             throw new MemoNotFoundException("존재하지 않는 메모 regex 입니다.");
         }

@@ -10,9 +10,7 @@ public interface TagsRelationRepository extends MongoRepository<TagsRelation, St
 
     void deleteByParentTagIdAndChildTagId(String parentTagId, String childTagId);
 
-    List<TagsRelation> findByChildTagId(String parentTagId);
-
     List<TagsRelation> findByParentTagId(String parentTagId);
 
-    Integer countByParentTagId(String parentTagId);
+    List<TagsRelation> findByChildTagId(String parentTagId);
 }
