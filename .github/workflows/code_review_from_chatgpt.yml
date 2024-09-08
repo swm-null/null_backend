@@ -6,7 +6,7 @@ permissions:
 
 on:
   pull_request:
-    types: [ opened ]
+    types: [ reopened ]
 
 jobs:
   code-review:
