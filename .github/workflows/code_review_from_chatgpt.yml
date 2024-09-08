@@ -6,31 +6,21 @@ permissions:
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [ opened ]
 
 jobs:
   code-review:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Get base branch name
-        id: get-base-branch
-        run: echo "BASE_BRANCH=$(jq -r .pull_request.base.ref "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
-
-      - name: Gather diff of all files
-        run: git diff origin/$BASE_BRANCH -- > combined_diff.txt
-
-      - name: Perform Code Review
-        uses: anc95/ChatGPT-CodeReview@main
+      - uses: anc95/ChatGPT-CodeReview@main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGUAGE: Korean
           MODEL: gpt-4o-mini
           top_p: 1
           temperature: 1
+          PROMPT: |
+            Please focus only on critical errors and major issues in the code review. Provide a single, concise response that highlights the most significant problems. Avoid giving extensive feedback on minor or stylistic issues. Summarize your comments and prioritize the most impactful suggestions for improvement.
           max_tokens: 5000
-          MAX_PATCH_LENGTH: 5000
-          patch_file: combined_diff.txt
+          MAX_PATCH_LENGTH: 3000
