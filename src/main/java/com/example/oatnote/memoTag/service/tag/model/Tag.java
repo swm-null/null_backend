@@ -2,7 +2,6 @@ package com.example.oatnote.memoTag.service.tag.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -37,8 +36,8 @@ public class Tag {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public Tag(String name, String userId, List<Double> embedding) {
-        this.id = UUID.randomUUID().toString();
+    public Tag(String id, String name, String userId, List<Double> embedding) {
+        this.id = id;
         this.name = name;
         this.userId = userId;
         this.embedding = embedding;

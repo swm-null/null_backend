@@ -59,6 +59,12 @@ public class MemoTagService {
         );
         Memo savedMemo = createMemoTags(aiCreateMemoTagsResponse.processedMemo(), userId);
         List<Tag> tags = updateMemosTagsRelations(aiCreateMemoTagsResponse.processedMemo(), savedMemo, userId);
+
+        TagEdge tagEdge = new TagEdge(
+            userId,
+            aiCreateMemoTagsResponse.newStructure()
+        );
+        tagEdgeService.saveTagEdge(tagEdge);
         return CreateMemoTagsResponse.from(savedMemo, tags);
     }
 
@@ -71,6 +77,12 @@ public class MemoTagService {
             Memo savedMemo = createMemoTags(aiMemoTagsResponse, "b973cd66-bc7b-4820-a9e8-78a1edae021c");
             updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "b973cd66-bc7b-4820-a9e8-78a1edae021c");
         }
+
+        TagEdge tagEdge = new TagEdge(
+            "b973cd66-bc7b-4820-a9e8-78a1edae021c",
+            aiCreateMemosTagsResponse.newStructure()
+        );
+        tagEdgeService.saveTagEdge(tagEdge);
     }
 
     public ChildMemosTagsResponse getChildMemosTags(
@@ -142,7 +154,7 @@ public class MemoTagService {
         );
         Memo memo = memoService.getMemo(memoId, userId);
         memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateEmbeddingResponse.embedding());
-        Memo updatedMemo = memoService.saveMemo(memo);
+        Memo updatedMemo = memoService.updateMemo(memo);
         List<String> tagIds = memoTagRelationService.getLinkedTagIds(memo.getId());
         List<Tag> tags = tagService.getTags(tagIds, userId);
         return UpdateMemoResponse.from(updatedMemo, tags);
@@ -175,15 +187,20 @@ public class MemoTagService {
             userId,
             aiMemoTagsResponse.embedding()
         );
+        Memo createdMemo = memoService.saveMemo(memo);
+        System.out.println(createdMemo.getCreatedAt());
+        System.out.println(createdMemo.getCreatedAt());
+        System.out.println(createdMemo.getCreatedAt());
         for (var newTag : aiMemoTagsResponse.newTags()) {
             Tag tag = new Tag(
+                newTag.id(),
                 newTag.name(),
                 userId,
                 newTag.embedding()
             );
             tagService.saveTag(tag);
         }
-        return memoService.saveMemo(memo);
+        return createdMemo;
     }
 
     private List<Tag> updateMemosTagsRelations(
@@ -198,17 +215,12 @@ public class MemoTagService {
             List<String> parentTagIds = tagsRelationService.getParentTagsIds(linkedTagId);
             createParentTagsRelations(savedMemo.getId(), parentTagIds);
         }
-        for (var addRelation : aiMemoTagsResponse.tagRelations().added()) {
+        for (var addRelation : aiMemoTagsResponse.tagsRelations().added()) {
             tagsRelationService.createRelation(addRelation.parentId(), addRelation.childId());
         }
-        for (var deletedRelation : aiMemoTagsResponse.tagRelations().deleted()) {
+        for (var deletedRelation : aiMemoTagsResponse.tagsRelations().deleted()) {
             tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
         }
-        TagEdge tagEdge = new TagEdge(
-            userId,
-            aiMemoTagsResponse.newStructure()
-        );
-        tagEdgeService.saveTagEdge(tagEdge);
         return tags;
     }
 

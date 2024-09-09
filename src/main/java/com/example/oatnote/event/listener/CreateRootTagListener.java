@@ -24,6 +24,7 @@ public class CreateRootTagListener {
 
     private void createDummyTagsForNewUser(String userId) {
         Tag rootTag = new Tag(
+            userId,
             "@",
             userId,
             new ArrayList<>()

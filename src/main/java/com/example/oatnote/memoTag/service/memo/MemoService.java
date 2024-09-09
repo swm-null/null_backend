@@ -18,7 +18,7 @@ public class MemoService {
     private final MemoRepository memoRepository;
 
     public Memo saveMemo(Memo memo) {
-        return memoRepository.save(memo);
+        return memoRepository.insert(memo);
     }
 
     public Memo getMemo(String memoId, String userId) {
@@ -40,6 +40,10 @@ public class MemoService {
             throw new MemoNotFoundException("존재하지 않는 메모 regex 입니다.");
         }
         return memos;
+    }
+
+    public Memo updateMemo(Memo memo) {
+        return memoRepository.save(memo);
     }
 
     public void deleteMemo(Memo memo) {

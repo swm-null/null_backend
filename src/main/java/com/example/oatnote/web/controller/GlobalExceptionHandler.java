@@ -19,11 +19,6 @@ import com.example.oatnote.user.service.exception.UserNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        return buildErrorResponse(1000, ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(AuthIllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleAuthIllegalArgumentException(AuthIllegalArgumentException ex) {
         return buildErrorResponse(1001, ex.getMessage(), HttpStatus.BAD_REQUEST);
