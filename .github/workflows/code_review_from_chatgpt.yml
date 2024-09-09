@@ -6,7 +6,7 @@ permissions:
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types: [ reopened ]
 
 jobs:
   code-review:
@@ -20,5 +20,7 @@ jobs:
           MODEL: gpt-4o-mini
           top_p: 1
           temperature: 1
-          max_tokens: 7000
-          MAX_PATCH_LENGTH: 7000
+          PROMPT: |
+            Please focus only on critical errors and major issues in the code review. Provide a single, concise response that highlights the most significant problems. Avoid giving extensive feedback on minor or stylistic issues. Summarize your comments and prioritize the most impactful suggestions for improvement.
+          max_tokens: 5000
+          MAX_PATCH_LENGTH: 3000

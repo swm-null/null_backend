@@ -47,10 +47,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.getWriter().write(TOKEN_EXPIRED_MESSAGE);
                     return;
                 }
-                String email = jwtUtil.extractEmail(accessToken);
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
+                String userId = jwtUtil.extractUserId(accessToken);
+                if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userId,
+                        null,
+                        new ArrayList<>()
+                    );
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
@@ -64,7 +67,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
         }
-
         chain.doFilter(request, response);
     }
 

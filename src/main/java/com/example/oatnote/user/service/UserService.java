@@ -50,8 +50,8 @@ public class UserService {
         if (!passwordEncoder.matches(loginUserRequest.password(), user.getPassword())) {
             throw new AuthIllegalArgumentException("비밀번호가 일치하지 않습니다");
         }
-        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
-        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getId());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId());
         return LoginUserResponse.of(accessToken, refreshToken);
     }
 
@@ -59,7 +59,7 @@ public class UserService {
         String refreshToken = refreshUserRequest.refreshToken();
         try {
             jwtUtil.validateToken(refreshToken);
-            String email = jwtUtil.extractEmail(refreshToken);
+            String email = jwtUtil.extractUserId(refreshToken);
             String newAccessToken = jwtUtil.generateAccessToken(email);
             return RefreshUserResponse.of(newAccessToken, refreshToken);
         } catch (JwtException e) {

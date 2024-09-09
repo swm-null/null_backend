@@ -21,17 +21,22 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public List<Tag> getTags(List<String> tagIds) {
-        return tagRepository.findAllById(tagIds);
+    public List<Tag> getTags(List<String> tagIds, String userId) {
+        return tagRepository.findByIdInAndUserId(tagIds, userId);
     }
 
-    public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest) {
-        return tagRepository.findAllByIdIn(tagsIds, pageRequest);
+    public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest, String userId) {
+        return tagRepository.findByIdInAndUserId(tagsIds, pageRequest, userId);
     }
 
-    public Tag getTag(String tagId) {
-        return tagRepository.findById(tagId)
+    public Tag getTag(String tagId, String userId) {
+        return tagRepository.findByIdAndUserId(tagId, userId)
             .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + tagId));
+    }
+
+    public Tag getTagByName(String parentTagName, String userId) {
+        return tagRepository.findByNameAndUserId(parentTagName, userId)
+            .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + parentTagName));
     }
 
     public void deleteTag(Tag tag) {

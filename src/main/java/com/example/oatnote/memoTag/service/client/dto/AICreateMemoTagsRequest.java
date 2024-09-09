@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AICreateMemoTagsRequest(
-    String userId,
-    AIMemoTagsRequest memo
+    AIMemoTagsRequest memo,
+    String userId
 ) {
 
     private record AIMemoTagsRequest(
@@ -19,7 +19,7 @@ public record AICreateMemoTagsRequest(
         }
     }
 
-    public static AICreateMemoTagsRequest from(String userId, String content) {
-        return new AICreateMemoTagsRequest(userId, AIMemoTagsRequest.from(content));
+    public static AICreateMemoTagsRequest from(String content, String userId) {
+        return new AICreateMemoTagsRequest(AIMemoTagsRequest.from(content), userId);
     }
 }

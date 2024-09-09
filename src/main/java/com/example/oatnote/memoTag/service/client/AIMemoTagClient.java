@@ -31,12 +31,9 @@ public class AIMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AICreateMemoTagsResponse createMemoTags(String userId, String content) {
+    public AICreateMemoTagsResponse createMemoTags(String content, String userId) {
         final URI uri = buildUri("/memo");
-        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(
-            userId,
-            content
-        );
+        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content, userId);
         ResponseEntity<AICreateMemoTagsResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemoTagsRequest,
@@ -45,10 +42,10 @@ public class AIMemoTagClient {
         return aiCreateMemoTagsResponse.getBody();
     }
 
-    public AICreateMemosTagsResponse createMemosTags(String content) {
+    public AICreateMemosTagsResponse createMemosTags(String content, String userId) {
         final URI uri = buildUri("/kakao-parser");
         final String type = content.substring(content.length() - 3);
-        AICreateMemosTagsRequest aiCreateMemosTagsRequest = AICreateMemosTagsRequest.from(content, type);
+        AICreateMemosTagsRequest aiCreateMemosTagsRequest = AICreateMemosTagsRequest.from(content, type, userId);
         ResponseEntity<AICreateMemosTagsResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
             uri,
             aiCreateMemosTagsRequest,
@@ -57,9 +54,9 @@ public class AIMemoTagClient {
         return aiCreateKakaoMemosResponse.getBody();
     }
 
-    public AISearchMemoResponse searchMemo(String content) {
+    public AISearchMemoResponse searchMemo(String content, String userId) {
         final URI uri = buildUri("/search");
-        AISearchMemoRequest aiSearchMemoRequest = AISearchMemoRequest.from(content);
+        AISearchMemoRequest aiSearchMemoRequest = AISearchMemoRequest.from(content, userId);
         ResponseEntity<AISearchMemoResponse> aiSearchMemoResponse = restTemplate.postForEntity(
             uri,
             aiSearchMemoRequest,

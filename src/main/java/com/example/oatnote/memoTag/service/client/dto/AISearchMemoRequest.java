@@ -4,15 +4,13 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-import jakarta.validation.constraints.NotBlank;
-
 @JsonNaming(SnakeCaseStrategy.class)
 public record AISearchMemoRequest(
-    @NotBlank(message = "내용은 비워둘 수 없습니다.")
-    String content
+    String content,
+    String userId
 ) {
 
-    public static AISearchMemoRequest from(String content) {
-        return new AISearchMemoRequest(content);
+    public static AISearchMemoRequest from(String content, String userId) {
+        return new AISearchMemoRequest(content, userId);
     }
 }
