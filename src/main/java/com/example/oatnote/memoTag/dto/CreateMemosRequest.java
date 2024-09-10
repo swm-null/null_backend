@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record CreateMemosTagsRequest(
+public record CreateMemosRequest(
     @Schema(description = "파일 url", example = "https://example.com/kakao.csv")
     @Pattern(regexp = ".*\\.(csv|txt)$", message = "파일 확장자는 .csv 또는 .txt이어야 합니다.")
     @NotBlank(message = "파일 url은 비워둘 수 없습니다.")

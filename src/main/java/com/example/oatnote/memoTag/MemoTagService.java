@@ -8,18 +8,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
-import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
-import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
-import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
+import com.example.oatnote.memoTag.dto.ChildTagsWithMemosResponse;
+import com.example.oatnote.memoTag.dto.CreateMemoRequest;
+import com.example.oatnote.memoTag.dto.CreateMemoResponse;
+import com.example.oatnote.memoTag.dto.CreateMemosRequest;
+import com.example.oatnote.memoTag.dto.MemosResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
 import com.example.oatnote.memoTag.dto.UpdateMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateTagRequest;
 import com.example.oatnote.memoTag.dto.UpdateTagResponse;
-import com.example.oatnote.memoTag.dto.innerDto.MemoTagsResponse;
+import com.example.oatnote.memoTag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memoTag.service.client.AIMemoTagClient;
 import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
 import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsResponse;
@@ -52,9 +52,9 @@ public class MemoTagService {
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
 
-    public CreateMemoTagsResponse createMemoTags(CreateMemoTagsRequest createMemoTagsRequest, String userId) {
+    public CreateMemoResponse createMemoTags(CreateMemoRequest createMemoRequest, String userId) {
         AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemoTags(
-            createMemoTagsRequest.content(),
+            createMemoRequest.content(),
             userId
         );
         Memo savedMemo = createMemoTags(aiCreateMemoTagsResponse.processedMemo(), userId);
@@ -65,12 +65,12 @@ public class MemoTagService {
             aiCreateMemoTagsResponse.newStructure()
         );
         tagEdgeService.saveTagEdge(tagEdge);
-        return CreateMemoTagsResponse.from(savedMemo, tags);
+        return CreateMemoResponse.from(savedMemo, tags);
     }
 
-    public void createMemosTags(CreateMemosTagsRequest createMemosTagsRequest) {
+    public void createMemosTags(CreateMemosRequest createMemosRequest) {
         AICreateMemosTagsResponse aiCreateMemosTagsResponse = aiMemoTagClient.createMemosTags(
-            createMemosTagsRequest.content(),
+            createMemosRequest.content(),
             "b973cd66-bc7b-4820-a9e8-78a1edae021c" //todo Email userId
         );
         for (var aiMemoTagsResponse : aiCreateMemosTagsResponse.processedMemos()) {
@@ -85,7 +85,7 @@ public class MemoTagService {
         tagEdgeService.saveTagEdge(tagEdge);
     }
 
-    public ChildMemosTagsResponse getChildMemosTags(
+    public ChildTagsWithMemosResponse getChildTagsWithMemos(
         String parentTagName,
         Integer tagPage,
         Integer tagLimit,
@@ -105,13 +105,13 @@ public class MemoTagService {
             Sort.by(Sort.Direction.DESC, "uTime")
         );
         Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest, userId);
-        Page<PagedMemosTagsResponse> pagedMemosTags = result.map(
+        Page<MemosResponse> pagedMemosTags = result.map(
             tag -> getMemos(tag.getId(), memoPage, memoLimit, userId)
         );
-        return ChildMemosTagsResponse.from(childTags, pagedMemosTags, criteria);
+        return ChildTagsWithMemosResponse.from(childTags, pagedMemosTags, criteria);
     }
 
-    public PagedMemosTagsResponse getMemos(String tagId, Integer memoPage, Integer memoLimit, String userId) {
+    public MemosResponse getMemos(String tagId, Integer memoPage, Integer memoLimit, String userId) {
         Tag tag = tagService.getTag(tagId, userId);
         Integer total = memoTagRelationService.countMemos(tagId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
@@ -121,13 +121,13 @@ public class MemoTagService {
             Sort.by(Sort.Direction.DESC, "uTime")
         );
         Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
-        Page<MemoTagsResponse> memoTagsPage = result.map(
-            memo -> MemoTagsResponse.from(
+        Page<MemoResponse> memoTagsPage = result.map(
+            memo -> MemoResponse.from(
                 memo,
                 tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()), userId)
             )
         );
-        return PagedMemosTagsResponse.from(tag, memoTagsPage, criteria);
+        return MemosResponse.from(tag, memoTagsPage, criteria);
     }
 
     public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest, String userId) {

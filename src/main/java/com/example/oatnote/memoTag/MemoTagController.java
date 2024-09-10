@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
-import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
-import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
-import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
+import com.example.oatnote.memoTag.dto.ChildTagsWithMemosResponse;
+import com.example.oatnote.memoTag.dto.CreateMemoRequest;
+import com.example.oatnote.memoTag.dto.CreateMemoResponse;
+import com.example.oatnote.memoTag.dto.CreateMemosRequest;
+import com.example.oatnote.memoTag.dto.MemosResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
@@ -33,61 +33,61 @@ public class MemoTagController implements MemoTagApiDoc {
 
     private final MemoTagService memoTagService;
 
-    @PostMapping("/memo/tags")
-    public ResponseEntity<CreateMemoTagsResponse> createMemoTags(
-        @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest,
+    @PostMapping("/memo")
+    public ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoRequest,
         @AuthenticationPrincipal String userId
     ) {
-        CreateMemoTagsResponse createMemoTagsResponse = memoTagService.createMemoTags(createMemoTagsRequest, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoTagsResponse);
+        CreateMemoResponse createMemoResponse = memoTagService.createMemoTags(createMemoRequest, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
-    @PostMapping("/memos/tags/email")
-    public ResponseEntity<Void> createMemosTagsByEmail(
-        @RequestBody @Valid CreateMemosTagsRequest createMemosTagsRequest
+    @PostMapping("/memos")
+    public ResponseEntity<Void> createMemosByEmail(
+        @RequestBody @Valid CreateMemosRequest createMemosRequest
     ) {
-        memoTagService.createMemosTags(createMemosTagsRequest);
+        memoTagService.createMemosTags(createMemosRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
-    @GetMapping("/memos/tags/{parentTagName}")
-    public ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
-        @PathVariable("parentTagName") String parentTagName,
+    @PostMapping("/memos/search")
+    public ResponseEntity<SearchMemoResponse> getMemosByAISearch(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        SearchMemoResponse searchMemoResponse = memoTagService.searchMemosTags(searchMemoRequest, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
+    }
+
+    @GetMapping("/tags/{parentTagId}/memos")
+    public ResponseEntity<ChildTagsWithMemosResponse> getChildTagsWithMemos(
+        @PathVariable("parentTagId") String parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
         @AuthenticationPrincipal String userId
     ) {
-        ChildMemosTagsResponse childMemosTagsResponse = memoTagService.getChildMemosTags(
-            parentTagName,
+        ChildTagsWithMemosResponse childTagsWithMemosResponse = memoTagService.getChildTagsWithMemos(
+            parentTagId,
             tagPage,
             tagLimit,
             memoPage,
             memoLimit,
             userId
         );
-        return ResponseEntity.status(HttpStatus.OK).body(childMemosTagsResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(childTagsWithMemosResponse);
     }
 
-    @GetMapping("/memos/tag/{tagId}")
-    public ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
+    @GetMapping("/tag/{tagId}/memos")
+    public ResponseEntity<MemosResponse> getMemosByTag(
         @PathVariable("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
         @AuthenticationPrincipal String userId
     ) {
-        PagedMemosTagsResponse pagedMemosTagsResponse = memoTagService.getMemos(tagId, memoPage, memoLimit, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(pagedMemosTagsResponse);
-    }
-
-    @PostMapping("/memos/tags/search")
-    public ResponseEntity<SearchMemoResponse> getMemosTagsByAISearch(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
-        @AuthenticationPrincipal String userId
-    ) {
-        SearchMemoResponse searchMemoResponse = memoTagService.searchMemosTags(searchMemoRequest, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
+        MemosResponse memosResponse = memoTagService.getMemos(tagId, memoPage, memoLimit, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(memosResponse);
     }
 
     @PutMapping("/memo/{memoId}")

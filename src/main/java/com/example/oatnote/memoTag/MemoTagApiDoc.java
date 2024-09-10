@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.oatnote.memoTag.dto.ChildMemosTagsResponse;
-import com.example.oatnote.memoTag.dto.CreateMemoTagsRequest;
-import com.example.oatnote.memoTag.dto.CreateMemoTagsResponse;
-import com.example.oatnote.memoTag.dto.CreateMemosTagsRequest;
-import com.example.oatnote.memoTag.dto.PagedMemosTagsResponse;
+import com.example.oatnote.memoTag.dto.ChildTagsWithMemosResponse;
+import com.example.oatnote.memoTag.dto.CreateMemoRequest;
+import com.example.oatnote.memoTag.dto.CreateMemoResponse;
+import com.example.oatnote.memoTag.dto.CreateMemosRequest;
+import com.example.oatnote.memoTag.dto.MemosResponse;
 import com.example.oatnote.memoTag.dto.SearchMemoRequest;
 import com.example.oatnote.memoTag.dto.SearchMemoResponse;
 import com.example.oatnote.memoTag.dto.UpdateMemoRequest;
@@ -43,9 +43,9 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "메모 생성")
-    @PostMapping("/memo/tags")
-    ResponseEntity<CreateMemoTagsResponse> createMemoTags(
-        @RequestBody @Valid CreateMemoTagsRequest createMemoTagsRequest,
+    @PostMapping("/memo")
+    ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestBody @Valid CreateMemoRequest createMemoTagsRequest,
         @AuthenticationPrincipal String userId
     );
 
@@ -57,9 +57,9 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "이메일을 통한 메모 태그 생성")
-    @PostMapping("/memos/tags/email")
-    ResponseEntity<Void> createMemosTagsByEmail(
-        @RequestBody @Valid CreateMemosTagsRequest createMemosTagsRequest
+    @PostMapping("/memos")
+    ResponseEntity<Void> createMemosByEmail(
+        @RequestBody @Valid CreateMemosRequest createMemosTagsRequest
     );
 
     @ApiResponses(
@@ -71,9 +71,25 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "자식 메모 태그 조회")
-    @GetMapping("/memos/tags/{parentTagId}")
-    ResponseEntity<ChildMemosTagsResponse> getChildMemosTags(
+    @Operation(summary = "AI 검색을 통한 메모 태그 조회")
+    @PostMapping("/memos/search")
+    ResponseEntity<SearchMemoResponse> getMemosByAISearch(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "자식 태그와 메모 조회")
+    @GetMapping("/tags/{parentTagId}/memos")
+    ResponseEntity<ChildTagsWithMemosResponse> getChildTagsWithMemos(
         @PathVariable("parentTagId") String parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
@@ -92,28 +108,11 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "특정 태그의 메모 조회")
-    @GetMapping("/memos/tag/{tagId}")
-    ResponseEntity<PagedMemosTagsResponse> getMemosByTagId(
+    @GetMapping("/tag/{tagId}/memos")
+    ResponseEntity<MemosResponse> getMemosByTag(
         @PathVariable("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
-        @AuthenticationPrincipal String userId
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "AI 검색을 통한 메모 태그 조회")
-    @PostMapping("/memos/tags/search")
-    ResponseEntity<SearchMemoResponse> getMemosTagsByAISearch(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
         @AuthenticationPrincipal String userId
     );
 

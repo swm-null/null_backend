@@ -4,7 +4,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
-import com.example.oatnote.memoTag.dto.innerDto.MemoTagsResponse;
+import com.example.oatnote.memoTag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memoTag.service.memo.model.Memo;
 import com.example.oatnote.memoTag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -17,14 +17,14 @@ public record SearchMemoResponse(
     String processedMessage,
 
     @Schema(description = "메모 리스트")
-    List<MemoTagsResponse> memos
+    List<MemoResponse> memos
 ) {
 
     public static SearchMemoResponse from(String processedMessage, List<Memo> memos, List<List<Tag>> tagsList) {
         return new SearchMemoResponse(
             processedMessage,
             memos.stream()
-                .map(memo -> MemoTagsResponse.from(memo, tagsList.get(memos.indexOf(memo))))
+                .map(memo -> MemoResponse.from(memo, tagsList.get(memos.indexOf(memo))))
                 .toList()
         );
     }

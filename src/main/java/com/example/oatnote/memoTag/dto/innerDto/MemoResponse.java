@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.oatnote.memoTag.service.memo.model.Memo;
+import com.example.oatnote.memoTag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -27,16 +28,20 @@ public record MemoResponse(
     LocalDateTime createdAt,
 
     @Schema(description = "수정일시", example = "2024-08-21T03:47:23.328108")
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+
+    @Schema(description = "태그 리스트")
+    List<TagResponse> tags
 ) {
 
-    public static MemoResponse from(Memo memo) {
+    public static MemoResponse from(Memo memo, List<Tag> tags) {
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
             memo.getCreatedAt(),
-            memo.getUpdatedAt()
+            memo.getUpdatedAt(),
+            tags.stream().map(TagResponse::from).toList()
         );
     }
 }

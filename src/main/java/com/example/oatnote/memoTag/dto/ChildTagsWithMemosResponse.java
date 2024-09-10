@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import com.example.oatnote.memoTag.dto.innerDto.MemoTagsResponse;
 import com.example.oatnote.memoTag.dto.innerDto.TagResponse;
 import com.example.oatnote.memoTag.service.tag.model.Tag;
 import com.example.oatnote.web.models.Criteria;
@@ -16,9 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record PagedMemosTagsResponse(
-    @Schema(description = "태그 이름", requiredMode = REQUIRED)
-    TagResponse tag,
+public record ChildTagsWithMemosResponse(
+    @Schema(description = "태그 리스트")
+    List<TagResponse> tags,
 
     @Schema(description = "특정 태그의 총 메모의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
@@ -32,17 +31,17 @@ public record PagedMemosTagsResponse(
     @Schema(description = "현재 페이지", example = "2", requiredMode = REQUIRED)
     Integer currentPage,
 
-    @Schema(description = "메모태그 리스트", requiredMode = REQUIRED)
-    List<MemoTagsResponse> memoTags
+    @Schema(description = "태그별 메모 리스트", requiredMode = REQUIRED)
+    List<MemosResponse> memosList
 ) {
 
-    public static PagedMemosTagsResponse from(
-        Tag tag,
-        Page<MemoTagsResponse> pagedResult,
+    public static ChildTagsWithMemosResponse from(
+        List<Tag> tags,
+        Page<MemosResponse> pagedResult,
         Criteria criteria
     ) {
-        return new PagedMemosTagsResponse(
-            TagResponse.from(tag),
+        return new ChildTagsWithMemosResponse(
+            tags.stream().map(TagResponse::from).toList(),
             pagedResult.getTotalElements(),
             pagedResult.getContent().size(),
             pagedResult.getTotalPages(),

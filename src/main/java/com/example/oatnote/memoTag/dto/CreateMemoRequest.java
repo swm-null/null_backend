@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record CreateMemoTagsRequest(
+public record CreateMemoRequest(
     @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해", requiredMode = REQUIRED)
     @NotBlank(message = "내용은 비워둘 수 없습니다.")
     String content,
