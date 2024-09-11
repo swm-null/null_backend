@@ -30,8 +30,8 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/memos/{memoId}/tags").authenticated() //TODO 경로 수정
-                .requestMatchers("/**").permitAll()
+                .requestMatchers("/user/login", "/user/register", "/user/refresh").permitAll()
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

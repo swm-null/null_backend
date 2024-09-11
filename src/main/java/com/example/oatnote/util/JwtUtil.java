@@ -34,12 +34,12 @@ public class JwtUtil {
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
     }
 
-    public String generateAccessToken(String email) {
-        return createToken(email, accessTokenExpirationTime, "ACCESS");
+    public String generateAccessToken(String userId) {
+        return createToken(userId, accessTokenExpirationTime, "ACCESS");
     }
 
-    public String generateRefreshToken(String email) {
-        return createToken(email, refreshTokenExpirationTime, "REFRESH");
+    public String generateRefreshToken(String userId) {
+        return createToken(userId, refreshTokenExpirationTime, "REFRESH");
     }
 
     private String createToken(String subject, long expirationTime, String tokenType) {
@@ -52,7 +52,7 @@ public class JwtUtil {
             .compact();
     }
 
-    public String extractEmail(String token) {
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 

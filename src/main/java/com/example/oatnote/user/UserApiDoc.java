@@ -4,11 +4,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.oatnote.user.models.LoginUserRequest;
-import com.example.oatnote.user.models.LoginUserResponse;
-import com.example.oatnote.user.models.RefreshUserRequest;
-import com.example.oatnote.user.models.RefreshUserResponse;
-import com.example.oatnote.user.models.RegisterUserRequest;
+import com.example.oatnote.user.dto.LoginUserRequest;
+import com.example.oatnote.user.dto.LoginUserResponse;
+import com.example.oatnote.user.dto.RefreshUserRequest;
+import com.example.oatnote.user.dto.RefreshUserResponse;
+import com.example.oatnote.user.dto.RegisterUserRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,7 +26,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "201"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/users/register")
+    @PostMapping("/user/register")
     ResponseEntity<Void> register(
         @RequestBody @Valid RegisterUserRequest registerUserRequest
     );
@@ -37,7 +37,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/users/login")
+    @PostMapping("/user/login")
     ResponseEntity<LoginUserResponse> login(
         @RequestBody @Valid LoginUserRequest loginUserRequest
     );
@@ -48,7 +48,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/users/refresh")
+    @PostMapping("/user/refresh")
     ResponseEntity<RefreshUserResponse> refreshAccessToken(
         @RequestBody @Valid RefreshUserRequest refreshUserRequest
     );

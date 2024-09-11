@@ -5,18 +5,20 @@ import java.util.stream.Collectors;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.oatnote.memo.service.memo.exception.MemoNotFoundException;
-import com.example.oatnote.memo.service.tag.exception.TagNotFoundException;
+import com.example.oatnote.memoTag.service.memo.exception.MemoNotFoundException;
+import com.example.oatnote.memoTag.service.tag.exception.TagNotFoundException;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(AuthIllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleAuthIllegalArgumentException(AuthIllegalArgumentException ex) {
         return buildErrorResponse(1001, ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -52,9 +54,9 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(1007, errorMessages, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        return buildErrorResponse(1000, ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        return buildErrorResponse(1008, ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(int errorCode, String message, HttpStatus status) {
