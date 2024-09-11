@@ -22,8 +22,8 @@ import com.example.oatnote.memoTag.dto.UpdateTagResponse;
 import com.example.oatnote.memoTag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memoTag.service.client.AIMemoTagClient;
 import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsResponse;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemoResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.memoTag.service.client.dto.AISearchMemoResponse;
 import com.example.oatnote.memoTag.service.client.dto.innerDto.ProcessedMemoResponse;
 import com.example.oatnote.memoTag.service.memo.MemoService;
@@ -53,34 +53,34 @@ public class MemoTagService {
     private final static boolean IS_LINKED_MEMO_TAG = true;
 
     public CreateMemoResponse createMemoTags(CreateMemoRequest createMemoRequest, String userId) {
-        AICreateMemoTagsResponse aiCreateMemoTagsResponse = aiMemoTagClient.createMemoTags(
+        AICreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemoTags(
             createMemoRequest.content(),
             userId
         );
-        Memo savedMemo = createMemoTags(aiCreateMemoTagsResponse.processedMemo(), userId);
-        List<Tag> tags = updateMemosTagsRelations(aiCreateMemoTagsResponse.processedMemo(), savedMemo, userId);
+        Memo savedMemo = createMemoTags(aiCreateMemoResponse.processedMemo(), userId);
+        List<Tag> tags = updateMemosTagsRelations(aiCreateMemoResponse.processedMemo(), savedMemo, userId);
 
         TagEdge tagEdge = new TagEdge(
             userId,
-            aiCreateMemoTagsResponse.newStructure()
+            aiCreateMemoResponse.newStructure()
         );
         tagEdgeService.saveTagEdge(tagEdge);
         return CreateMemoResponse.from(savedMemo, tags);
     }
 
     public void createMemosTags(CreateMemosRequest createMemosRequest) {
-        AICreateMemosTagsResponse aiCreateMemosTagsResponse = aiMemoTagClient.createMemosTags(
+        AICreateMemosResponse aiCreateMemosResponse = aiMemoTagClient.createMemosTags(
             createMemosRequest.content(),
             "b973cd66-bc7b-4820-a9e8-78a1edae021c" //todo Email userId
         );
-        for (var aiMemoTagsResponse : aiCreateMemosTagsResponse.processedMemos()) {
+        for (var aiMemoTagsResponse : aiCreateMemosResponse.processedMemos()) {
             Memo savedMemo = createMemoTags(aiMemoTagsResponse, "b973cd66-bc7b-4820-a9e8-78a1edae021c");
             updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "b973cd66-bc7b-4820-a9e8-78a1edae021c");
         }
 
         TagEdge tagEdge = new TagEdge(
             "b973cd66-bc7b-4820-a9e8-78a1edae021c",
-            aiCreateMemosTagsResponse.newStructure()
+            aiCreateMemosResponse.newStructure()
         );
         tagEdgeService.saveTagEdge(tagEdge);
     }

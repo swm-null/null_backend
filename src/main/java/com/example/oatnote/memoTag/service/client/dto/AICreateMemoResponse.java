@@ -8,8 +8,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AICreateMemosTagsResponse(
-    List<ProcessedMemoResponse> processedMemos,
+public record AICreateMemoResponse(
+    ProcessedMemoResponse processedMemo,
     Map<String, List<String>> newStructure
 ) {
+
 }

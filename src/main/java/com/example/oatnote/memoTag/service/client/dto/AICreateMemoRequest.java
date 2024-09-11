@@ -5,7 +5,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AICreateMemoTagsRequest(
+public record AICreateMemoRequest(
     AIMemoTagsRequest memo,
     String userId
 ) {
@@ -19,7 +19,7 @@ public record AICreateMemoTagsRequest(
         }
     }
 
-    public static AICreateMemoTagsRequest from(String content, String userId) {
-        return new AICreateMemoTagsRequest(AIMemoTagsRequest.from(content), userId);
+    public static AICreateMemoRequest from(String content, String userId) {
+        return new AICreateMemoRequest(AIMemoTagsRequest.from(content), userId);
     }
 }

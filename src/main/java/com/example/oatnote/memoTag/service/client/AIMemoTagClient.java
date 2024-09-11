@@ -10,10 +10,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingRequest;
 import com.example.oatnote.memoTag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsRequest;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemoTagsResponse;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsRequest;
-import com.example.oatnote.memoTag.service.client.dto.AICreateMemosTagsResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemoRequest;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemoResponse;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemosRequest;
+import com.example.oatnote.memoTag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.memoTag.service.client.dto.AISearchMemoRequest;
 import com.example.oatnote.memoTag.service.client.dto.AISearchMemoResponse;
 
@@ -31,25 +31,25 @@ public class AIMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AICreateMemoTagsResponse createMemoTags(String content, String userId) {
+    public AICreateMemoResponse createMemoTags(String content, String userId) {
         final URI uri = buildUri("/memo");
-        AICreateMemoTagsRequest aiCreateMemoTagsRequest = AICreateMemoTagsRequest.from(content, userId);
-        ResponseEntity<AICreateMemoTagsResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
+        AICreateMemoRequest aiCreateMemoRequest = AICreateMemoRequest.from(content, userId);
+        ResponseEntity<AICreateMemoResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
             uri,
-            aiCreateMemoTagsRequest,
-            AICreateMemoTagsResponse.class
+            aiCreateMemoRequest,
+            AICreateMemoResponse.class
         );
         return aiCreateMemoTagsResponse.getBody();
     }
 
-    public AICreateMemosTagsResponse createMemosTags(String content, String userId) {
+    public AICreateMemosResponse createMemosTags(String content, String userId) {
         final URI uri = buildUri("/kakao-parser");
         final String type = content.substring(content.length() - 3);
-        AICreateMemosTagsRequest aiCreateMemosTagsRequest = AICreateMemosTagsRequest.from(content, type, userId);
-        ResponseEntity<AICreateMemosTagsResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
+        AICreateMemosRequest aiCreateMemosRequest = AICreateMemosRequest.from(content, type, userId);
+        ResponseEntity<AICreateMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
             uri,
-            aiCreateMemosTagsRequest,
-            AICreateMemosTagsResponse.class
+            aiCreateMemosRequest,
+            AICreateMemosResponse.class
         );
         return aiCreateKakaoMemosResponse.getBody();
     }

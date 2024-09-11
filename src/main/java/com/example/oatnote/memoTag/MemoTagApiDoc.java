@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Memo", description = "메모 관리 API")
+@Tag(name = "Memo Tag", description = "메모 태그 관리 API")
 public interface MemoTagApiDoc {
 
     @ApiResponses(
