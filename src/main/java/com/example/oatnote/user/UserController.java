@@ -22,15 +22,15 @@ public class UserController implements UserApiDoc {
 
     private final UserService userService;
 
-    @PostMapping("/users/register")
+    @PostMapping("/user/register")
     public ResponseEntity<Void> register(
         @RequestBody @Valid RegisterUserRequest registerUserRequest
     ) {
         userService.register(registerUserRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/users/login")
+    @PostMapping("/user/login")
     public ResponseEntity<LoginUserResponse> login(
         @RequestBody @Valid LoginUserRequest loginUserRequest
     ) {
@@ -38,8 +38,10 @@ public class UserController implements UserApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(loginUserResponse);
     }
 
-    @PostMapping("/users/refresh")
-    public ResponseEntity<RefreshUserResponse> refreshAccessToken(@RequestBody RefreshUserRequest refreshUserRequest) {
+    @PostMapping("/user/refresh")
+    public ResponseEntity<RefreshUserResponse> refreshAccessToken(
+        @RequestBody RefreshUserRequest refreshUserRequest
+    ) {
         RefreshUserResponse refreshUserResponse = userService.refreshAccessToken(refreshUserRequest);
         return ResponseEntity.status(HttpStatus.OK).body(refreshUserResponse);
     }

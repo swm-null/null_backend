@@ -47,7 +47,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestBody @Valid CreateMemosRequest createMemosRequest
     ) {
         memoTagService.createMemosTags(createMemosRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/memos/search")

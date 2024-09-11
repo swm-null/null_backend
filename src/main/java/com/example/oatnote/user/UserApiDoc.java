@@ -26,7 +26,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "201"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/users/register")
+    @PostMapping("/user/register")
     ResponseEntity<Void> register(
         @RequestBody @Valid RegisterUserRequest registerUserRequest
     );
@@ -37,7 +37,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/users/login")
+    @PostMapping("/user/login")
     ResponseEntity<LoginUserResponse> login(
         @RequestBody @Valid LoginUserRequest loginUserRequest
     );
@@ -48,7 +48,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/users/refresh")
+    @PostMapping("/user/refresh")
     ResponseEntity<RefreshUserResponse> refreshAccessToken(
         @RequestBody @Valid RefreshUserRequest refreshUserRequest
     );
