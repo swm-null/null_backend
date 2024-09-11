@@ -71,29 +71,32 @@ public class MemoTagService {
     public void createMemosTags(CreateMemosRequest createMemosRequest) {
         AICreateMemosResponse aiCreateMemosResponse = aiMemoTagClient.createMemosTags(
             createMemosRequest.content(),
-            "b973cd66-bc7b-4820-a9e8-78a1edae021c" //todo Email userId
+            "5b07af24-ec32-4ab1-98ca-6f58235fa034" //todo Email userId
         );
         for (var aiMemoTagsResponse : aiCreateMemosResponse.processedMemos()) {
-            Memo savedMemo = createMemoTags(aiMemoTagsResponse, "b973cd66-bc7b-4820-a9e8-78a1edae021c");
-            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "b973cd66-bc7b-4820-a9e8-78a1edae021c");
+            Memo savedMemo = createMemoTags(aiMemoTagsResponse, "5b07af24-ec32-4ab1-98ca-6f58235fa034");
+            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "5b07af24-ec32-4ab1-98ca-6f58235fa034");
         }
 
         TagEdge tagEdge = new TagEdge(
-            "b973cd66-bc7b-4820-a9e8-78a1edae021c",
+            "5b07af24-ec32-4ab1-98ca-6f58235fa034",
             aiCreateMemosResponse.newStructure()
         );
         tagEdgeService.saveTagEdge(tagEdge);
     }
 
     public ChildTagsWithMemosResponse getChildTagsWithMemos(
-        String parentTagName,
+        String parentTagId,
         Integer tagPage,
         Integer tagLimit,
         Integer memoPage,
         Integer memoLimit,
         String userId
     ) {
-        Tag parentTag = tagService.getTagByName(parentTagName, userId);
+        if (parentTagId == null) {
+            parentTagId = userId;
+        }
+        Tag parentTag = tagService.getTag(parentTagId, userId);
         List<String> childTagsIds = tagsRelationService.getChildTagsIds(parentTag.getId());
         List<Tag> childTags = tagService.getTags(childTagsIds, userId);
 
@@ -188,9 +191,6 @@ public class MemoTagService {
             aiMemoTagsResponse.embedding()
         );
         Memo createdMemo = memoService.saveMemo(memo);
-        System.out.println(createdMemo.getCreatedAt());
-        System.out.println(createdMemo.getCreatedAt());
-        System.out.println(createdMemo.getCreatedAt());
         for (var newTag : aiMemoTagsResponse.newTags()) {
             Tag tag = new Tag(
                 newTag.id(),

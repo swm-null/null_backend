@@ -13,6 +13,9 @@ public class TagEdgeService {
     private final TagEdgeRepository tagEdgeRepository;
 
     public void saveTagEdge(TagEdge tagEdge) {
+        if (tagEdgeRepository.findByUserId(tagEdge.getUserId()).isPresent()) {
+            tagEdgeRepository.deleteByUserId(tagEdge.getUserId());
+        }
         tagEdgeRepository.save(tagEdge);
     }
 }

@@ -59,9 +59,9 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
-    @GetMapping("/tags/{parentTagId}/memos")
+    @GetMapping("/tags/memos")
     public ResponseEntity<ChildTagsWithMemosResponse> getChildTagsWithMemos(
-        @PathVariable("parentTagId") String parentTagId,
+        @RequestParam(value = "parentTagId", required = false) String parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
@@ -79,9 +79,9 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(childTagsWithMemosResponse);
     }
 
-    @GetMapping("/tag/{tagId}/memos")
+    @GetMapping("/tag/memos")
     public ResponseEntity<MemosResponse> getMemosByTag(
-        @PathVariable("tagId") String tagId,
+        @RequestParam("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
         @AuthenticationPrincipal String userId

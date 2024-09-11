@@ -34,11 +34,6 @@ public class TagService {
             .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + tagId));
     }
 
-    public Tag getTagByName(String parentTagName, String userId) {
-        return tagRepository.findByNameAndUserId(parentTagName, userId)
-            .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + parentTagName));
-    }
-
     public void deleteTag(Tag tag) {
         tagRepository.delete(tag);
     }

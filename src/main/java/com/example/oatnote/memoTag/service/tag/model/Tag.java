@@ -3,7 +3,6 @@ package com.example.oatnote.memoTag.service.tag.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -29,7 +28,6 @@ public class Tag {
     private List<Double> embedding;
 
     @Field("cTime")
-    @CreatedDate
     private LocalDateTime createdAt;
 
     @Field("uTime")
@@ -41,10 +39,13 @@ public class Tag {
         this.name = name;
         this.userId = userId;
         this.embedding = embedding;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void update(String name, List<Double> embedding) {
         this.name = name;
         this.embedding = embedding;
+        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -56,7 +56,7 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "이메일을 통한 메모 태그 생성")
+    @Operation(summary = "이메일을 통한 메모 리스트 생성")
     @PostMapping("/memos")
     ResponseEntity<Void> createMemosByEmail(
         @RequestBody @Valid CreateMemosRequest createMemosTagsRequest
@@ -71,7 +71,7 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "AI 검색을 통한 메모 태그 조회")
+    @Operation(summary = "AI 검색을 통한 메모 조회")
     @PostMapping("/memos/search")
     ResponseEntity<SearchMemoResponse> getMemosByAISearch(
         @RequestBody @Valid SearchMemoRequest searchMemoRequest,
@@ -87,10 +87,10 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "자식 태그와 메모 조회")
-    @GetMapping("/tags/{parentTagId}/memos")
+    @Operation(summary = "자식 태그들과 관련된 메모 리스트 조회")
+    @GetMapping("/tags/memos")
     ResponseEntity<ChildTagsWithMemosResponse> getChildTagsWithMemos(
-        @PathVariable("parentTagId") String parentTagId,
+        @RequestParam(value = "parentTagId", required = false) String parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
@@ -107,10 +107,10 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "특정 태그의 메모 조회")
-    @GetMapping("/tag/{tagId}/memos")
+    @Operation(summary = "특정 태그의 메모 리스트 조회")
+    @GetMapping("/tag/memos")
     ResponseEntity<MemosResponse> getMemosByTag(
-        @PathVariable("tagId") String tagId,
+        @RequestParam("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
         @AuthenticationPrincipal String userId

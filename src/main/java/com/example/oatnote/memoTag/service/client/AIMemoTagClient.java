@@ -43,7 +43,7 @@ public class AIMemoTagClient {
     }
 
     public AICreateMemosResponse createMemosTags(String content, String userId) {
-        final URI uri = buildUri("/kakao-parser");
+        final URI uri = buildUri("/kakao-parser/");
         final String type = content.substring(content.length() - 3);
         AICreateMemosRequest aiCreateMemosRequest = AICreateMemosRequest.from(content, type, userId);
         ResponseEntity<AICreateMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
@@ -55,7 +55,7 @@ public class AIMemoTagClient {
     }
 
     public AISearchMemoResponse searchMemo(String content, String userId) {
-        final URI uri = buildUri("/search");
+        final URI uri = buildUri("/search/");
         AISearchMemoRequest aiSearchMemoRequest = AISearchMemoRequest.from(content, userId);
         ResponseEntity<AISearchMemoResponse> aiSearchMemoResponse = restTemplate.postForEntity(
             uri,
@@ -66,7 +66,7 @@ public class AIMemoTagClient {
     }
 
     public AICreateEmbeddingResponse createEmbedding(String name) {
-        final URI uri = buildUri("/get_embedding");
+        final URI uri = buildUri("/get_embedding/");
         AICreateEmbeddingRequest aiCreateEmbeddingRequest = AICreateEmbeddingRequest.from(name);
         ResponseEntity<AICreateEmbeddingResponse> aiCreateEmbeddingResponse = restTemplate.postForEntity(
             uri,
