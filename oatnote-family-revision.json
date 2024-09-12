@@ -20,40 +20,6 @@
       "environment": [],
       "mountPoints": [],
       "volumesFrom": [],
-      "secrets": [
-        {
-          "name": "MONGODB_URI",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:MONGODB_URI::"
-        },
-        {
-          "name": "AI_URL",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:AI_URL::"
-        },
-        {
-          "name": "JWT_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:JWT_SECRET_KEY::"
-        },
-        {
-          "name": "SWAGGER_SERVER_URL",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:SWAGGER_SERVER_URL::"
-        },
-        {
-          "name": "ALLOWED_ORIGINS_PRODUCT",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_PRODUCT::"
-        },
-        {
-          "name": "ALLOWED_ORIGINS_STAGE",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_STAGE::"
-        },
-        {
-          "name": "ALLOWED_ORIGINS_LOCAL",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_LOCAL::"
-        },
-        {
-          "name": "ALLOWED_ORIGINS_AI",
-          "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:905418277583:secret:dev/oatnote-3hjwsn:ALLOWED_ORIGINS_AI::"
-        }
-      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
