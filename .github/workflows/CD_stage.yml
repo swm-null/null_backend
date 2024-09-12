@@ -11,7 +11,7 @@ env:
   ECS_CLUSTER: oatnote-cluster
   ECS_TASK_DEFINITION: oatnote-family-revision.json
   CONTAINER_NAME: oatnote-container
-  SECRET_NAME: stage/oatnote # Secrets Manager에서의 secret 이름
+  SECRET_NAME: stage/oatnote
 
 permissions:
   contents: read
@@ -35,9 +35,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -45,18 +42,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
       - name: Retrieve secrets from AWS Secrets Manager
         run: |
+          mkdir -p ./src/main/resources
           aws secretsmanager get-secret-value \
             --secret-id ${{ env.SECRET_NAME }} \
             --region ${{ env.AWS_REGION }} \
             --query SecretString \
             --output text > ./src/main/resources/application.yml
+
+      - name: Build with Gradle
+        run: ./gradlew build
 
       - name: Login to Amazon ECR
         id: login-ecr
