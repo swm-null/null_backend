@@ -39,4 +39,8 @@ out/
 
 *adminsdk.json
 
+application.yml
+application-stage.yml
+application-prod.yml
+
 logs
