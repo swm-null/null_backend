@@ -9,7 +9,7 @@ import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
-import com.example.oatnote.event.model.UserRegisteredEvent;
+import com.example.oatnote.event.UserRegisteredEvent;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
