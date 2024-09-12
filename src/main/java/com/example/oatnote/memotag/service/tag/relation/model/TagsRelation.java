@@ -1,4 +1,4 @@
-package com.example.oatnote.memotag.service.tagsRelation.model;
+package com.example.oatnote.memotag.service.tag.relation.model;
 
 import java.util.UUID;
 

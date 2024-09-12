@@ -1,8 +1,8 @@
-package com.example.oatnote.memotag.service.tagEdge;
+package com.example.oatnote.memotag.service.tag.edge;
 
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memotag.service.tagEdge.model.TagEdge;
+import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,10 +12,10 @@ public class TagEdgeService {
 
     private final TagEdgeRepository tagEdgeRepository;
 
-    public void saveTagEdge(TagEdge tagEdge) {
+    public void createTagEdge(TagEdge tagEdge) {
         if (tagEdgeRepository.findByUserId(tagEdge.getUserId()).isPresent()) {
             tagEdgeRepository.deleteByUserId(tagEdge.getUserId());
         }
-        tagEdgeRepository.save(tagEdge);
+        tagEdgeRepository.insert(tagEdge);
     }
 }

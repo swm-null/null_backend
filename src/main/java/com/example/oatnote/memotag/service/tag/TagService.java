@@ -6,8 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.memotag.service.tag.edge.TagEdgeService;
+import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.memotag.service.tag.exception.TagNotFoundException;
 import com.example.oatnote.memotag.service.tag.model.Tag;
+import com.example.oatnote.memotag.service.tag.relation.TagsRelationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TagService {
 
+    private final TagEdgeService tagEdgeService;
+    private final TagsRelationService tagsRelationService;
     private final TagRepository tagRepository;
 
     public Tag saveTag(Tag tag) {
@@ -36,5 +41,25 @@ public class TagService {
 
     public void deleteTag(Tag tag) {
         tagRepository.delete(tag);
+    }
+
+    public void createTagEdge(TagEdge tagEdge) {
+        tagEdgeService.createTagEdge(tagEdge);
+    }
+
+    public void createRelation(String parentTagId, String childTagId) {
+        tagsRelationService.createRelation(parentTagId, childTagId);
+    }
+
+    public List<String> getChildTagsIds(String parentTagId) {
+        return tagsRelationService.getChildTagsIds(parentTagId);
+    }
+
+    public List<String> getParentTagsIds(String childTagId) {
+        return tagsRelationService.getParentTagsIds(childTagId);
+    }
+
+    public void deleteRelation(String parentTagId, String childTagId) {
+        tagsRelationService.deleteRelation(parentTagId, childTagId);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.oatnote.memotag.service.tagEdge.model;
+package com.example.oatnote.memotag.service.tag.edge.model;
 
 import java.util.List;
 import java.util.Map;

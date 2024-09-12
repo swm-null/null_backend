@@ -1,10 +1,10 @@
-package com.example.oatnote.memotag.service.tagsRelation;
+package com.example.oatnote.memotag.service.tag.relation;
 
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.example.oatnote.memotag.service.tagsRelation.model.TagsRelation;
+import com.example.oatnote.memotag.service.tag.relation.model.TagsRelation;
 
 public interface TagsRelationRepository extends MongoRepository<TagsRelation, String> {
 

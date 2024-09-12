@@ -31,10 +31,8 @@ import com.example.oatnote.memotag.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.example.oatnote.memotag.service.memoTagRelation.MemoTagRelationService;
 import com.example.oatnote.memotag.service.tag.TagService;
+import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.memotag.service.tag.model.Tag;
-import com.example.oatnote.memotag.service.tagEdge.TagEdgeService;
-import com.example.oatnote.memotag.service.tagEdge.model.TagEdge;
-import com.example.oatnote.memotag.service.tagsRelation.TagsRelationService;
 import com.example.oatnote.web.models.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -47,8 +45,6 @@ public class MemoTagService {
     private final MemoService memoService;
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
-    private final TagsRelationService tagsRelationService;
-    private final TagEdgeService tagEdgeService;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
 
@@ -64,7 +60,7 @@ public class MemoTagService {
             userId,
             aiCreateMemoResponse.newStructure()
         );
-        tagEdgeService.saveTagEdge(tagEdge);
+        tagService.createTagEdge(tagEdge);
         return CreateMemoResponse.from(savedMemo, tags);
     }
 
@@ -82,7 +78,7 @@ public class MemoTagService {
             "5b07af24-ec32-4ab1-98ca-6f58235fa034",
             aiCreateMemosResponse.newStructure()
         );
-        tagEdgeService.saveTagEdge(tagEdge);
+        tagService.createTagEdge(tagEdge);
     }
 
     public ChildTagsWithMemosResponse getChildTagsWithMemos(
@@ -97,7 +93,7 @@ public class MemoTagService {
             parentTagId = userId;
         }
         Tag parentTag = tagService.getTag(parentTagId, userId);
-        List<String> childTagsIds = tagsRelationService.getChildTagsIds(parentTag.getId());
+        List<String> childTagsIds = tagService.getChildTagsIds(parentTag.getId());
         List<Tag> childTags = tagService.getTags(childTagsIds, userId);
 
         Integer total = childTags.size();
@@ -212,14 +208,14 @@ public class MemoTagService {
         for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
             tags.add(tagService.getTag(linkedTagId, userId));
             memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG);
-            List<String> parentTagIds = tagsRelationService.getParentTagsIds(linkedTagId);
+            List<String> parentTagIds = tagService.getParentTagsIds(linkedTagId);
             createParentTagsRelations(savedMemo.getId(), parentTagIds);
         }
         for (var addRelation : aiMemoTagsResponse.tagsRelations().added()) {
-            tagsRelationService.createRelation(addRelation.parentId(), addRelation.childId());
+            tagService.createRelation(addRelation.parentId(), addRelation.childId());
         }
         for (var deletedRelation : aiMemoTagsResponse.tagsRelations().deleted()) {
-            tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
         }
         return tags;
     }
@@ -228,7 +224,7 @@ public class MemoTagService {
         if (parentTagIds != null && !parentTagIds.isEmpty()) {
             for (var tagId : parentTagIds) {
                 memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG);
-                createParentTagsRelations(memoId, tagsRelationService.getParentTagsIds(tagId));
+                createParentTagsRelations(memoId, tagService.getParentTagsIds(tagId));
             }
         }
     }
