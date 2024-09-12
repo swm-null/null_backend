@@ -11,7 +11,7 @@ env:
   ECS_CLUSTER: oatnote-cluster
   ECS_TASK_DEFINITION: oatnote-family-revision.json
   CONTAINER_NAME: oatnote-container
-  SECRET_NAME: stage/oatnote
+  SECRET_NAME: stage/oatnote # Secrets Manager에서의 secret 이름
 
 permissions:
   contents: read
@@ -45,16 +45,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Retrieve secrets from Secrets Manager
-        id: get-secret
-        uses: aws-actions/aws-secretsmanager-get-secret-value@v1
-        with:
-          secret-id: ${{ env.SECRET_NAME }}
-          region: ${{ env.AWS_REGION }}
-
-      - name: Write application.yml
+      - name: Install AWS CLI
         run: |
-          echo "${{ steps.get-secret.outputs.secret }}" > ./src/main/resources/application.yml
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Retrieve secrets from AWS Secrets Manager
+        run: |
+          aws secretsmanager get-secret-value \
+            --secret-id ${{ env.SECRET_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --query SecretString \
+            --output text > ./src/main/resources/application.yml
 
       - name: Login to Amazon ECR
         id: login-ecr
