@@ -67,15 +67,15 @@ public class MemoTagService {
     public void createMemosTags(CreateMemosRequest createMemosRequest) {
         AICreateMemosResponse aiCreateMemosResponse = aiMemoTagClient.createMemosTags(
             createMemosRequest.content(),
-            "5b07af24-ec32-4ab1-98ca-6f58235fa034" //todo Email userId
+            "70c0d720-fa31-4220-86ff-35163e956bd9" //todo Email userId
         );
         for (var aiMemoTagsResponse : aiCreateMemosResponse.processedMemos()) {
-            Memo savedMemo = createMemoTags(aiMemoTagsResponse, "5b07af24-ec32-4ab1-98ca-6f58235fa034");
-            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "5b07af24-ec32-4ab1-98ca-6f58235fa034");
+            Memo savedMemo = createMemoTags(aiMemoTagsResponse, "70c0d720-fa31-4220-86ff-35163e956bd9");
+            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "70c0d720-fa31-4220-86ff-35163e956bd9");
         }
 
         TagEdge tagEdge = new TagEdge(
-            "5b07af24-ec32-4ab1-98ca-6f58235fa034",
+            "70c0d720-fa31-4220-86ff-35163e956bd9",
             aiCreateMemosResponse.newStructure()
         );
         tagService.createTagEdge(tagEdge);
