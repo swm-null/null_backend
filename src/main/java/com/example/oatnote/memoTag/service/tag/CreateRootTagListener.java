@@ -1,12 +1,11 @@
-package com.example.oatnote.event.listener;
+package com.example.oatnote.memoTag.service.tag;
 
 import java.util.ArrayList;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.example.oatnote.event.model.UserRegisteredEvent;
-import com.example.oatnote.memoTag.service.tag.TagService;
+import com.example.oatnote.event.UserRegisteredEvent;
 import com.example.oatnote.memoTag.service.tag.model.Tag;
 
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,10 @@ public class CreateRootTagListener {
 
     @EventListener
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
-        createDummyTagsForNewUser(event.userId());
+        createRootTag(event.userId());
     }
 
-    private void createDummyTagsForNewUser(String userId) {
+    private void createRootTag(String userId) {
         Tag rootTag = new Tag(
             userId,
             "@",
