@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record MemosResponse(
+public record TagWithMemosResponse(
     @Schema(description = "태그 이름", requiredMode = REQUIRED)
     TagResponse tag,
 
@@ -36,12 +36,12 @@ public record MemosResponse(
     List<MemoResponse> memos
 ) {
 
-    public static MemosResponse from(
+    public static TagWithMemosResponse from(
         Tag tag,
         Page<MemoResponse> pagedResult,
         Criteria criteria
     ) {
-        return new MemosResponse(
+        return new TagWithMemosResponse(
             TagResponse.from(tag),
             pagedResult.getTotalElements(),
             pagedResult.getContent().size(),

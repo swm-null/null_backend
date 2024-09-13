@@ -32,12 +32,12 @@ public record ChildTagsWithMemosResponse(
     Integer currentPage,
 
     @Schema(description = "태그별 메모 리스트", requiredMode = REQUIRED)
-    List<MemosResponse> memosList
+    List<TagWithMemosResponse> tagWithMemos
 ) {
 
     public static ChildTagsWithMemosResponse from(
         List<Tag> tags,
-        Page<MemosResponse> pagedResult,
+        Page<TagWithMemosResponse> pagedResult,
         Criteria criteria
     ) {
         return new ChildTagsWithMemosResponse(

@@ -14,7 +14,7 @@ import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.memotag.dto.MemosResponse;
+import com.example.oatnote.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.memotag.dto.SearchMemoRequest;
 import com.example.oatnote.memotag.dto.SearchMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
@@ -109,7 +109,7 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "특정 태그의 메모 리스트 조회")
     @GetMapping("/tag/memos")
-    ResponseEntity<MemosResponse> getMemosByTag(
+    ResponseEntity<TagWithMemosResponse> getMemosByTag(
         @RequestParam("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
