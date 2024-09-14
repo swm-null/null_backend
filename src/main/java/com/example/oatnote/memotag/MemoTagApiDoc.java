@@ -1,5 +1,8 @@
 package com.example.oatnote.memotag;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,13 +17,14 @@ import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.memotag.dto.TagWithMemosResponse;
+import com.example.oatnote.memotag.dto.MemosResponse;
 import com.example.oatnote.memotag.dto.SearchMemoRequest;
 import com.example.oatnote.memotag.dto.SearchMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.memotag.dto.UpdateTagResponse;
+import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -57,7 +61,7 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "이메일을 통한 메모 리스트 생성")
-    @PostMapping("/memos")
+    @PostMapping("/memos/email")
     ResponseEntity<Void> createMemosByEmail(
         @RequestBody @Valid CreateMemosRequest createMemosTagsRequest
     );
@@ -87,8 +91,24 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "자식 태그들과 관련된 메모 리스트 조회")
-    @GetMapping("/tags/memos")
+    @Operation(summary = "자식 태그 리스트 조회")
+    @GetMapping("/childTags")
+    ResponseEntity<List<TagResponse>> getChildTags(
+        @RequestParam(value = "parentTagId", required = false) String parentTagId,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "자식 태그 리스트와 관련된 메모 리스트 조회")
+    @GetMapping("/childTags/memos")
     ResponseEntity<ChildTagsWithMemosResponse> getChildTagsWithMemos(
         @RequestParam(value = "parentTagId", required = false) String parentTagId,
         @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
@@ -109,7 +129,7 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "특정 태그의 메모 리스트 조회")
     @GetMapping("/tag/memos")
-    ResponseEntity<TagWithMemosResponse> getMemosByTag(
+    ResponseEntity<MemosResponse> getMemosByTag(
         @RequestParam("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
