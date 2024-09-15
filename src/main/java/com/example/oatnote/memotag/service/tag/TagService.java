@@ -1,5 +1,6 @@
 package com.example.oatnote.memotag.service.tag;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -61,5 +62,9 @@ public class TagService {
 
     public void deleteRelation(String parentTagId, String childTagId) {
         tagsRelationService.deleteRelation(parentTagId, childTagId);
+    }
+
+    public List<Tag> getChildTags(String parentTagId, String userId) {
+        return getTags(getChildTagsIds(parentTagId), userId);
     }
 }

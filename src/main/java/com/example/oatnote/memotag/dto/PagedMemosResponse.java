@@ -8,10 +8,13 @@ import org.springframework.data.domain.Page;
 
 import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.web.models.Criteria;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public record MemosResponse(
+@JsonNaming(SnakeCaseStrategy.class)
+public record PagedMemosResponse(
     @Schema(description = "총 메모의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
 
@@ -28,11 +31,11 @@ public record MemosResponse(
     List<MemoResponse> memos
 ) {
 
-    public static MemosResponse from(
+    public static PagedMemosResponse from(
         Page<MemoResponse> pagedResult,
         Criteria criteria
     ) {
-        return new MemosResponse(
+        return new PagedMemosResponse(
             pagedResult.getTotalElements(),
             pagedResult.getContent().size(),
             pagedResult.getTotalPages(),

@@ -12,7 +12,8 @@ import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.memotag.dto.MemosResponse;
+import com.example.oatnote.memotag.dto.PagedMemosResponse;
+import com.example.oatnote.memotag.dto.PagedTagsResponse;
 import com.example.oatnote.memotag.dto.SearchMemoRequest;
 import com.example.oatnote.memotag.dto.SearchMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
@@ -87,7 +88,7 @@ public class MemoTagService {
             parentTagId = userId;
         }
         Tag parentTag = tagService.getTag(parentTagId, userId);
-        List<Tag> childTags = tagService.getTags(tagService.getChildTagsIds(parentTag.getId()), userId);
+        List<Tag> childTags = tagService.getChildTags(parentTag.getId(), userId);
         return childTags.stream()
             .map(TagResponse::from)
             .toList();
@@ -116,14 +117,24 @@ public class MemoTagService {
         );
 
         Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest, userId);
-        Page<TagResponse> pagedTags = result.map(TagResponse::from);
-        Page<MemosResponse> pagedMemos = pagedTags.map(
-            tag -> getMemos(tag.id(), memoPage, memoLimit, userId)
+        Page<PagedTagsResponse> pagedTags = result.map(
+            tag -> new PagedTagsResponse(
+                TagResponse.from(tag),
+                tagService.getChildTags(tag.getId(), userId).stream()
+                    .map(TagResponse::from)
+                    .toList()
+            )
+        );
+        Page<PagedMemosResponse> pagedMemos = pagedTags.map(
+            pagedTag -> getMemos(pagedTag.tag().id(), memoPage, memoLimit, userId)
         );
         return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);
     }
 
-    public MemosResponse getMemos(String tagId, Integer memoPage, Integer memoLimit, String userId) {
+    public PagedMemosResponse getMemos(String tagId, Integer memoPage, Integer memoLimit, String userId) {
+        if (tagId == null) {
+            tagId = userId;
+        }
         Integer total = memoTagRelationService.countMemos(tagId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
         PageRequest pageRequest = PageRequest.of(
@@ -139,7 +150,7 @@ public class MemoTagService {
                 tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()), userId)
             )
         );
-        return MemosResponse.from(memoTagsPage, criteria);
+        return PagedMemosResponse.from(memoTagsPage, criteria);
     }
 
     public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest, String userId) {
@@ -218,17 +229,17 @@ public class MemoTagService {
         String userId
     ) {
         List<Tag> tags = new ArrayList<>();
-        for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
-            tags.add(tagService.getTag(linkedTagId, userId));
-            memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG);
-            List<String> parentTagIds = tagService.getParentTagsIds(linkedTagId);
-            createParentTagsRelations(savedMemo.getId(), parentTagIds);
-        }
         for (var addRelation : aiMemoTagsResponse.tagsRelations().added()) {
             tagService.createRelation(addRelation.parentId(), addRelation.childId());
         }
         for (var deletedRelation : aiMemoTagsResponse.tagsRelations().deleted()) {
             tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+        }
+        for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
+            tags.add(tagService.getTag(linkedTagId, userId));
+            memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG);
+            List<String> parentTagIds = tagService.getParentTagsIds(linkedTagId);
+            createParentTagsRelations(savedMemo.getId(), parentTagIds);
         }
         return tags;
     }
