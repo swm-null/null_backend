@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memotag.service.tag.edge.TagEdgeService;
@@ -28,7 +29,7 @@ public class TagService {
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserId(tagIds, userId);
+        return tagRepository.findByIdInAndUserId(tagIds, userId, Sort.by(Sort.Direction.ASC, "name"));
     }
 
     public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest, String userId) {

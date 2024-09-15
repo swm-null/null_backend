@@ -23,6 +23,7 @@ import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.memotag.dto.UpdateTagResponse;
+import com.example.oatnote.memotag.dto.enums.SortOrderTypeEnum;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 @Tag(name = "Memo Tag", description = "메모 태그 관리 API")
 public interface MemoTagApiDoc {
@@ -96,6 +98,7 @@ public interface MemoTagApiDoc {
         @RequestParam("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "5") Integer memoLimit,
+        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     );
 
@@ -132,6 +135,7 @@ public interface MemoTagApiDoc {
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
+        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     );
 

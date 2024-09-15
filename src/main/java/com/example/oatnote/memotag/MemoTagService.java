@@ -20,6 +20,7 @@ import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.memotag.dto.UpdateTagResponse;
+import com.example.oatnote.memotag.dto.enums.SortOrderTypeEnum;
 import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.memotag.service.client.AIMemoTagClient;
@@ -83,6 +84,30 @@ public class MemoTagService {
         tagService.createTagEdge(tagEdge);
     }
 
+    public PagedMemosResponse getMemos(
+        String tagId,
+        Integer memoPage,
+        Integer memoLimit,
+        SortOrderTypeEnum sortOrder,
+        String userId
+    ) {
+        if (tagId == null) {
+            tagId = userId;
+        }
+        Integer total = memoTagRelationService.countMemos(tagId);
+        Criteria criteria = Criteria.of(memoPage, memoLimit, total);
+        PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
+
+        Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
+        Page<MemoResponse> memoTagsPage = result.map(
+            memo -> MemoResponse.from(
+                memo,
+                tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()), userId)
+            )
+        );
+        return PagedMemosResponse.from(memoTagsPage, criteria);
+    }
+
     public List<TagResponse> getChildTags(String parentTagId, String userId) {
         if (parentTagId == null) {
             parentTagId = userId;
@@ -100,6 +125,7 @@ public class MemoTagService {
         Integer tagLimit,
         Integer memoPage,
         Integer memoLimit,
+        SortOrderTypeEnum sortOrder,
         String userId
     ) {
         if (parentTagId == null) {
@@ -110,11 +136,7 @@ public class MemoTagService {
 
         Integer total = childTagsIds.size();
         Criteria criteria = Criteria.of(tagPage, tagLimit, total);
-        PageRequest pageRequest = PageRequest.of(
-            criteria.getPage(),
-            criteria.getLimit(),
-            Sort.by(Sort.Direction.DESC, "name")
-        );
+        PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), SortOrderTypeEnum.NAME);
 
         Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest, userId);
         Page<PagedTagsResponse> pagedTags = result.map(
@@ -126,31 +148,9 @@ public class MemoTagService {
             )
         );
         Page<PagedMemosResponse> pagedMemos = pagedTags.map(
-            pagedTag -> getMemos(pagedTag.tag().id(), memoPage, memoLimit, userId)
+            pagedTag -> getMemos(pagedTag.tag().id(), memoPage, memoLimit, sortOrder, userId)
         );
         return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);
-    }
-
-    public PagedMemosResponse getMemos(String tagId, Integer memoPage, Integer memoLimit, String userId) {
-        if (tagId == null) {
-            tagId = userId;
-        }
-        Integer total = memoTagRelationService.countMemos(tagId);
-        Criteria criteria = Criteria.of(memoPage, memoLimit, total);
-        PageRequest pageRequest = PageRequest.of(
-            criteria.getPage(),
-            criteria.getLimit(),
-            Sort.by(Sort.Direction.DESC, "uTime")
-        );
-
-        Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
-        Page<MemoResponse> memoTagsPage = result.map(
-            memo -> MemoResponse.from(
-                memo,
-                tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()), userId)
-            )
-        );
-        return PagedMemosResponse.from(memoTagsPage, criteria);
     }
 
     public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest, String userId) {
@@ -203,7 +203,7 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    private Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse, String userId) {
+    Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse, String userId) {
         Memo memo = new Memo(
             aiMemoTagsResponse.content(),
             new ArrayList<>(),
@@ -223,7 +223,7 @@ public class MemoTagService {
         return createdMemo;
     }
 
-    private List<Tag> updateMemosTagsRelations(
+    List<Tag> updateMemosTagsRelations(
         ProcessedMemoResponse aiMemoTagsResponse,
         Memo savedMemo,
         String userId
@@ -244,12 +244,21 @@ public class MemoTagService {
         return tags;
     }
 
-    private void createParentTagsRelations(String memoId, List<String> parentTagIds) {
+    void createParentTagsRelations(String memoId, List<String> parentTagIds) {
         if (parentTagIds != null && !parentTagIds.isEmpty()) {
             for (var tagId : parentTagIds) {
                 memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG);
                 createParentTagsRelations(memoId, tagService.getParentTagsIds(tagId));
             }
         }
+    }
+
+    PageRequest createPageRequest(Integer page, Integer limit, SortOrderTypeEnum sortOrder) {
+        Sort sort = switch (sortOrder) {
+            case NAME -> Sort.by(Sort.Direction.ASC, "name");
+            case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
+            default -> Sort.by(Sort.Direction.DESC, "uTime");
+        };
+        return PageRequest.of(page, limit, sort);
     }
 }

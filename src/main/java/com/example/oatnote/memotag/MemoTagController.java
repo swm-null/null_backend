@@ -25,9 +25,11 @@ import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.memotag.dto.UpdateTagResponse;
+import com.example.oatnote.memotag.dto.enums.SortOrderTypeEnum;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -62,6 +64,24 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
+    @GetMapping("/tag/memos")
+    public ResponseEntity<PagedMemosResponse> getMemosByTag(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
+        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
+        @AuthenticationPrincipal String userId
+    ) {
+        PagedMemosResponse pagedMemosResponse = memoTagService.getMemos(
+            tagId,
+            memoPage,
+            memoLimit,
+            sortOrder,
+            userId
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(pagedMemosResponse);
+    }
+
     @GetMapping("/childTags")
     public ResponseEntity<List<TagResponse>> getChildTags(
         @RequestParam(value = "parentTagId", required = false) String parentTagId,
@@ -78,6 +98,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
+        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     ) {
         ChildTagsWithMemosResponse childTagsWithMemosResponse = memoTagService.getChildTagsWithMemos(
@@ -86,20 +107,10 @@ public class MemoTagController implements MemoTagApiDoc {
             tagLimit,
             memoPage,
             memoLimit,
+            sortOrder,
             userId
         );
         return ResponseEntity.status(HttpStatus.OK).body(childTagsWithMemosResponse);
-    }
-
-    @GetMapping("/tag/memos")
-    public ResponseEntity<PagedMemosResponse> getMemosByTag(
-        @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
-        @AuthenticationPrincipal String userId
-    ) {
-        PagedMemosResponse pagedMemosResponse = memoTagService.getMemos(tagId, memoPage, memoLimit, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(pagedMemosResponse);
     }
 
     @PutMapping("/memo/{memoId}")
