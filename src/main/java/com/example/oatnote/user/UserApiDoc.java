@@ -52,4 +52,25 @@ public interface UserApiDoc {
     ResponseEntity<RefreshUserResponse> refreshAccessToken(
         @RequestBody @Valid RefreshUserRequest refreshUserRequest
     );
+
+    @Operation(summary = "이메일 인증 코드 전송")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping("/user/email/dispatch")
+    ResponseEntity<Void> dispatchEmail(
+        @RequestBody @Valid DispatchEmailRequest dispatchEmailRequest
+    );
+
+    @Operation(summary = "이메일 인증 코드 확인")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping("/user/email/verification")
+    ResponseEntity<Void> verifyEmail(
+        @RequestBody @Valid VerifyEmailRequest VerifyEmailRequest
+    );
 }
