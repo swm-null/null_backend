@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotBlank;
 @JsonNaming(SnakeCaseStrategy.class)
 public record LoginUserRequest(
     @Schema(description = "이메일 주소", example = "user@example.com", requiredMode = RequiredMode.REQUIRED)
-    @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "유효한 이메일 주소를 입력하세요.")
     String email,
 
