@@ -1,17 +1,22 @@
 spring:
+  mail:
+    host: test
+    port: 123
+    username: test
+    password: test
   ai:
-    url: https://ai-memo.com
+    url: test
+
+cors:
+  allowedOrigins:
+    - test
+
+swagger:
+  server-url: test
 
 jwt:
-  secret-key: cd06f8c2b0dd065faf6ef910c7f15934363df71c33740fd245590665286ed268
+  secret-key: test3110e37a96c9f9da6c270cb18d2918ff653b95860d3d0e3753f42f3138aa
   access-token:
     expiration-time: 600000
   refresh-token:
     expiration-time: 86400000
-
-swagger:
-  server-url: http://localhost:8080
-
-cors:
-  allowedOrigins:
-    - http://localhost:3000
