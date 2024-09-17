@@ -13,8 +13,7 @@ import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.dto.VerifyEmailRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
-import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
-import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
+import com.example.oatnote.user.service.exception.UserAuthException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.model.User;
 import com.example.oatnote.util.JwtUtil;
@@ -37,10 +36,10 @@ public class UserService {
     public void register(RegisterUserRequest registerUserRequest) {
         String password = registerUserRequest.password();
         if (password == null || !password.equals(registerUserRequest.confirmPassword())) {
-            throw new UserIllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new UserAuthException("비밀번호가 일치하지 않습니다.");
         }
         if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
-            throw new UserIllegalArgumentException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
+            throw new UserAuthException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
         }
         User user = new User(
             registerUserRequest.email(),
@@ -54,7 +53,7 @@ public class UserService {
         User user = userRepository.findByEmail(loginUserRequest.email())
             .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + loginUserRequest.email()));
         if (!passwordEncoder.matches(loginUserRequest.password(), user.getPassword())) {
-            throw new AuthIllegalArgumentException("비밀번호가 일치하지 않습니다");
+            throw new UserAuthException("비밀번호가 일치하지 않습니다");
         }
         String accessToken = jwtUtil.generateAccessToken(user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId());
@@ -69,7 +68,7 @@ public class UserService {
             String newAccessToken = jwtUtil.generateAccessToken(email);
             return RefreshUserResponse.of(newAccessToken, refreshToken);
         } catch (JwtException e) {
-            throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다." + e);
+            throw new UserAuthException("refresh token 이 일치하지 않습니다." + e);
         }
     }
 

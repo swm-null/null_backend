@@ -13,7 +13,6 @@ import jakarta.validation.constraints.Size;
 @JsonNaming(SnakeCaseStrategy.class)
 public record RegisterUserRequest(
     @Schema(description = "이메일 주소", example = "user@example.com", requiredMode = RequiredMode.REQUIRED)
-    @NotBlank(message = "이메일은 비어 있을 수 없습니다.")
     @Email(message = "유효한 이메일 주소를 입력하세요.")
     String email,
 
@@ -28,7 +27,19 @@ public record RegisterUserRequest(
 
     @Schema(description = "비밀번호 확인", example = "password123!", requiredMode = RequiredMode.REQUIRED)
     @NotBlank(message = "비밀번호 확인은 비어 있을 수 없습니다.")
-    String confirmPassword
+    String confirmPassword,
+
+    @Schema(description = "이름", example = "bbo", requiredMode = RequiredMode.REQUIRED)
+    @Size(max = 10, message = "이름은 최대 10자입니다.")
+    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$", message = "한글, 영문 및 숫자만 사용할 수 있습니다.")
+    String name,
+
+    @Schema(description = "휴대폰 번호", example = "010-1234-5678 또는 01012345678", requiredMode = RequiredMode.REQUIRED)
+    @Pattern(regexp = "^(\\d{3}-\\d{3,4}-\\d{4}|\\d{10,11})$", message = "전화번호 형식이 올바르지 않습니다.")
+    String phone,
+
+    @Schema(description = "이메일 인증 여부", example = "true", requiredMode = RequiredMode.REQUIRED)
+    boolean isVerified
 ) {
 
 }

@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.oatnote.memotag.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memotag.service.tag.exception.TagNotFoundException;
-import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
-import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
+import com.example.oatnote.user.service.exception.UserAuthException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.email.exception.EmailDispatchException;
 import com.example.oatnote.user.service.email.exception.EmailVerificationException;
@@ -26,8 +25,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(1001, ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserIllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleUserIllegalArgumentException(UserIllegalArgumentException ex) {
+    @ExceptionHandler(UserAuthException.class)
+    public ResponseEntity<ErrorResponse> handleUserIllegalArgumentException(UserAuthException ex) {
         return buildErrorResponse(1002, ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
