@@ -1,5 +1,7 @@
 package com.example.oatnote.user.service.email;
 
+import java.util.Objects;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class EmailVerificationService {
     public void verifyEmail(String email, String code) {
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
             .orElseThrow(() -> new EmailVerificationException("인증 코드가 만료되었거나 존재하지 않습니다."));
-        if (!code.equals(emailVerification.getCode())) {
+        if (!Objects.equals(code, emailVerification.getCode())) {
             throw new EmailVerificationException("인증 코드가 일치하지 않습니다.");
         }
         emailVerificationRepository.delete(emailVerification);

@@ -1,11 +1,14 @@
 package com.example.oatnote.user.service;
 
+import java.util.Objects;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.event.UserRegisteredEvent;
 import com.example.oatnote.user.dto.DispatchEmailRequest;
+import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
@@ -34,8 +37,7 @@ public class UserService {
     private final ApplicationEventPublisher eventPublisher;
 
     public void register(RegisterUserRequest registerUserRequest) {
-        String password = registerUserRequest.password();
-        if (password == null || !password.equals(registerUserRequest.confirmPassword())) {
+        if (!Objects.equals(registerUserRequest.password(), registerUserRequest.confirmPassword())) {
             throw new UserAuthException("비밀번호가 일치하지 않습니다.");
         } else if (registerUserRequest.isEmailVerified()) {
             throw new UserAuthException("이메일 인증을 완료해주세요.");
@@ -82,6 +84,20 @@ public class UserService {
 
     public void verifyEmail(VerifyEmailRequest verifyEmailRequest) {
         emailVerificationService.verifyEmail(verifyEmailRequest.email(), verifyEmailRequest.code());
+    }
+
+    public void findPassword(FindPasswordRequest findPasswordRequest) {
+        if (!Objects.equals(findPasswordRequest.newPassword(), findPasswordRequest.confirmPassword())) {
+            throw new UserAuthException("비밀번호가 일치하지 않습니다.");
+        }
+        User user = userRepository.findByEmail(findPasswordRequest.email())
+            .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + findPasswordRequest.email()));
+        User updatedUser = user.updatePassword(passwordEncoder.encode(findPasswordRequest.newPassword()));
+        userRepository.save(updatedUser);
+    }
+
+    public void withdraw(String userId) {
+        userRepository.deleteById(userId);
     }
 }
 

@@ -1,10 +1,13 @@
 package com.example.oatnote.user;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.example.oatnote.user.dto.DispatchEmailRequest;
+import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
@@ -74,5 +77,28 @@ public interface UserApiDoc {
     @PostMapping("/user/email/verification")
     ResponseEntity<Void> verifyEmail(
         @RequestBody @Valid VerifyEmailRequest VerifyEmailRequest
+    );
+
+    @Operation(summary = "비밀번호 찾기")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping("/user/password/find")
+    ResponseEntity<Void> findPassword(
+        @RequestBody @Valid FindPasswordRequest request
+    );
+
+    @Operation(summary = "회원 탈퇴")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @DeleteMapping("/user")
+    ResponseEntity<Void> withdraw(
+        @AuthenticationPrincipal String userId
     );
 }
