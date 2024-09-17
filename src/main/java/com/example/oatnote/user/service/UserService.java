@@ -47,8 +47,7 @@ public class UserService {
         User user = new User(
             registerUserRequest.email(),
             passwordEncoder.encode(registerUserRequest.password()),
-            registerUserRequest.name(),
-            registerUserRequest.phone()
+            registerUserRequest.name()
         );
         userRepository.save(user);
         eventPublisher.publishEvent(new UserRegisteredEvent(user.getId()));
@@ -92,8 +91,8 @@ public class UserService {
         }
         User user = userRepository.findByEmail(findPasswordRequest.email())
             .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + findPasswordRequest.email()));
-        User updatedUser = user.updatePassword(passwordEncoder.encode(findPasswordRequest.newPassword()));
-        userRepository.save(updatedUser);
+        user.updatePassword(passwordEncoder.encode(findPasswordRequest.newPassword()));
+        userRepository.save(user);
     }
 
     public void withdraw(String userId) {

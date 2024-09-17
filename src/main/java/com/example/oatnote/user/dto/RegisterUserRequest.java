@@ -34,10 +34,6 @@ public record RegisterUserRequest(
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$", message = "한글, 영문 및 숫자만 사용할 수 있습니다.")
     String name,
 
-    @Schema(description = "휴대폰 번호", example = "010-1234-5678 또는 01012345678", requiredMode = RequiredMode.REQUIRED)
-    @Pattern(regexp = "^(\\d{3}-\\d{3,4}-\\d{4}|\\d{10,11})$", message = "전화번호 형식이 올바르지 않습니다.")
-    String phone,
-
     @Schema(description = "이메일 인증 여부", example = "true", requiredMode = RequiredMode.REQUIRED)
     boolean isEmailVerified
 ) {
