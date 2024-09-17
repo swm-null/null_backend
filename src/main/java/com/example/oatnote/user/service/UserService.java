@@ -37,13 +37,16 @@ public class UserService {
         String password = registerUserRequest.password();
         if (password == null || !password.equals(registerUserRequest.confirmPassword())) {
             throw new UserAuthException("비밀번호가 일치하지 않습니다.");
-        }
-        if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
+        } else if (registerUserRequest.isEmailVerified()) {
+            throw new UserAuthException("이메일 인증을 완료해주세요.");
+        } else if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
             throw new UserAuthException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
         }
         User user = new User(
             registerUserRequest.email(),
-            passwordEncoder.encode(registerUserRequest.password())
+            passwordEncoder.encode(registerUserRequest.password()),
+            registerUserRequest.name(),
+            registerUserRequest.phone()
         );
         userRepository.save(user);
         eventPublisher.publishEvent(new UserRegisteredEvent(user.getId()));

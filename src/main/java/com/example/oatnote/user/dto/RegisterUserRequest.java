@@ -39,7 +39,7 @@ public record RegisterUserRequest(
     String phone,
 
     @Schema(description = "이메일 인증 여부", example = "true", requiredMode = RequiredMode.REQUIRED)
-    boolean isVerified
+    boolean isEmailVerified
 ) {
 
 }

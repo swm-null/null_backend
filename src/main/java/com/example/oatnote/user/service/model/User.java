@@ -23,16 +23,22 @@ public class User {
     @Field(name = "pwd")
     private String password;
 
+    private String name;
+
+    private String phone;
+
     @Field(name = "cTime")
     private LocalDateTime createdAt;
 
     @Field(name = "uTime")
     private LocalDateTime updatedAt;
 
-    public User(String email, String password) {
+    public User(String email, String password, String name, String phone) {
         this.id = UUID.randomUUID().toString();
         this.email = email;
         this.password = password;
+        this.name = name;
+        this.phone = phone;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
