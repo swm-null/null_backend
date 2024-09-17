@@ -4,13 +4,17 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.user.dto.DispatchEmailRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.event.UserRegisteredEvent;
+import com.example.oatnote.user.dto.VerifyEmailRequest;
+import com.example.oatnote.user.service.email.EmailService;
 import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
+import com.example.oatnote.user.service.exception.EmailDispatchException;
 import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.model.User;
@@ -23,9 +27,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final EmailService emailService;
+
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+
     private final JwtUtil jwtUtil;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
     public void register(RegisterUserRequest registerUserRequest) {
@@ -65,6 +72,19 @@ public class UserService {
         } catch (JwtException e) {
             throw new AuthIllegalArgumentException("refresh token 이 일치하지 않습니다." + e);
         }
+    }
+
+    public void dispatchEmail(DispatchEmailRequest dispatchEmailRequest) {
+        String verificationCode = 100000 + (int) (Math.random() * 900000) + "";
+        try {
+            emailService.sendVerificationCode(dispatchEmailRequest.email(), verificationCode);
+        } catch (Exception e) {
+            throw new EmailDispatchException("이메일 전송에 실패했습니다." + e);
+        }
+    }
+
+    public void verifyEmail(VerifyEmailRequest verifyEmailRequest) {
+
     }
 }
 

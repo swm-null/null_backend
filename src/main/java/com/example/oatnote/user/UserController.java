@@ -54,7 +54,7 @@ public class UserController implements UserApiDoc {
     }
 
     @PostMapping("/user/email/dispatch")
-    ResponseEntity<Void> dispatchEmail(
+    public ResponseEntity<Void> dispatchEmail(
         @RequestBody @Valid DispatchEmailRequest dispatchEmailRequest
     ) {
         userService.dispatchEmail(dispatchEmailRequest);
@@ -62,7 +62,7 @@ public class UserController implements UserApiDoc {
     }
 
     @PostMapping("/user/email/verification")
-    ResponseEntity<Void> verifyEmail(
+    public ResponseEntity<Void> verifyEmail(
         @RequestBody @Valid VerifyEmailRequest VerifyEmailRequest
     ) {
         userService.verifyEmail(VerifyEmailRequest);
