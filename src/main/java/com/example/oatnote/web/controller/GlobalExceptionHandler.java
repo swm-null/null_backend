@@ -20,11 +20,6 @@ import com.example.oatnote.user.service.email.exception.EmailVerificationExcepti
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AuthIllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleAuthIllegalArgumentException(AuthIllegalArgumentException ex) {
-        return buildErrorResponse(1001, ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(UserAuthException.class)
     public ResponseEntity<ErrorResponse> handleUserIllegalArgumentException(UserAuthException ex) {
         return buildErrorResponse(1002, ex.getMessage(), HttpStatus.BAD_REQUEST);
