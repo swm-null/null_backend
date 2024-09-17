@@ -7,10 +7,10 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: oatnote
-  ECS_SERVICE: oatnote-service
-  ECS_CLUSTER: oatnote-cluster
-  ECS_TASK_DEFINITION: oatnote-family-revision.json
-  CONTAINER_NAME: oatnote-container
+  ECS_SERVICE: oatnote-be-stage-service
+  ECS_CLUSTER: oatnote-stage-cluster
+  ECS_TASK_DEFINITION: oatnote-be-stage-family-revision.json
+  CONTAINER_NAME: oatnote-be-stage-container
   SECRET_NAME: stage/oatnote
 
 permissions:
