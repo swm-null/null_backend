@@ -1,4 +1,4 @@
-package com.example.oatnote.user.service.exception;
+package com.example.oatnote.user.service.email.exception;
 
 public class EmailDispatchException extends RuntimeException {
 

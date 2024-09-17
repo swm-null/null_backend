@@ -66,6 +66,6 @@ public class UserController implements UserApiDoc {
         @RequestBody @Valid VerifyEmailRequest VerifyEmailRequest
     ) {
         userService.verifyEmail(VerifyEmailRequest);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

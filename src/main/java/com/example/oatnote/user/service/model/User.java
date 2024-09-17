@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import lombok.Getter;
 
-@Document(collection = "users")
 @Getter
+@Document(collection = "users")
 public class User {
 
     @Id
