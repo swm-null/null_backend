@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.event.UserRegisteredEvent;
+import com.example.oatnote.event.UserWithdrawEvent;
 import com.example.oatnote.user.dto.DispatchEmailRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
@@ -77,8 +78,7 @@ public class UserService {
     }
 
     public void dispatchEmail(DispatchEmailRequest dispatchEmailRequest) {
-        String code = 100000 + (int)(Math.random() * 900000) + "";
-        emailVerificationService.sendVerificationCode(dispatchEmailRequest.email(), code);
+        emailVerificationService.sendVerificationCode(dispatchEmailRequest.email());
     }
 
     public void verifyEmail(VerifyEmailRequest verifyEmailRequest) {
@@ -97,6 +97,7 @@ public class UserService {
 
     public void withdraw(String userId) {
         userRepository.deleteById(userId);
+        eventPublisher.publishEvent(new UserWithdrawEvent(userId));
     }
 }
 

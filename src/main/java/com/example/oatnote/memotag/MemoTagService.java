@@ -179,7 +179,13 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    private Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse, String userId) {
+    public void deleteAll(String userId) {
+        memoTagRelationService.deleteAll(userId);
+        memoService.deleteAll(userId);
+        tagService.deleteAll(userId);
+    }
+
+    Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse, String userId) {
         Memo memo = new Memo(
             aiMemoTagsResponse.content(),
             new ArrayList<>(),
@@ -199,7 +205,7 @@ public class MemoTagService {
         return createdMemo;
     }
 
-    private List<Tag> updateMemosTagsRelations(
+    List<Tag> updateMemosTagsRelations(
         ProcessedMemoResponse aiMemoTagsResponse,
         Memo savedMemo,
         String userId
@@ -220,7 +226,7 @@ public class MemoTagService {
         return tags;
     }
 
-    private void createParentTagsRelations(String memoId, List<String> parentTagIds) {
+    void createParentTagsRelations(String memoId, List<String> parentTagIds) {
         if (parentTagIds != null && !parentTagIds.isEmpty()) {
             for (var tagId : parentTagIds) {
                 memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG);

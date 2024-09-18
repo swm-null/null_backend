@@ -48,4 +48,8 @@ public class MemoTagRelationService {
     public Integer countMemos(String tagId) {
         return memoTagRelationRepository.countByTagId(tagId);
     }
+
+    public void deleteAll(String userId) {
+        memoTagRelationRepository.deleteByUserId(userId);
+    }
 }

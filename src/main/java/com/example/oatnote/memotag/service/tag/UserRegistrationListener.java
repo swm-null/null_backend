@@ -12,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class CreateRootTagListener {
+public class UserRegistrationListener {
 
     private final TagService tagService;
 
     @EventListener
-    public void handleUserRegisteredEvent(UserRegisteredEvent event) {
+    public void handleUserRegistrationEvent(UserRegisteredEvent event) {
         createRootTag(event.userId());
     }
 

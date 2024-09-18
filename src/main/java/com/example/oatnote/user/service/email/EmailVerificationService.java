@@ -1,7 +1,9 @@
 package com.example.oatnote.user.service.email;
 
+import java.security.SecureRandom;
 import java.util.Objects;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,9 @@ public class EmailVerificationService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final JavaMailSender mailSender;
 
-    public void sendVerificationCode(String email, String code) {
+    public void sendVerificationCode(String email) {
         try {
+            String code = RandomStringUtils.randomNumeric(6);
             sendEmail(email, code);
             emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
             emailVerificationRepository.save(new EmailVerification(email, code));
@@ -56,7 +59,7 @@ public class EmailVerificationService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
         helper.setTo(to);
-        helper.setSubject("Oatnote : 이메일 인증 코드");
+        helper.setSubject(String.format("Oatnote : 이메일 인증 코드 - %s", code));
         helper.setText(htmlMessage, true);
         mailSender.send(message);
     }
