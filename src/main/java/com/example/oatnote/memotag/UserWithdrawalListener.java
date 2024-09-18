@@ -18,10 +18,10 @@ public class UserWithdrawalListener {
 
     @EventListener
     public void handleUserWithdrawalEvent(UserRegisteredEvent event) {
-        deleteMemoTag(event.userId());
+        deleteAllUserData(event.userId());
     }
 
-    private void deleteMemoTag(String userId) {
-
+    private void deleteAllUserData(String userId) {
+        memoTagService.deleteAllUserData(userId);
     }
 }

@@ -18,4 +18,6 @@ public interface TagRepository extends MongoRepository<Tag, String> {
     Optional<Tag> findByNameAndUserId(String parentTagName, String userId);
 
     List<Tag> findByIdInAndUserId(List<String> tagIds, String userId);
+
+    void deleteByUserId(String userId);
 }

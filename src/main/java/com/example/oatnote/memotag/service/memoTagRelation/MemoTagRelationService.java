@@ -14,8 +14,8 @@ public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
-    public void createRelation(String memoId, String tagId, boolean isLinked) {
-        MemoTagRelation memoTagRelation = new MemoTagRelation(memoId, tagId, isLinked);
+    public void createRelation(String memoId, String tagId, boolean isLinked, String userId) {
+        MemoTagRelation memoTagRelation = new MemoTagRelation(memoId, tagId, isLinked, userId);
         memoTagRelationRepository.save(memoTagRelation);
     }
 
@@ -49,7 +49,7 @@ public class MemoTagRelationService {
         return memoTagRelationRepository.countByTagId(tagId);
     }
 
-    public void deleteAll(String userId) {
+    public void deleteAllUserData(String userId) {
         memoTagRelationRepository.deleteByUserId(userId);
     }
 }

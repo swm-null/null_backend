@@ -14,8 +14,8 @@ public class TagsRelationService {
 
     private final TagsRelationRepository tagsRelationRepository;
 
-    public void createRelation(String parentTagId, String childTagId) {
-        TagsRelation tagsRelation = new TagsRelation(parentTagId, childTagId);
+    public void createRelation(String parentTagId, String childTagId, String userId) {
+        TagsRelation tagsRelation = new TagsRelation(parentTagId, childTagId, userId);
         tagsRelationRepository.insert(tagsRelation);
     }
 
@@ -33,5 +33,9 @@ public class TagsRelationService {
         return tagsRelationRepository.findByParentTagId(parentTagId).stream()
             .map(TagsRelation::getChildTagId)
             .toList();
+    }
+
+    public void deleteAllUserData(String userId) {
+        tagsRelationRepository.deleteByUserId(userId);
     }
 }

@@ -179,10 +179,10 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    public void deleteAll(String userId) {
-        memoTagRelationService.deleteAll(userId);
-        memoService.deleteAll(userId);
-        tagService.deleteAll(userId);
+    public void deleteAllUserData(String userId) {
+        memoTagRelationService.deleteAllUserData(userId);
+        memoService.deleteAllUserData(userId);
+        tagService.deleteAllUserData(userId);
     }
 
     Memo createMemoTags(ProcessedMemoResponse aiMemoTagsResponse, String userId) {
@@ -213,12 +213,12 @@ public class MemoTagService {
         List<Tag> tags = new ArrayList<>();
         for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
             tags.add(tagService.getTag(linkedTagId, userId));
-            memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG);
+            memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG, userId);
             List<String> parentTagIds = tagService.getParentTagsIds(linkedTagId);
-            createParentTagsRelations(savedMemo.getId(), parentTagIds);
+            createParentTagsRelations(savedMemo.getId(), parentTagIds, userId);
         }
         for (var addRelation : aiMemoTagsResponse.tagsRelations().added()) {
-            tagService.createRelation(addRelation.parentId(), addRelation.childId());
+            tagService.createRelation(addRelation.parentId(), addRelation.childId(), userId);
         }
         for (var deletedRelation : aiMemoTagsResponse.tagsRelations().deleted()) {
             tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
@@ -226,11 +226,11 @@ public class MemoTagService {
         return tags;
     }
 
-    void createParentTagsRelations(String memoId, List<String> parentTagIds) {
+    void createParentTagsRelations(String memoId, List<String> parentTagIds, String userId) {
         if (parentTagIds != null && !parentTagIds.isEmpty()) {
             for (var tagId : parentTagIds) {
-                memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG);
-                createParentTagsRelations(memoId, tagService.getParentTagsIds(tagId));
+                memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG, userId);
+                createParentTagsRelations(memoId, tagService.getParentTagsIds(tagId), userId);
             }
         }
     }

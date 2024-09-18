@@ -47,8 +47,8 @@ public class TagService {
         tagEdgeService.createTagEdge(tagEdge);
     }
 
-    public void createRelation(String parentTagId, String childTagId) {
-        tagsRelationService.createRelation(parentTagId, childTagId);
+    public void createRelation(String parentTagId, String childTagId, String userId) {
+        tagsRelationService.createRelation(parentTagId, childTagId, userId);
     }
 
     public List<String> getChildTagsIds(String parentTagId) {
@@ -61,5 +61,11 @@ public class TagService {
 
     public void deleteRelation(String parentTagId, String childTagId) {
         tagsRelationService.deleteRelation(parentTagId, childTagId);
+    }
+
+    public void deleteAllUserData(String userId) {
+        tagEdgeService.deleteAllUserData(userId);
+        tagsRelationService.deleteAllUserData(userId);
+        tagRepository.deleteByUserId(userId);
     }
 }
