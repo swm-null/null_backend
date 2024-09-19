@@ -1,48 +1,41 @@
 {
-  "family": "oatnote-family",
+  "family": "oatnote-be-stage-family",
   "containerDefinitions": [
     {
-      "name": "oatnote-container",
-      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote:latest",
-      "cpu": 1024,
-      "memory": 3072,
-      "memoryReservation": 1024,
+      "name": "oatnote-be-stage-container",
+      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote:stage",
+      "cpu": 2048,
+      "memory": 4096,
       "portMappings": [
         {
-          "name": "oatnote-container-8080-task",
           "containerPort": 8080,
           "hostPort": 8080,
-          "protocol": "tcp",
-          "appProtocol": "http"
+          "protocol": "tcp"
         }
       ],
       "essential": true,
-      "environment": [],
-      "mountPoints": [],
-      "volumesFrom": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/oatnote-family",
-          "awslogs-create-group": "true",
+          "awslogs-group": "/ecs/oatnote-be-stage-family",
+          "mode": "non-blocking",
+          "max-buffer-size": "25m",
           "awslogs-region": "ap-northeast-2",
           "awslogs-stream-prefix": "ecs"
         }
-      },
-      "systemControls": []
+      }
     }
   ],
+  "taskRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
   "executionRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
-  "volumes": [],
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "cpu": "1024",
-  "memory": "3072",
+  "cpu": "2048",
+  "memory": "5120",
   "runtimePlatform": {
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
-  },
-  "tags": []
+  }
 }

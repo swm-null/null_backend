@@ -1,9 +1,11 @@
 package com.example.oatnote.memotag.service.tag;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memotag.service.tag.edge.TagEdgeService;
@@ -53,6 +55,10 @@ public class TagService {
 
     public List<String> getChildTagsIds(String parentTagId) {
         return tagsRelationService.getChildTagsIds(parentTagId);
+    }
+
+    public List<Tag> getChildTags(String parentTagId, String userId) {
+        return getTags(getChildTagsIds(parentTagId), userId);
     }
 
     public List<String> getParentTagsIds(String childTagId) {
