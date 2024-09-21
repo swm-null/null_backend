@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 
 import com.example.oatnote.event.UserRegisteredEvent;
 import com.example.oatnote.event.UserWithdrawEvent;
-import com.example.oatnote.user.dto.DispatchEmailRequest;
+import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
-import com.example.oatnote.user.dto.VerifyEmailRequest;
+import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
 import com.example.oatnote.user.service.exception.UserAuthException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
@@ -77,12 +77,12 @@ public class UserService {
         }
     }
 
-    public void dispatchEmail(DispatchEmailRequest dispatchEmailRequest) {
-        emailVerificationService.sendVerificationCode(dispatchEmailRequest.email());
+    public void sendCode(SendCodeRequest sendCodeRequest) {
+        emailVerificationService.sendCode(sendCodeRequest.email());
     }
 
-    public void verifyEmail(VerifyEmailRequest verifyEmailRequest) {
-        emailVerificationService.verifyEmail(verifyEmailRequest.email(), verifyEmailRequest.code());
+    public void verifyCode(VerifyCodeRequest verifyCodeRequest) {
+        emailVerificationService.verifyCode(verifyCodeRequest.email(), verifyCodeRequest.code());
     }
 
     public void findPassword(FindPasswordRequest findPasswordRequest) {

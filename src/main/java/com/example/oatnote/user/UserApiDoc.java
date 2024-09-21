@@ -6,14 +6,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.oatnote.user.dto.DispatchEmailRequest;
+import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
-import com.example.oatnote.user.dto.VerifyEmailRequest;
+import com.example.oatnote.user.dto.VerifyCodeRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,9 +63,9 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/email/dispatch")
-    ResponseEntity<Void> dispatchEmail(
-        @RequestBody @Valid DispatchEmailRequest dispatchEmailRequest
+    @PostMapping("/user/sendCode")
+    ResponseEntity<Void> sendCode(
+        @RequestBody @Valid SendCodeRequest sendCodeRequest
     );
 
     @Operation(summary = "이메일 인증 코드 확인")
@@ -74,9 +74,9 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/email/verification")
-    ResponseEntity<Void> verifyEmail(
-        @RequestBody @Valid VerifyEmailRequest VerifyEmailRequest
+    @PostMapping("/user/verifyCode")
+    ResponseEntity<Void> verifyCode(
+        @RequestBody @Valid VerifyCodeRequest verifyCodeRequest
     );
 
     @Operation(summary = "비밀번호 찾기")
@@ -85,9 +85,9 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/password/find")
+    @PostMapping("/user/findPassword")
     ResponseEntity<Void> findPassword(
-        @RequestBody @Valid FindPasswordRequest request
+        @RequestBody @Valid FindPasswordRequest findPasswordRequest
     );
 
     @Operation(summary = "회원 탈퇴")

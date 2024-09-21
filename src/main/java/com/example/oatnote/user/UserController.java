@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.user.dto.DispatchEmailRequest;
+import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
-import com.example.oatnote.user.dto.VerifyEmailRequest;
+import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -51,23 +51,23 @@ public class UserController implements UserApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(refreshUserResponse);
     }
 
-    @PostMapping("/user/email/dispatch")
-    public ResponseEntity<Void> dispatchEmail(
-        @RequestBody @Valid DispatchEmailRequest dispatchEmailRequest
+    @PostMapping("/user/sendCode")
+    public ResponseEntity<Void> sendCode(
+        @RequestBody @Valid SendCodeRequest sendCodeRequest
     ) {
-        userService.dispatchEmail(dispatchEmailRequest);
+        userService.sendCode(sendCodeRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/user/email/verification")
-    public ResponseEntity<Void> verifyEmail(
-        @RequestBody @Valid VerifyEmailRequest VerifyEmailRequest
+    @PostMapping("/user/verifyCode")
+    public ResponseEntity<Void> verifyCode(
+        @RequestBody @Valid VerifyCodeRequest verifyCodeRequest
     ) {
-        userService.verifyEmail(VerifyEmailRequest);
+        userService.verifyCode(verifyCodeRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/user/find/password")
+    @PostMapping("/user/findPassword")
     public ResponseEntity<Void> findPassword(
         @RequestBody @Valid FindPasswordRequest findPasswordRequest
     ) {

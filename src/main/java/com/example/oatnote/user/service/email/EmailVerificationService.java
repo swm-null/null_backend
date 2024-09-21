@@ -1,6 +1,5 @@
 package com.example.oatnote.user.service.email;
 
-import java.security.SecureRandom;
 import java.util.Objects;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,7 +22,7 @@ public class EmailVerificationService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final JavaMailSender mailSender;
 
-    public void sendVerificationCode(String email) {
+    public void sendCode(String email) {
         try {
             String code = RandomStringUtils.randomNumeric(6);
             sendEmail(email, code);
@@ -34,7 +33,7 @@ public class EmailVerificationService {
         }
     }
 
-    public void verifyEmail(String email, String code) {
+    public void verifyCode(String email, String code) {
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
             .orElseThrow(() -> new EmailVerificationException("인증 코드가 만료되었거나 존재하지 않습니다."));
         if (!Objects.equals(code, emailVerification.getCode())) {

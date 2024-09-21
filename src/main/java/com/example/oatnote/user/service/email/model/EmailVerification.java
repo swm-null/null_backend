@@ -17,12 +17,12 @@ public class EmailVerification {
 
     private String code;
 
-    @Field("expiry_date")
-    private LocalDateTime expiryDate;
+    @Field("eTime")
+    private LocalDateTime expiryTime;
 
     public EmailVerification(String email, String code) {
         this.email = email;
         this.code = code;
-        this.expiryDate = LocalDateTime.now().plusMinutes(10);
+        this.expiryTime = LocalDateTime.now().plusMinutes(10);
     }
 }
