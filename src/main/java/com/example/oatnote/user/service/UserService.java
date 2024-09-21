@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.oatnote.event.UserRegisteredEvent;
 import com.example.oatnote.event.UserWithdrawEvent;
+import com.example.oatnote.user.dto.CheckEmailRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
@@ -40,9 +41,8 @@ public class UserService {
     public void register(RegisterUserRequest registerUserRequest) {
         if (!Objects.equals(registerUserRequest.password(), registerUserRequest.confirmPassword())) {
             throw new UserAuthException("비밀번호가 일치하지 않습니다.");
-        } else if (registerUserRequest.isEmailVerified()) {
-            throw new UserAuthException("이메일 인증을 완료해주세요.");
-        } else if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
+        }
+        if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
             throw new UserAuthException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
         }
         User user = new User(
@@ -74,6 +74,12 @@ public class UserService {
             return RefreshUserResponse.of(newAccessToken, refreshToken);
         } catch (JwtException e) {
             throw new UserAuthException("refresh token 이 일치하지 않습니다." + e);
+        }
+    }
+
+    public void checkEmailDuplication(CheckEmailRequest checkEmailRequest) {
+        if (userRepository.findByEmail(checkEmailRequest.email()).isPresent()) {
+            throw new UserAuthException("이미 존재하는 이메일입니다: " + checkEmailRequest.email());
         }
     }
 

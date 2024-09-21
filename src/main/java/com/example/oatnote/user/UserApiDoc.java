@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.oatnote.user.dto.CheckEmailRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
@@ -56,6 +57,16 @@ public interface UserApiDoc {
     @PostMapping("/user/refresh")
     ResponseEntity<RefreshUserResponse> refreshAccessToken(
         @RequestBody @Valid RefreshUserRequest refreshUserRequest
+    );
+
+    @Operation(summary = "이메일 중복 체크")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping("/user/sendCode")
+    ResponseEntity<Void> checkEmailDuplication(
+        @RequestBody @Valid CheckEmailRequest checkEmailRequest
     );
 
     @Operation(summary = "이메일 인증 코드 전송")

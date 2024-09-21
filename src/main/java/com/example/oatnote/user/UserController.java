@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.oatnote.user.dto.CheckEmailRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
@@ -49,6 +50,14 @@ public class UserController implements UserApiDoc {
     ) {
         RefreshUserResponse refreshUserResponse = userService.refreshAccessToken(refreshUserRequest);
         return ResponseEntity.status(HttpStatus.OK).body(refreshUserResponse);
+    }
+
+    @PostMapping("/user/sendCode")
+    public ResponseEntity<Void> checkEmailDuplication(
+        @RequestBody @Valid CheckEmailRequest checkEmailRequest
+    ) {
+        userService.checkEmailDuplication(checkEmailRequest);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/user/sendCode")
