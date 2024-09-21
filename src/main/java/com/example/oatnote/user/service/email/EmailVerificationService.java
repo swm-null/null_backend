@@ -22,15 +22,21 @@ public class EmailVerificationService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final JavaMailSender mailSender;
 
-    public void sendCode(String email) {
+    private static final int CODE_LENGTH = 6;
+
+    public void sendCode(String email, int expiryMinutes) {
         try {
-            String code = RandomStringUtils.randomNumeric(6);
+            String code = RandomStringUtils.randomNumeric(CODE_LENGTH);
             sendEmail(email, code);
-            emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
-            emailVerificationRepository.save(new EmailVerification(email, code));
+            saveEmailVerification(email, code, expiryMinutes);
         } catch (MessagingException e) {
             throw new EmailDispatchException("이메일 전송에 실패했습니다.");
         }
+    }
+
+    public void saveEmailVerification(String email, String code, int expiryMinutes) {
+        emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
+        emailVerificationRepository.save(new EmailVerification(email, code));
     }
 
     public void verifyCode(String email, String code) {
