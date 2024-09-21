@@ -12,20 +12,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.oatnote.memotag.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memotag.service.tag.exception.TagNotFoundException;
-import com.example.oatnote.user.service.exception.AuthIllegalArgumentException;
-import com.example.oatnote.user.service.exception.UserIllegalArgumentException;
+import com.example.oatnote.user.service.exception.UserAuthException;
 import com.example.oatnote.user.service.exception.UserNotFoundException;
+import com.example.oatnote.user.service.email.exception.EmailDispatchException;
+import com.example.oatnote.user.service.email.exception.EmailVerificationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AuthIllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleAuthIllegalArgumentException(AuthIllegalArgumentException ex) {
-        return buildErrorResponse(1001, ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserIllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleUserIllegalArgumentException(UserIllegalArgumentException ex) {
+    @ExceptionHandler(UserAuthException.class)
+    public ResponseEntity<ErrorResponse> handleUserIllegalArgumentException(UserAuthException ex) {
         return buildErrorResponse(1002, ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
@@ -57,6 +53,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         return buildErrorResponse(1008, ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailDispatchException.class)
+    public ResponseEntity<ErrorResponse> handleEmailDispatchException(EmailDispatchException ex) {
+        return buildErrorResponse(1009, ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmailVerificationException.class)
+    public ResponseEntity<ErrorResponse> handleEmailVerificationException(EmailVerificationException ex) {
+        return buildErrorResponse(1010, ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(int errorCode, String message, HttpStatus status) {

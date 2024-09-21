@@ -18,4 +18,8 @@ public class TagEdgeService {
         }
         tagEdgeRepository.insert(tagEdge);
     }
+
+    public void deleteAllUserData(String userId) {
+        tagEdgeRepository.deleteByUserId(userId);
+    }
 }

@@ -28,10 +28,15 @@ public class MemoTagRelation {
     @Field("isL")
     private boolean isLinked;
 
-    public MemoTagRelation(String memoId, String tagId, boolean isLinked) {
+    @Indexed
+    @Field("uId")
+    private String userId;
+
+    public MemoTagRelation(String memoId, String tagId, boolean isLinked, String userId) {
         this.id = UUID.randomUUID().toString();
         this.memoId = memoId;
         this.tagId = tagId;
         this.isLinked = isLinked;
+        this.userId = userId;
     }
 }

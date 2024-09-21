@@ -24,9 +24,14 @@ public class TagsRelation {
     @Field("cTId")
     private String childTagId;
 
-    public TagsRelation(String parentTagId, String childTagId) {
+    @Indexed
+    @Field("uId")
+    private String userId;
+
+    public TagsRelation(String parentTagId, String childTagId, String userId) {
         this.id = UUID.randomUUID().toString();
         this.parentTagId = parentTagId;
         this.childTagId = childTagId;
+        this.userId = userId;
     }
 }

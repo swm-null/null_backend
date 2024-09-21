@@ -20,4 +20,6 @@ public interface MemoRepository extends MongoRepository<Memo, String> {
 
     @Query("{ 'content' : { $regex: ?0, $options: 'i' }, 'userId' : ?1 }")
     List<Memo> findByContentRegexAndUserId(String regex, String userId);
+
+    void deleteByUserId(String userId);
 }

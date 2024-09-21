@@ -29,7 +29,7 @@ public class TagService {
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserId(tagIds, userId, Sort.by(Sort.Direction.ASC, "name"));
+        return tagRepository.findByIdInAndUserId(tagIds, userId);
     }
 
     public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest, String userId) {
@@ -49,12 +49,16 @@ public class TagService {
         tagEdgeService.createTagEdge(tagEdge);
     }
 
-    public void createRelation(String parentTagId, String childTagId) {
-        tagsRelationService.createRelation(parentTagId, childTagId);
+    public void createRelation(String parentTagId, String childTagId, String userId) {
+        tagsRelationService.createRelation(parentTagId, childTagId, userId);
     }
 
     public List<String> getChildTagsIds(String parentTagId) {
         return tagsRelationService.getChildTagsIds(parentTagId);
+    }
+
+    public List<Tag> getChildTags(String parentTagId, String userId) {
+        return getTags(getChildTagsIds(parentTagId), userId);
     }
 
     public List<String> getParentTagsIds(String childTagId) {
@@ -65,7 +69,9 @@ public class TagService {
         tagsRelationService.deleteRelation(parentTagId, childTagId);
     }
 
-    public List<Tag> getChildTags(String parentTagId, String userId) {
-        return getTags(getChildTagsIds(parentTagId), userId);
+    public void deleteAllUserData(String userId) {
+        tagEdgeService.deleteAllUserData(userId);
+        tagsRelationService.deleteAllUserData(userId);
+        tagRepository.deleteByUserId(userId);
     }
 }
