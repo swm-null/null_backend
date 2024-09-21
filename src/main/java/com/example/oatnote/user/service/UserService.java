@@ -31,9 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final EmailVerificationService emailVerificationService;
-
     private final UserRepository userRepository;
-
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
@@ -45,6 +43,7 @@ public class UserService {
         if (userRepository.findByEmail(registerUserRequest.email()).isPresent()) {
             throw new UserAuthException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
         }
+        emailVerificationService.verifyCode(registerUserRequest.email(), registerUserRequest.code());
         User user = new User(
             registerUserRequest.email(),
             passwordEncoder.encode(registerUserRequest.password()),
@@ -95,6 +94,7 @@ public class UserService {
         if (!Objects.equals(findPasswordRequest.newPassword(), findPasswordRequest.confirmPassword())) {
             throw new UserAuthException("비밀번호가 일치하지 않습니다.");
         }
+        emailVerificationService.verifyCode(findPasswordRequest.email(), findPasswordRequest.code());
         User user = userRepository.findByEmail(findPasswordRequest.email())
             .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + findPasswordRequest.email()));
         user.updatePassword(passwordEncoder.encode(findPasswordRequest.newPassword()));

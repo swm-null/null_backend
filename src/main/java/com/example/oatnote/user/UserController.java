@@ -52,7 +52,7 @@ public class UserController implements UserApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(refreshUserResponse);
     }
 
-    @PostMapping("/user/sendCode")
+    @PostMapping("/user/checkEmail")
     public ResponseEntity<Void> checkEmailDuplication(
         @RequestBody @Valid CheckEmailRequest checkEmailRequest
     ) {

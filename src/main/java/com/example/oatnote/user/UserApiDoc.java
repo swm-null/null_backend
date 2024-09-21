@@ -64,7 +64,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/sendCode")
+    @PostMapping("/user/checkEmail")
     ResponseEntity<Void> checkEmailDuplication(
         @RequestBody @Valid CheckEmailRequest checkEmailRequest
     );

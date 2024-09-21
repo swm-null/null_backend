@@ -35,8 +35,9 @@ public record RegisterUserRequest(
     @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$", message = "한글, 영문 및 숫자만 사용할 수 있습니다.")
     String name,
 
-    @Schema(description = "이메일 인증 코드", example = "true", requiredMode = REQUIRED)
-    @NotBlank
+    @Schema(description = "인증 코드", example = "123456", requiredMode = REQUIRED)
+    @NotBlank(message = "유효한 인증 코드를 입력하세요.")
+    @Size(min = 6, max = 6, message = "인증 코드는 6자리 숫자입니다.")
     String code
 ) {
 
