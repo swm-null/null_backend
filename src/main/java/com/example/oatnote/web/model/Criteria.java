@@ -1,4 +1,4 @@
-package com.example.oatnote.web.models;
+package com.example.oatnote.web.model;
 
 import java.util.Objects;
 
