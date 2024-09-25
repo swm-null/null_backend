@@ -1,5 +1,7 @@
 package com.example.oatnote.web.models;
 
+import java.util.Objects;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +33,7 @@ public class Criteria {
     }
 
     private static int validateAndCalculatePage(Integer page) {
-        if (page == null) {
+        if (Objects.isNull(page)) {
             page = DEFAULT_PAGE;
         }
         if (page < MIN_PAGE) {
@@ -42,9 +44,9 @@ public class Criteria {
     }
 
     private static int validateAndCalculatePage(Integer page, Integer limit, Integer total) {
-        int totalPage = total.equals(0) ? 1 : (int)Math.ceil((double)total / limit);
+        int totalPage = Objects.equals(total, 0) ? 1 : (int)Math.ceil((double)total / limit);
 
-        if (page == null) {
+        if (Objects.isNull(page)) {
             page = DEFAULT_PAGE;
         }
         if (page < MIN_PAGE) {
@@ -58,7 +60,7 @@ public class Criteria {
     }
 
     private static int validateAndCalculateLimit(Integer limit) {
-        if (limit == null) {
+        if (Objects.isNull(limit)) {
             limit = DEFAULT_LIMIT;
         }
         if (limit < MIN_LIMIT) {

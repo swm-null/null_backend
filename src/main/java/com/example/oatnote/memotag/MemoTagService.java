@@ -2,6 +2,7 @@ package com.example.oatnote.memotag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +51,7 @@ public class MemoTagService {
     private final MemoTagRelationService memoTagRelationService;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
+    private final static String TEMP_USER_ID = "70c0d720-fa31-4220-86ff-35163e956bd9"; //todo 삭제
 
     public CreateMemoResponse createMemoTags(CreateMemoRequest createMemoRequest, String userId) {
         AICreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemoTags(
@@ -59,10 +61,7 @@ public class MemoTagService {
         Memo savedMemo = createMemoTags(aiCreateMemoResponse.processedMemo(), userId);
         List<Tag> tags = updateMemosTagsRelations(aiCreateMemoResponse.processedMemo(), savedMemo, userId);
 
-        TagEdge tagEdge = new TagEdge(
-            userId,
-            aiCreateMemoResponse.newStructure()
-        );
+        TagEdge tagEdge = new TagEdge(userId, aiCreateMemoResponse.newStructure());
         tagService.createTagEdge(tagEdge);
         return CreateMemoResponse.from(savedMemo, tags);
     }
@@ -70,17 +69,14 @@ public class MemoTagService {
     public void createMemosTags(CreateMemosRequest createMemosRequest) {
         AICreateMemosResponse aiCreateMemosResponse = aiMemoTagClient.createMemosTags(
             createMemosRequest.content(),
-            "70c0d720-fa31-4220-86ff-35163e956bd9" //todo Email userId
+            TEMP_USER_ID
         );
         for (var aiMemoTagsResponse : aiCreateMemosResponse.processedMemos()) {
-            Memo savedMemo = createMemoTags(aiMemoTagsResponse, "70c0d720-fa31-4220-86ff-35163e956bd9");
-            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, "70c0d720-fa31-4220-86ff-35163e956bd9");
+            Memo savedMemo = createMemoTags(aiMemoTagsResponse, TEMP_USER_ID);
+            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, TEMP_USER_ID);
         }
 
-        TagEdge tagEdge = new TagEdge(
-            "70c0d720-fa31-4220-86ff-35163e956bd9",
-            aiCreateMemosResponse.newStructure()
-        );
+        TagEdge tagEdge = new TagEdge(TEMP_USER_ID, aiCreateMemosResponse.newStructure());
         tagService.createTagEdge(tagEdge);
     }
 
@@ -91,9 +87,7 @@ public class MemoTagService {
         SortOrderTypeEnum sortOrder,
         String userId
     ) {
-        if (tagId == null) {
-            tagId = userId;
-        }
+        tagId = Objects.requireNonNullElse(tagId, userId);
         Integer total = memoTagRelationService.countMemos(tagId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
         PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
@@ -109,9 +103,7 @@ public class MemoTagService {
     }
 
     public List<TagResponse> getChildTags(String parentTagId, String userId) {
-        if (parentTagId == null) {
-            parentTagId = userId;
-        }
+        parentTagId = Objects.requireNonNullElse(parentTagId, userId);
         Tag parentTag = tagService.getTag(parentTagId, userId);
         List<Tag> childTags = tagService.getChildTags(parentTag.getId(), userId);
         return childTags.stream()
@@ -128,9 +120,7 @@ public class MemoTagService {
         SortOrderTypeEnum sortOrder,
         String userId
     ) {
-        if (parentTagId == null) {
-            parentTagId = userId;
-        }
+        parentTagId = Objects.requireNonNullElse(parentTagId, userId);
         Tag parentTag = tagService.getTag(parentTagId, userId);
         List<String> childTagsIds = tagService.getChildTagsIds(parentTag.getId());
 
