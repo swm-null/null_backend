@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String accessToken = extractAccessToken(request);
-        if (accessToken != null) {
+        if (Objects.nonNull(accessToken)) {
             try {
                 jwtUtil.validateToken(accessToken);
                 if (jwtUtil.isTokenExpired(accessToken)) {

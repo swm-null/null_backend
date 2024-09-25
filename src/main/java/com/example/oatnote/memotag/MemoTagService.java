@@ -87,25 +87,27 @@ public class MemoTagService {
         SortOrderTypeEnum sortOrder,
         String userId
     ) {
+        if(Objects.equals(sortOrder, SortOrderTypeEnum.NAME)) {
+            throw new MemoNotFoundException("메모는 이름순으로 정렬할 수 없습니다.");
+        }
+
         tagId = Objects.requireNonNullElse(tagId, userId);
+
         Integer total = memoTagRelationService.countMemos(tagId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
         PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
 
         Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
         Page<MemoResponse> memoTagsPage = result.map(
-            memo -> MemoResponse.from(
-                memo,
-                tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()), userId)
-            )
+            memo -> MemoResponse.from(memo, getLinkedTags(memo.getId(), userId))
         );
         return PagedMemosResponse.from(memoTagsPage, criteria);
     }
 
     public List<TagResponse> getChildTags(String parentTagId, String userId) {
         parentTagId = Objects.requireNonNullElse(parentTagId, userId);
-        Tag parentTag = tagService.getTag(parentTagId, userId);
-        List<Tag> childTags = tagService.getChildTags(parentTag.getId(), userId);
+
+        List<Tag> childTags = tagService.getChildTags(parentTagId, userId);
         return childTags.stream()
             .map(TagResponse::from)
             .toList();
@@ -121,8 +123,8 @@ public class MemoTagService {
         String userId
     ) {
         parentTagId = Objects.requireNonNullElse(parentTagId, userId);
-        Tag parentTag = tagService.getTag(parentTagId, userId);
-        List<String> childTagsIds = tagService.getChildTagsIds(parentTag.getId());
+
+        List<String> childTagsIds = tagService.getChildTagsIds(parentTagId);
 
         Integer total = childTagsIds.size();
         Criteria criteria = Criteria.of(tagPage, tagLimit, total);
@@ -145,18 +147,14 @@ public class MemoTagService {
 
     public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest, String userId) {
         AISearchMemoResponse aiSearchMemoResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content(), userId);
-        List<Memo> memos;
-        switch (aiSearchMemoResponse.type()) {
-            case SIMILARITY -> memos = memoService.getMemos(aiSearchMemoResponse.ids(), userId);
-            case REGEX -> memos = memoService.getMemosContainingRegex(aiSearchMemoResponse.regex(), userId);
-            case TAG -> memos = memoService.getMemos(
-                memoTagRelationService.getMemoIds(aiSearchMemoResponse.tags()),
-                userId
-            );
-            default -> throw new MemoNotFoundException("메모를 찾지 못했습니다.");
-        }
+        List<Memo> memos = switch (aiSearchMemoResponse.type()) {
+            case SIMILARITY -> memoService.getMemos(aiSearchMemoResponse.ids(), userId);
+            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemoResponse.regex(), userId);
+            case TAG -> memoService.getMemos(memoTagRelationService.getMemoIds(aiSearchMemoResponse.tags()), userId);
+        };
+
         List<List<Tag>> tagsList = memos.stream()
-            .map(memo -> tagService.getTags(memoTagRelationService.getLinkedTagIds(memo.getId()), userId))
+            .map(memo -> getLinkedTags(memo.getId(), userId))
             .toList();
         return SearchMemoResponse.from(aiSearchMemoResponse.processedMessage(), memos, tagsList);
     }
@@ -168,9 +166,7 @@ public class MemoTagService {
         Memo memo = memoService.getMemo(memoId, userId);
         memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), aiCreateEmbeddingResponse.embedding());
         Memo updatedMemo = memoService.updateMemo(memo);
-        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memo.getId());
-        List<Tag> tags = tagService.getTags(tagIds, userId);
-        return UpdateMemoResponse.from(updatedMemo, tags);
+        return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {
@@ -219,18 +215,15 @@ public class MemoTagService {
         return createdMemo;
     }
 
-    List<Tag> updateMemosTagsRelations(
-        ProcessedMemoResponse aiMemoTagsResponse,
-        Memo savedMemo,
-        String userId
-    ) {
-        List<Tag> tags = new ArrayList<>();
+    List<Tag> updateMemosTagsRelations(ProcessedMemoResponse aiMemoTagsResponse, Memo savedMemo, String userId) {
         for (var addRelation : aiMemoTagsResponse.tagsRelations().added()) {
             tagService.createRelation(addRelation.parentId(), addRelation.childId(), userId);
         }
         for (var deletedRelation : aiMemoTagsResponse.tagsRelations().deleted()) {
             tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
         }
+
+        List<Tag> tags = new ArrayList<>();
         for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
             tags.add(tagService.getTag(linkedTagId, userId));
             memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG, userId);
@@ -241,7 +234,7 @@ public class MemoTagService {
     }
 
     void createParentTagsRelations(String memoId, List<String> parentTagIds, String userId) {
-        if (parentTagIds != null && !parentTagIds.isEmpty()) {
+        if (Objects.nonNull(parentTagIds) && !parentTagIds.isEmpty()) {
             for (var tagId : parentTagIds) {
                 memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG, userId);
                 createParentTagsRelations(memoId, tagService.getParentTagsIds(tagId), userId);
@@ -253,8 +246,13 @@ public class MemoTagService {
         Sort sort = switch (sortOrder) {
             case NAME -> Sort.by(Sort.Direction.ASC, "name");
             case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
-            default -> Sort.by(Sort.Direction.DESC, "uTime");
+            case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
         };
         return PageRequest.of(page, limit, sort);
+    }
+
+    List<Tag> getLinkedTags(String memoId, String userId) {
+        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId);
+        return tagService.getTags(tagIds, userId);
     }
 }
