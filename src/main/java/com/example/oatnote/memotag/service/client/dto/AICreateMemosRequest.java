@@ -9,6 +9,7 @@ public record AICreateMemosRequest(
     String type,
     String userId
 ) {
+
     public static AICreateMemosRequest from(String content, String type, String userId) {
         return new AICreateMemosRequest(content, type, userId);
     }

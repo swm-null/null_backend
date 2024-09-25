@@ -4,12 +4,12 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.util.List;
 
-import com.example.oatnote.memotag.service.client.dto.enums.AISearchType;
+import com.example.oatnote.memotag.service.client.dto.enums.AISearchTypeEnum;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AISearchMemoResponse(
-    AISearchType type, // "similarity" | "regex" | "tag"
+    AISearchTypeEnum type, // "similarity" | "regex" | "tag"
     String processedMessage,
     List<String> ids,
     String regex,

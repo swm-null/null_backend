@@ -6,20 +6,20 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AICreateMemoRequest(
-    AIMemoTagsRequest memo,
+    AIMemo memo,
     String userId
 ) {
 
-    private record AIMemoTagsRequest(
+    private record AIMemo(
         String content
     ) {
 
-        public static AIMemoTagsRequest from(String content) {
-            return new AIMemoTagsRequest(content);
+        public static AIMemo from(String content) {
+            return new AIMemo(content);
         }
     }
 
     public static AICreateMemoRequest from(String content, String userId) {
-        return new AICreateMemoRequest(AIMemoTagsRequest.from(content), userId);
+        return new AICreateMemoRequest(AIMemo.from(content), userId);
     }
 }
