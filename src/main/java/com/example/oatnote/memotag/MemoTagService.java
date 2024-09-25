@@ -235,12 +235,6 @@ public class MemoTagService {
         String userId
     ) {
         List<Tag> tags = new ArrayList<>();
-        for (var linkedTagId : aiMemoTagsResponse.parentTagIds()) {
-            tags.add(tagService.getTag(linkedTagId, userId));
-            memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG, userId);
-            List<String> parentTagIds = tagService.getParentTagsIds(linkedTagId);
-            createParentTagsRelations(savedMemo.getId(), parentTagIds, userId);
-        }
         for (var addRelation : aiMemoTagsResponse.tagsRelations().added()) {
             tagService.createRelation(addRelation.parentId(), addRelation.childId(), userId);
         }
