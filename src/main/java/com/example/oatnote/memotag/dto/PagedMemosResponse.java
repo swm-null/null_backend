@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
-import com.example.oatnote.web.models.Criteria;
+import com.example.oatnote.web.model.Criteria;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 

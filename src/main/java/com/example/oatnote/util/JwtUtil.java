@@ -26,8 +26,8 @@ public class JwtUtil {
 
     public JwtUtil(
         @Value("${jwt.secret-key}") String secretKey,
-        @Value("${jwt.access-token.expiration-time}") Long accessTokenExpirationTime,
-        @Value("${jwt.refresh-token.expiration-time}") Long refreshTokenExpirationTime
+        @Value("${jwt.access-token.expiration-ms}") Long accessTokenExpirationTime,
+        @Value("${jwt.refresh-token.expiration-ms}") Long refreshTokenExpirationTime
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpirationTime = accessTokenExpirationTime;

@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record ProcessedMemoResponse(
+public record ProcessedMemoTags(
     String content,
     List<Double> embedding,
     LocalDateTime timestamp,
     List<String> parentTagIds,
     List<NewTag> newTags,
-    TagRelations tagsRelations
+    TagsRelations tagsRelations
 ) {
 
     public record NewTag(
@@ -24,7 +24,7 @@ public record ProcessedMemoResponse(
 
     }
 
-    public record TagRelations(
+    public record TagsRelations(
         List<Relation> added,
         List<Relation> deleted
     ) {

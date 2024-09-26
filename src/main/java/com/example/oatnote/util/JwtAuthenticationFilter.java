@@ -2,6 +2,7 @@ package com.example.oatnote.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String accessToken = extractAccessToken(request);
-        if (accessToken != null) {
+        if (Objects.nonNull(accessToken)) {
             try {
                 jwtUtil.validateToken(accessToken);
                 if (jwtUtil.isTokenExpired(accessToken)) {
@@ -48,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
                 String userId = jwtUtil.extractUserId(accessToken);
-                if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (Objects.nonNull(userId) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userId,
                         null,

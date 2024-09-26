@@ -8,15 +8,16 @@ spring:
     url: test
 
 cors:
-  allowedOrigins:
+  allowed-origins:
     - test
 
 swagger:
-  server-url: test
+  server:
+    url: test
 
 jwt:
   secret-key: test3110e37a96c9f9da6c270cb18d2918ff653b95860d3d0e3753f42f3138aa
   access-token:
-    expiration-time: 600000
+    expiration-ms: 600000
   refresh-token:
-    expiration-time: 86400000
+    expiration-ms: 86400000
