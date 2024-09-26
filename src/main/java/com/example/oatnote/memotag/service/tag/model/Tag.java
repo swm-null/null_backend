@@ -34,6 +34,14 @@ public class Tag {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    public Tag(String id, String name, String userId, LocalDateTime now) {
+        this.id = id;
+        this.name = name;
+        this.userId = userId;
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
     public Tag(String id, String name, String userId, List<Double> embedding) {
         this.id = id;
         this.name = name;

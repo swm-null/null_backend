@@ -2,6 +2,7 @@ package com.example.oatnote.memotag;
 
 import static com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags.TagsRelations.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,10 +29,11 @@ import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.memotag.service.client.dto.AICreateMemoResponse;
+import com.example.oatnote.memotag.service.client.dto.AICreateTagsRequest;
+import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
-import com.example.oatnote.memotag.service.client.dto.AISearchMemoRequest;
-import com.example.oatnote.memotag.service.client.dto.AISearchMemoResponse;
+import com.example.oatnote.memotag.service.client.dto.AISearchMemosRequest;
+import com.example.oatnote.memotag.service.client.dto.AISearchMemosResponse;
 import com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags;
 import com.example.oatnote.memotag.service.memo.MemoService;
 import com.example.oatnote.memotag.service.memo.exception.MemoNotFoundException;
@@ -57,16 +59,13 @@ public class MemoTagService {
     private final static String TEMP_USER_ID = "70c0d720-fa31-4220-86ff-35163e956bd9"; //todo 삭제
 
     public CreateMemoResponse createMemoTags(CreateMemoRequest createMemoRequest, String userId) {
-        AICreateMemoResponse aiCreateMemoResponse = aiMemoTagClient.createMemoTags(
-            createMemoRequest.content(),
-            userId
-        );
-        Memo savedMemo = createMemoTags(aiCreateMemoResponse.processedMemoTags(), userId);
-        List<Tag> tags = updateMemosTagsRelations(aiCreateMemoResponse.processedMemoTags(), savedMemo, userId);
+        LocalDateTime now = LocalDateTime.now();
+        AICreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAICreateMemoRequest(userId);
+        AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
-        TagEdge tagEdge = new TagEdge(userId, aiCreateMemoResponse.newStructure());
-        tagService.createTagEdge(tagEdge);
-        return CreateMemoResponse.from(savedMemo, tags);
+        Memo memo = createMemoRequest.toMemo(userId, now);
+        List<Tag> tags = aiCreateTagsResponse.toTags(userId, now);
+        return CreateMemoResponse.from(memo, tags);
     }
 
     public void createMemosTags(CreateMemosRequest createMemosRequest) {
@@ -149,18 +148,18 @@ public class MemoTagService {
     }
 
     public SearchMemoResponse searchMemos(SearchMemoRequest searchMemoRequest, String userId) {
-        AISearchMemoRequest aiSearchMemoRequest = searchMemoRequest.toAISearchMemoRequest(userId);
-        AISearchMemoResponse aiSearchMemoResponse = aiMemoTagClient.searchMemo(aiSearchMemoRequest);
+        AISearchMemosRequest aiSearchMemosRequest = searchMemoRequest.toAISearchMemoRequest(userId);
+        AISearchMemosResponse aiSearchMemosResponse = aiMemoTagClient.searchMemo(aiSearchMemosRequest);
 
-        List<Memo> memos = switch (aiSearchMemoResponse.type()) {
-            case SIMILARITY -> memoService.getMemos(aiSearchMemoResponse.ids(), userId);
-            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemoResponse.regex(), userId);
+        List<Memo> memos = switch (aiSearchMemosResponse.type()) {
+            case SIMILARITY -> memoService.getMemos(aiSearchMemosResponse.ids(), userId);
+            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemosResponse.regex(), userId);
         };
 
         List<List<Tag>> tagsList = memos.stream()
             .map(memo -> getLinkedTags(memo.getId(), userId))
             .toList();
-        return SearchMemoResponse.from(aiSearchMemoResponse.processedMessage(), memos, tagsList);
+        return SearchMemoResponse.from(aiSearchMemosResponse.processedMessage(), memos, tagsList);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
