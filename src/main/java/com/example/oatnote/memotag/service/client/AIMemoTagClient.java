@@ -54,9 +54,8 @@ public class AIMemoTagClient {
         return aiCreateKakaoMemosResponse.getBody();
     }
 
-    public AISearchMemoResponse searchMemo(String content, String userId) {
+    public AISearchMemoResponse searchMemo(AISearchMemoRequest aiSearchMemoRequest) {
         final URI uri = buildUri("/search");
-        AISearchMemoRequest aiSearchMemoRequest = AISearchMemoRequest.from(content, userId);
         ResponseEntity<AISearchMemoResponse> aiSearchMemoResponse = restTemplate.postForEntity(
             uri,
             aiSearchMemoRequest,

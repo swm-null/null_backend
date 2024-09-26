@@ -76,22 +76,6 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "AI 검색을 통한 메모 조회")
-    @PostMapping("/memos/search")
-    ResponseEntity<SearchMemoResponse> getMemosByAISearch(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
-        @AuthenticationPrincipal String userId
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
     @Operation(summary = "특정 태그의 메모 리스트 조회")
     @GetMapping("/tag/memos")
     ResponseEntity<PagedMemosResponse> getMemosByTag(
@@ -136,6 +120,22 @@ public interface MemoTagApiDoc {
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
         @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "AI 검색을 통한 메모 조회")
+    @PostMapping("/memos/search")
+    ResponseEntity<SearchMemoResponse> searchMemos(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
         @AuthenticationPrincipal String userId
     );
 

@@ -29,7 +29,6 @@ import com.example.oatnote.memotag.dto.enums.SortOrderTypeEnum;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -53,15 +52,6 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         memoTagService.createMemosTags(createMemosRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @PostMapping("/memos/search")
-    public ResponseEntity<SearchMemoResponse> getMemosByAISearch(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
-        @AuthenticationPrincipal String userId
-    ) {
-        SearchMemoResponse searchMemoResponse = memoTagService.searchMemosTags(searchMemoRequest, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
     @GetMapping("/tag/memos")
@@ -111,6 +101,15 @@ public class MemoTagController implements MemoTagApiDoc {
             userId
         );
         return ResponseEntity.status(HttpStatus.OK).body(childTagsWithMemosResponse);
+    }
+
+    @PostMapping("/memos/search")
+    public ResponseEntity<SearchMemoResponse> searchMemos(
+        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        SearchMemoResponse searchMemoResponse = memoTagService.searchMemos(searchMemoRequest, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
     }
 
     @PutMapping("/memo/{memoId}")

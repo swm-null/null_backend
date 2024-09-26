@@ -30,6 +30,7 @@ import com.example.oatnote.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemoResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
+import com.example.oatnote.memotag.service.client.dto.AISearchMemoRequest;
 import com.example.oatnote.memotag.service.client.dto.AISearchMemoResponse;
 import com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags;
 import com.example.oatnote.memotag.service.memo.MemoService;
@@ -147,12 +148,13 @@ public class MemoTagService {
         return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);
     }
 
-    public SearchMemoResponse searchMemosTags(SearchMemoRequest searchMemoRequest, String userId) {
-        AISearchMemoResponse aiSearchMemoResponse = aiMemoTagClient.searchMemo(searchMemoRequest.content(), userId);
+    public SearchMemoResponse searchMemos(SearchMemoRequest searchMemoRequest, String userId) {
+        AISearchMemoRequest aiSearchMemoRequest = searchMemoRequest.toAISearchMemoRequest(userId);
+        AISearchMemoResponse aiSearchMemoResponse = aiMemoTagClient.searchMemo(aiSearchMemoRequest);
+
         List<Memo> memos = switch (aiSearchMemoResponse.type()) {
             case SIMILARITY -> memoService.getMemos(aiSearchMemoResponse.ids(), userId);
             case REGEX -> memoService.getMemosContainingRegex(aiSearchMemoResponse.regex(), userId);
-            case TAG -> memoService.getMemos(memoTagRelationService.getMemoIds(aiSearchMemoResponse.tags()), userId);
         };
 
         List<List<Tag>> tagsList = memos.stream()
