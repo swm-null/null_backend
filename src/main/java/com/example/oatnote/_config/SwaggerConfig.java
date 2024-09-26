@@ -36,7 +36,7 @@ public class SwaggerConfig {
         return new Info()
             .title("OatNote API")
             .description("오트노트의 API 문서입니다.")
-            .version("v0.0.3");
+            .version("v0.0.4");
     }
 
     private Server apiServer() {
