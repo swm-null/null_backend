@@ -44,7 +44,7 @@ public class AIMemoTagClient {
     }
 
     public AICreateStructureResponse createStructure(AICreateStructureRequest aiCreateStructureRequest) {
-        final URI uri = buildUri("/memo/structure");
+        final URI uri = buildUri("/memo/structures");
         ResponseEntity<AICreateStructureResponse> aiCreateStructureResponse = restTemplate.postForEntity(
             uri,
             aiCreateStructureRequest,

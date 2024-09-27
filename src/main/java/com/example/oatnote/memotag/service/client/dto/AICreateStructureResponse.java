@@ -5,14 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags;
+import com.example.oatnote.memotag.service.memo.model.Memo;
+import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AICreateStructureResponse(
+    List<NewTag> newTags,
     List<ProcessedMemo> processedMemos,
     TagsRelations tagsRelations,
-    List<NewTag> newTags,
     Map<String, List<String>> newStructure
 ) {
 
@@ -21,32 +23,8 @@ public record AICreateStructureResponse(
         String content,
         String metadata,
         List<Double> embedding,
-        String timestamp,
+        LocalDateTime timestamp,
         List<String> parentTagIds
-    ) {
-
-    }
-
-    @JsonNaming(SnakeCaseStrategy.class)
-    public record TagsRelations(
-        List<AddedRelation> added,
-        List<DeletedRelation> deleted
-    ) {
-
-    }
-
-    @JsonNaming(SnakeCaseStrategy.class)
-    public record AddedRelation(
-        String parentId,
-        String childId
-    ) {
-
-    }
-
-    @JsonNaming(SnakeCaseStrategy.class)
-    public record DeletedRelation(
-        String parentId,
-        String childId
     ) {
 
     }
@@ -59,5 +37,37 @@ public record AICreateStructureResponse(
         List<Double> embedding
     ) {
 
+        public Tag toTag(String userId, LocalDateTime now) {
+            return new Tag(
+                id,
+                name,
+                userId,
+                embedding,
+                now
+            );
+        }
+    }
+
+    @JsonNaming(SnakeCaseStrategy.class)
+    public record TagsRelations(
+        List<AddedRelation> added,
+        List<DeletedRelation> deleted
+    ) {
+
+        @JsonNaming(SnakeCaseStrategy.class) //todo toRelation
+        public record AddedRelation(
+            String parentId,
+            String childId
+        ) {
+
+        }
+
+        @JsonNaming(SnakeCaseStrategy.class)
+        public record DeletedRelation(
+            String parentId,
+            String childId
+        ) {
+
+        }
     }
 }

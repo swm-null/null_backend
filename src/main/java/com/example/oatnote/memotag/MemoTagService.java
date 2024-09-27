@@ -1,6 +1,10 @@
 package com.example.oatnote.memotag;
 
-import static com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags.TagsRelations.*;
+import static com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse.NewTag;
+import static com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse.ProcessedMemo;
+import static com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse.TagsRelations.AddedRelation;
+import static com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse.TagsRelations.DeletedRelation;
+import static com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags.TagsRelations.Relation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,11 +33,11 @@ import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
+import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateStructureRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateTagsRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
-import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.memotag.service.client.dto.AISearchMemosRequest;
 import com.example.oatnote.memotag.service.client.dto.AISearchMemosResponse;
 import com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags;
@@ -65,27 +69,14 @@ public class MemoTagService {
 
         AICreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAICreateMemoRequest(userId);
         AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
-        Memo memo = createMemoRequest.toMemo(userId, now);
+        Memo rawMemo = createMemoRequest.toMemo(userId, now);
 
-        createStructure(aiCreateTagsResponse, memo, userId, now);
+        createStructure(aiCreateTagsResponse, rawMemo, userId, now);
 
-        return CreateMemoResponse.from(memo, aiCreateTagsResponse.tags());
+        return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
-    private void createStructure(
-        AICreateTagsResponse aiCreateTagsResponse,
-        Memo memo,
-        String userId,
-        LocalDateTime now
-    ) {
-        AICreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAICreateStructureRequest(
-            memo,
-            userId
-        );
-        AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
-    }
-
-    public void createMemosTags(CreateMemosRequest createMemosRequest) {
+    public void createMemosTags(CreateMemosRequest createMemosRequest) { //todo refactor
         AICreateMemosResponse aiCreateMemosResponse = aiMemoTagClient.createMemosTags(
             createMemosRequest.content(),
             TEMP_USER_ID
@@ -214,6 +205,52 @@ public class MemoTagService {
         memoTagRelationService.deleteAllUserData(userId);
         memoService.deleteAllUserData(userId);
         tagService.deleteAllUserData(userId);
+    }
+
+    void createStructure(
+        AICreateTagsResponse aiCreateTagsResponse,
+        Memo rawMemo,
+        String userId,
+        LocalDateTime now
+    ) {
+        AICreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAICreateStructureRequest(
+            rawMemo,
+            userId
+        );
+        AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
+
+        processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
+    }
+
+    void processMemoTag(
+        AICreateStructureResponse aiCreateStructureResponse,
+        Memo memo,
+        String userId,
+        LocalDateTime now
+    ) {
+        for (NewTag newTag : aiCreateStructureResponse.newTags()) {
+            Tag tag = newTag.toTag(userId, now);
+            tagService.saveTag(tag);
+        }
+
+        for (AddedRelation addedRelation : aiCreateStructureResponse.tagsRelations().added()) {
+            tagService.createRelation(addedRelation.parentId(), addedRelation.childId(), userId);
+        }
+
+        for (DeletedRelation deletedRelation : aiCreateStructureResponse.tagsRelations().deleted()) {
+            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+        }
+
+        tagService.createTagEdge(new TagEdge(userId, aiCreateStructureResponse.newStructure()));
+
+        ProcessedMemo aiProcessedMemo = aiCreateStructureResponse.processedMemos().get(0); //todo list refactor
+        memo.process(aiProcessedMemo.content(), aiProcessedMemo.metadata(), aiProcessedMemo.embedding());
+        memoService.saveMemo(memo);
+        for (String parentTagId : aiProcessedMemo.parentTagIds()) {
+            memoTagRelationService.createRelation(memo.getId(), parentTagId, IS_LINKED_MEMO_TAG, userId);
+            List<String> parentTagIds = tagService.getParentTagsIds(parentTagId);
+            createParentTagsRelations(memo.getId(), parentTagIds, userId);
+        }
     }
 
     Memo createMemoTags(ProcessedMemoTags aiMemoTagsResponse, String userId) {

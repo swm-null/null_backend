@@ -47,14 +47,7 @@ public class Memo {
     }
 
     public Memo(String content, List<String> imageUrls, String userId, String metadata, List<Double> embedding) {
-        this.id = UUID.randomUUID().toString();
-        this.content = content;
-        this.imageUrls = imageUrls;
-        this.userId = userId;
-        this.metadata = metadata;
-        this.embedding = embedding;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+
     }
 
     public void update(String content, List<String> imageUrls, String metadata, List<Double> embedding) {
@@ -63,5 +56,8 @@ public class Memo {
         this.metadata = metadata;
         this.embedding = embedding;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void process(String content, String metadata, List<Double> embedding) {
     }
 }
