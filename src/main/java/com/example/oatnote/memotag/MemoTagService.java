@@ -14,6 +14,7 @@ import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
@@ -207,6 +208,7 @@ public class MemoTagService {
         tagService.deleteAllUserData(userId);
     }
 
+    @Async
     void createStructure(
         AICreateTagsResponse aiCreateTagsResponse,
         Memo rawMemo,
@@ -218,7 +220,6 @@ public class MemoTagService {
             userId
         );
         AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
-
         processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
     }
 
