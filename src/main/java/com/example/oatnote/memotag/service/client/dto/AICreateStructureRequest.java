@@ -2,6 +2,7 @@ package com.example.oatnote.memotag.service.client.dto;
 
 import java.util.List;
 
+import com.example.oatnote.memotag.service.client.dto.innerDto.AITag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -11,17 +12,12 @@ public record AICreateStructureRequest(
     String userId
 ) {
 
-    private record AIMemo(
+    @JsonNaming(SnakeCaseStrategy.class)
+    public record AIMemo(
         String content,
+        List<String> imageUrls,
         List<AITag> tags
     ) {
 
-        private record AITag(
-            String id,
-            String name,
-            boolean isNew
-        ) {
-
-        }
     }
 }

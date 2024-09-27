@@ -18,10 +18,11 @@ public record AICreateStructureResponse(
 
     @JsonNaming(SnakeCaseStrategy.class)
     public record ProcessedMemo(
-        String timestamp,
         String content,
-        List<String> parentTagIds,
-        List<Object> embedding
+        String metadata,
+        List<Double> embedding,
+        String timestamp,
+        List<String> parentTagIds
     ) {
 
     }
@@ -55,7 +56,7 @@ public record AICreateStructureResponse(
         String id,
         String name,
         boolean isNew,
-        List<Object> embedding
+        List<Double> embedding
     ) {
 
     }

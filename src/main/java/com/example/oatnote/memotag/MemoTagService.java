@@ -29,6 +29,8 @@ import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
+import com.example.oatnote.memotag.service.client.dto.AICreateStructureRequest;
+import com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateTagsRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
@@ -60,12 +62,27 @@ public class MemoTagService {
 
     public CreateMemoResponse createMemoTags(CreateMemoRequest createMemoRequest, String userId) {
         LocalDateTime now = LocalDateTime.now();
+
         AICreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAICreateMemoRequest(userId);
         AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
-
         Memo memo = createMemoRequest.toMemo(userId, now);
-        List<Tag> tags = aiCreateTagsResponse.toTags(userId, now);
-        return CreateMemoResponse.from(memo, tags);
+
+        createStructure(aiCreateTagsResponse, memo, userId, now);
+
+        return CreateMemoResponse.from(memo, aiCreateTagsResponse.tags());
+    }
+
+    private void createStructure(
+        AICreateTagsResponse aiCreateTagsResponse,
+        Memo memo,
+        String userId,
+        LocalDateTime now
+    ) {
+        AICreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAICreateStructureRequest(
+            memo,
+            userId
+        );
+        AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
     }
 
     public void createMemosTags(CreateMemosRequest createMemosRequest) {
@@ -89,7 +106,7 @@ public class MemoTagService {
         SortOrderTypeEnum sortOrder,
         String userId
     ) {
-        if(Objects.equals(sortOrder, SortOrderTypeEnum.NAME)) {
+        if (Objects.equals(sortOrder, SortOrderTypeEnum.NAME)) {
             throw new MemoNotFoundException("메모는 이름순으로 정렬할 수 없습니다.");
         }
 
@@ -167,7 +184,8 @@ public class MemoTagService {
             updateMemoRequest.content()
         );
         Memo memo = memoService.getMemo(memoId, userId);
-        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), null, aiCreateEmbeddingResponse.embedding());
+        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), null,
+            aiCreateEmbeddingResponse.embedding());
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }

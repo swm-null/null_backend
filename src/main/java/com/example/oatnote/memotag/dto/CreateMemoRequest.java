@@ -31,7 +31,7 @@ public record CreateMemoRequest(
 
     public AICreateTagsRequest toAICreateMemoRequest(String userId) {
         return new AICreateTagsRequest(
-            new AICreateTagsRequest.AIRawMemo(content),
+            new AICreateTagsRequest.AIRawMemo(content, imageUrls),
             userId
         );
     }

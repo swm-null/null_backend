@@ -3,6 +3,8 @@ package com.example.oatnote.memotag.dto.innerDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
+import com.example.oatnote.memotag.service.client.dto.innerDto.AITag;
 import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
@@ -34,7 +36,18 @@ public record MemoResponse(
     List<TagResponse> tags
 ) {
 
-    public static MemoResponse from(Memo memo, List<Tag> tags) {
+    public static MemoResponse fromV2(Memo memo, List<AITag> tags) {
+        return new MemoResponse(
+            memo.getId(),
+            memo.getContent(),
+            memo.getImageUrls(),
+            memo.getCreatedAt(),
+            memo.getUpdatedAt(),
+            tags.stream().map(TagResponse::fromV2).toList()
+        );
+    }
+
+    public static MemoResponse from(Memo memo, List<Tag> tags) { // todo replace V2
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),

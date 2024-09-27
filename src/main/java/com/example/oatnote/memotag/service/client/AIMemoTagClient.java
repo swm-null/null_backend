@@ -10,6 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
+import com.example.oatnote.memotag.service.client.dto.AICreateStructureRequest;
+import com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateTagsRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemosRequest;
@@ -39,6 +41,16 @@ public class AIMemoTagClient {
             AICreateTagsResponse.class
         );
         return aiCreateTagsResponse.getBody();
+    }
+
+    public AICreateStructureResponse createStructure(AICreateStructureRequest aiCreateStructureRequest) {
+        final URI uri = buildUri("/memo/structure");
+        ResponseEntity<AICreateStructureResponse> aiCreateStructureResponse = restTemplate.postForEntity(
+            uri,
+            aiCreateStructureRequest,
+            AICreateStructureResponse.class
+        );
+        return aiCreateStructureResponse.getBody();
     }
 
     public AICreateMemosResponse createMemosTags(String content, String userId) {
