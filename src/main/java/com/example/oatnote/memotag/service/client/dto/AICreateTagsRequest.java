@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AICreateTagsRequest(
-    AIRawMemo rawMemo,
+    RawMemo rawMemo,
     String userId
 ) {
 
-    public record AIRawMemo(
+    public record RawMemo(
         String content,
         List<String> imageUrls
     ) {

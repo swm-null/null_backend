@@ -3,8 +3,7 @@ package com.example.oatnote.memotag.dto.innerDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
-import com.example.oatnote.memotag.service.client.dto.innerDto.AITag;
+import com.example.oatnote.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
@@ -36,25 +35,25 @@ public record MemoResponse(
     List<TagResponse> tags
 ) {
 
-    public static MemoResponse fromV2(Memo memo, List<AITag> tags) {
+    public static MemoResponse fromRawTag(Memo memo, List<RawTag> tags) {
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
             memo.getCreatedAt(),
             memo.getUpdatedAt(),
-            tags.stream().map(TagResponse::fromV2).toList()
+            tags.stream().map(TagResponse::fromRawTag).toList()
         );
     }
 
-    public static MemoResponse from(Memo memo, List<Tag> tags) { // todo replace V2
+    public static MemoResponse fromTag(Memo memo, List<Tag> tags) {
         return new MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
             memo.getCreatedAt(),
             memo.getUpdatedAt(),
-            tags.stream().map(TagResponse::from).toList()
+            tags.stream().map(TagResponse::fromTag).toList()
         );
     }
 }

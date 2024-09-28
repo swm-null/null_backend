@@ -113,7 +113,7 @@ public class MemoTagService {
 
         Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
         Page<MemoResponse> memoTagsPage = result.map(
-            memo -> MemoResponse.from(memo, getLinkedTags(memo.getId(), userId))
+            memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId))
         );
         return PagedMemosResponse.from(memoTagsPage, criteria);
     }
@@ -123,7 +123,7 @@ public class MemoTagService {
 
         List<Tag> childTags = tagService.getChildTags(parentTagId, userId);
         return childTags.stream()
-            .map(TagResponse::from)
+            .map(TagResponse::fromTag)
             .toList();
     }
 
@@ -147,9 +147,9 @@ public class MemoTagService {
         Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest, userId);
         Page<PagedTagsResponse> pagedTags = result.map(
             tag -> new PagedTagsResponse(
-                TagResponse.from(tag),
+                TagResponse.fromTag(tag),
                 tagService.getChildTags(tag.getId(), userId).stream()
-                    .map(TagResponse::from)
+                    .map(TagResponse::fromTag)
                     .toList()
             )
         );

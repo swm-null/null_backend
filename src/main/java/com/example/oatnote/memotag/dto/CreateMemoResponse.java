@@ -5,10 +5,8 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import java.util.List;
 
 import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
-import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
-import com.example.oatnote.memotag.service.client.dto.innerDto.AITag;
+import com.example.oatnote.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.memotag.service.memo.model.Memo;
-import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,9 +17,9 @@ public record CreateMemoResponse(
     MemoResponse memo
 ) {
 
-    public static CreateMemoResponse from(Memo memo, List<AITag> tags) {
+    public static CreateMemoResponse from(Memo memo, List<RawTag> tags) {
         return new CreateMemoResponse(
-            MemoResponse.fromV2(memo, tags)
+            MemoResponse.fromRawTag(memo, tags)
         );
     }
 }

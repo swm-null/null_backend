@@ -5,7 +5,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AITag(
+public record RawTag(
     String id,
     String name,
     boolean isNew
