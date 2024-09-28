@@ -81,14 +81,10 @@ public class UserService {
 
     public RefreshUserResponse refreshAccessToken(RefreshUserRequest refreshUserRequest) {
         String refreshToken = refreshUserRequest.refreshToken();
-        try {
-            jwtUtil.validateToken(refreshToken);
-            String email = jwtUtil.extractUserId(refreshToken);
-            String newAccessToken = jwtUtil.generateAccessToken(email);
-            return RefreshUserResponse.of(newAccessToken, refreshToken);
-        } catch (JwtException e) {
-            throw OatAuthException.withDetail("토큰이 유효하지 않습니다.");
-        }
+        jwtUtil.validateToken(refreshToken);
+        String email = jwtUtil.extractUserId(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(email);
+        return RefreshUserResponse.of(newAccessToken, refreshToken);
     }
 
     public void checkEmailDuplication(CheckEmailRequest checkEmailRequest) {
