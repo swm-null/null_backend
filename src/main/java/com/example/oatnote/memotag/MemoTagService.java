@@ -1,6 +1,6 @@
 package com.example.oatnote.memotag;
 
-import static com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags.TagsRelations.*;
+import static com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags.TagsRelations.Relation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +33,12 @@ import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.memotag.service.client.dto.AISearchMemoResponse;
 import com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags;
 import com.example.oatnote.memotag.service.memo.MemoService;
-import com.example.oatnote.memotag.service.memo.exception.MemoNotFoundException;
 import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.example.oatnote.memotag.service.memoTagRelation.MemoTagRelationService;
 import com.example.oatnote.memotag.service.tag.TagService;
 import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.memotag.service.tag.model.Tag;
+import com.example.oatnote.web.exception.OatIllegalArgumentException;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -89,8 +89,8 @@ public class MemoTagService {
         SortOrderTypeEnum sortOrder,
         String userId
     ) {
-        if(Objects.equals(sortOrder, SortOrderTypeEnum.NAME)) {
-            throw new MemoNotFoundException("메모는 이름순으로 정렬할 수 없습니다.");
+        if (Objects.equals(sortOrder, SortOrderTypeEnum.NAME)) {
+            throw OatIllegalArgumentException.withDetail("메모는 이름 순으로 정렬할 수 없습니다.");
         }
 
         tagId = Objects.requireNonNullElse(tagId, userId);
