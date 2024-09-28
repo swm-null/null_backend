@@ -73,11 +73,10 @@ public class MemoTagService {
 
         AICreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAICreateMemoRequest(userId);
         AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
-        Memo rawMemo = createMemoRequest.toMemo(userId, now);
 
+        Memo rawMemo = createMemoRequest.toMemo(userId, now);
         eventPublisher.publishEvent(new CreateStructureAsyncEvent(aiCreateTagsResponse, rawMemo, userId, now));
 
-        System.out.println("먼저 처리");
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
@@ -225,7 +224,6 @@ public class MemoTagService {
         );
         AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
         processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
-        System.out.println("비동기임");
     }
 
     void processMemoTag(
