@@ -1,11 +1,9 @@
 package com.example.oatnote.memotag.service.tag;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memotag.service.tag.edge.TagEdgeService;
@@ -69,9 +67,9 @@ public class TagService {
         tagsRelationService.deleteRelation(parentTagId, childTagId);
     }
 
-    public void deleteAllUserData(String userId) {
-        tagEdgeService.deleteAllUserData(userId);
-        tagsRelationService.deleteAllUserData(userId);
+    public void deleteUserAllData(String userId) {
+        tagEdgeService.deleteUserAllData(userId);
+        tagsRelationService.deleteUserAllData(userId);
         tagRepository.deleteByUserId(userId);
     }
 }

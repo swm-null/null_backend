@@ -35,7 +35,7 @@ public class TagsRelationService {
             .toList();
     }
 
-    public void deleteAllUserData(String userId) {
+    public void deleteUserAllData(String userId) {
         tagsRelationRepository.deleteByUserId(userId);
     }
 }

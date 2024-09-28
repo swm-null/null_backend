@@ -50,7 +50,7 @@ public class MemoService {
         memoRepository.delete(memo);
     }
 
-    public void deleteAllUserData(String userId) {
+    public void deleteUserAllData(String userId) {
         memoRepository.deleteByUserId(userId);
     }
 }

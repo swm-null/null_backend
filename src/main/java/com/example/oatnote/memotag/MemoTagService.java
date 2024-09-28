@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.event.CreateStructureAsyncEvent;
 import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
@@ -61,6 +63,7 @@ public class MemoTagService {
     private final MemoService memoService;
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
     private final static String TEMP_USER_ID = "70c0d720-fa31-4220-86ff-35163e956bd9"; //todo 삭제
@@ -72,8 +75,9 @@ public class MemoTagService {
         AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
         Memo rawMemo = createMemoRequest.toMemo(userId, now);
 
-        createStructure(aiCreateTagsResponse, rawMemo, userId, now);
+        eventPublisher.publishEvent(new CreateStructureAsyncEvent(aiCreateTagsResponse, rawMemo, userId, now));
 
+        System.out.println("먼저 처리");
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
@@ -202,14 +206,14 @@ public class MemoTagService {
         tagService.deleteTag(tag);
     }
 
-    public void deleteAllUserData(String userId) {
-        memoTagRelationService.deleteAllUserData(userId);
-        memoService.deleteAllUserData(userId);
-        tagService.deleteAllUserData(userId);
+    public void deleteUserAllData(String userId) {
+        memoTagRelationService.deleteUserAllData(userId);
+        memoService.deleteUserAllData(userId);
+        tagService.deleteUserAllData(userId);
     }
 
     @Async
-    void createStructure(
+    public void createStructureAsync(
         AICreateTagsResponse aiCreateTagsResponse,
         Memo rawMemo,
         String userId,
@@ -221,6 +225,7 @@ public class MemoTagService {
         );
         AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
         processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
+        System.out.println("비동기임");
     }
 
     void processMemoTag(
