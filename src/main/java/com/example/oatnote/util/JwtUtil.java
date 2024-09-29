@@ -8,6 +8,8 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.example.oatnote.web.exception.OatAuthException;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -80,16 +82,8 @@ public class JwtUtil {
     public void validateToken(String token) throws JwtException {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-        } catch (ExpiredJwtException e) {
-            throw new JwtException("JWT token has expired", e);
-        } catch (UnsupportedJwtException e) {
-            throw new JwtException("Unsupported JWT token", e);
-        } catch (MalformedJwtException e) {
-            throw new JwtException("Invalid JWT token", e);
-        } catch (SecurityException e) {
-            throw new JwtException("Invalid JWT signature", e);
-        } catch (IllegalArgumentException e) {
-            throw new JwtException("JWT claims string is empty", e);
+        } catch (Exception e) {
+            throw OatAuthException.withDetail("유효하지 않은 토큰입니다.");
         }
     }
 }

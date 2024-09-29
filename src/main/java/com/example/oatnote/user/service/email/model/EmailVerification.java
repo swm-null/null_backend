@@ -20,9 +20,9 @@ public class EmailVerification {
     @Field("eTime")
     private LocalDateTime expiryTime;
 
-    public EmailVerification(String email, String code) {
+    public EmailVerification(String email, String code, int expiryTime) {
         this.email = email;
         this.code = code;
-        this.expiryTime = LocalDateTime.now().plusMinutes(10);
+        this.expiryTime = LocalDateTime.now().plusMinutes(expiryTime);
     }
 }
