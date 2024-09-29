@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
-import com.example.oatnote.memotag.service.tag.exception.TagNotFoundException;
 import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.example.oatnote.memotag.service.tag.relation.TagsRelationService;
+import com.example.oatnote.web.exception.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public class TagService {
 
     public Tag getTag(String tagId, String userId) {
         return tagRepository.findByIdAndUserId(tagId, userId)
-            .orElseThrow(() -> new TagNotFoundException("태그를 찾지 못했습니다: " + tagId));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("태그를 찾지 못했습니다: %s", tagId)));
     }
 
     public void deleteTag(Tag tag) {

@@ -9,19 +9,20 @@ import org.springframework.stereotype.Service;
 import com.example.oatnote.event.RegisterUserEvent;
 import com.example.oatnote.event.WithdrawUserEvent;
 import com.example.oatnote.user.dto.CheckEmailRequest;
-import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
+import com.example.oatnote.user.dto.SendCodeRequest;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
-import com.example.oatnote.user.service.exception.UserAuthException;
-import com.example.oatnote.user.service.exception.UserNotFoundException;
 import com.example.oatnote.user.service.model.User;
 import com.example.oatnote.util.JwtUtil;
+import com.example.oatnote.web.exception.OatAuthException;
+import com.example.oatnote.web.exception.OatDataNotFoundException;
+import com.example.oatnote.web.exception.OatIllegalArgumentException;
 
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +44,14 @@ public class UserService {
         String password = registerUserRequest.password();
         String confirmPassword = registerUserRequest.confirmPassword();
         if (!Objects.equals(password, confirmPassword)) {
-            throw new UserAuthException("비밀번호가 일치하지 않습니다.");
+            throw OatIllegalArgumentException.withDetail("비밀번호가 일치하지 않습니다.");
         }
 
         String email = registerUserRequest.email();
         String code = registerUserRequest.code();
         String name = registerUserRequest.name();
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new UserAuthException("이미 존재하는 이메일입니다: " + registerUserRequest.email());
+            throw OatIllegalArgumentException.withDetail(String.format("이미 존재하는 이메일입니다: %s", email));
         }
 
         emailVerificationService.verifyCode(email, code);
@@ -67,11 +68,11 @@ public class UserService {
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {
         String email = loginUserRequest.email();
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + email));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다: " + email));
 
         String password = loginUserRequest.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserAuthException("비밀번호가 일치하지 않습니다");
+            throw OatIllegalArgumentException.withDetail("비밀번호가 일치하지 않습니다.");
         }
         String accessToken = jwtUtil.generateAccessToken(user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId());
@@ -80,20 +81,16 @@ public class UserService {
 
     public RefreshUserResponse refreshAccessToken(RefreshUserRequest refreshUserRequest) {
         String refreshToken = refreshUserRequest.refreshToken();
-        try {
-            jwtUtil.validateToken(refreshToken);
-            String email = jwtUtil.extractUserId(refreshToken);
-            String newAccessToken = jwtUtil.generateAccessToken(email);
-            return RefreshUserResponse.of(newAccessToken, refreshToken);
-        } catch (JwtException e) {
-            throw new UserAuthException("refresh token 이 일치하지 않습니다." + e);
-        }
+        jwtUtil.validateToken(refreshToken);
+        String email = jwtUtil.extractUserId(refreshToken);
+        String newAccessToken = jwtUtil.generateAccessToken(email);
+        return RefreshUserResponse.of(newAccessToken, refreshToken);
     }
 
     public void checkEmailDuplication(CheckEmailRequest checkEmailRequest) {
         String email = checkEmailRequest.email();
         userRepository.findByEmail(email).ifPresent(user -> {
-            throw new UserAuthException("이미 존재하는 이메일입니다: " + email);
+            throw OatIllegalArgumentException.withDetail(String.format("이미 존재하는 이메일입니다: %s", email));
         });
     }
 
@@ -113,7 +110,7 @@ public class UserService {
         String newPassword = findPasswordRequest.newPassword();
         String confirmPassword = findPasswordRequest.confirmPassword();
         if (!Objects.equals(newPassword, confirmPassword)) {
-            throw new UserAuthException("비밀번호가 일치하지 않습니다.");
+            throw OatIllegalArgumentException.withDetail("비밀번호가 일치하지 않습니다.");
         }
 
         String email = findPasswordRequest.email();
@@ -121,7 +118,7 @@ public class UserService {
         emailVerificationService.verifyCode(email, code);
 
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("유저를 찾지 못했습니다: " + email));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다: " + email));
 
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);

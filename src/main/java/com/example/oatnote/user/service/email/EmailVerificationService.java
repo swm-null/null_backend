@@ -7,9 +7,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.user.service.email.exception.EmailDispatchException;
-import com.example.oatnote.user.service.email.exception.EmailVerificationException;
 import com.example.oatnote.user.service.email.model.EmailVerification;
+import com.example.oatnote.web.exception.OatDataNotFoundException;
+import com.example.oatnote.web.exception.OatExternalServiceException;
+import com.example.oatnote.web.exception.OatIllegalArgumentException;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -30,20 +31,20 @@ public class EmailVerificationService {
             sendEmail(email, code);
             saveEmailVerification(email, code, expiryMinutes);
         } catch (MessagingException e) {
-            throw new EmailDispatchException("이메일 전송에 실패했습니다.");
+            throw OatExternalServiceException.withDetail(String.format("이메일 전송에 실패했습니다 : %s", email));
         }
     }
 
     public void saveEmailVerification(String email, String code, int expiryMinutes) {
         emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
-        emailVerificationRepository.save(new EmailVerification(email, code));
+        emailVerificationRepository.save(new EmailVerification(email, code, expiryMinutes));
     }
 
     public void verifyCode(String email, String code) {
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
-            .orElseThrow(() -> new EmailVerificationException("인증 코드가 만료되었거나 존재하지 않습니다."));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("인증 코드가 발급되지 않았습니다 : %s", email)));
         if (!Objects.equals(code, emailVerification.getCode())) {
-            throw new EmailVerificationException("인증 코드가 일치하지 않습니다.");
+            throw OatIllegalArgumentException.withDetail("인증 코드가 일치하지 않습니다.");
         }
         emailVerificationRepository.delete(emailVerification);
     }
