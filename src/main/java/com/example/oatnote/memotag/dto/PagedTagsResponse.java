@@ -1,7 +1,5 @@
 package com.example.oatnote.memotag.dto;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 import java.util.List;
 
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
@@ -25,8 +23,8 @@ public record PagedTagsResponse(
         List<Tag> childTags
     ) {
         return new PagedTagsResponse(
-            TagResponse.from(tag),
-            childTags.stream().map(TagResponse::from).toList()
+            TagResponse.fromTag(tag),
+            childTags.stream().map(TagResponse::fromTag).toList()
         );
     }
 }

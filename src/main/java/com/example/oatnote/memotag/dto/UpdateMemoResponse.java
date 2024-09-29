@@ -19,7 +19,7 @@ public record UpdateMemoResponse(
 
     public static UpdateMemoResponse from(Memo memo, List<Tag> tags) {
         return new UpdateMemoResponse(
-            MemoResponse.from(memo, tags)
+            MemoResponse.fromTag(memo, tags)
         );
     }
 }

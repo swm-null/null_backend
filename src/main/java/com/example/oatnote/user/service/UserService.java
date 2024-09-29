@@ -6,8 +6,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.event.UserRegisteredEvent;
-import com.example.oatnote.event.UserWithdrawEvent;
+import com.example.oatnote.event.RegisterUserEvent;
+import com.example.oatnote.event.WithdrawUserEvent;
 import com.example.oatnote.user.dto.CheckEmailRequest;
 import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
@@ -62,7 +62,7 @@ public class UserService {
             name
         );
         User createdUser = userRepository.save(user);
-        eventPublisher.publishEvent(new UserRegisteredEvent(createdUser.getId()));
+        eventPublisher.publishEvent(new RegisterUserEvent(createdUser.getId()));
     }
 
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {
@@ -126,7 +126,7 @@ public class UserService {
 
     public void withdraw(String userId) {
         userRepository.deleteById(userId);
-        eventPublisher.publishEvent(new UserWithdrawEvent(userId));
+        eventPublisher.publishEvent(new WithdrawUserEvent(userId));
     }
 }
 

@@ -24,7 +24,7 @@ public record SearchMemoResponse(
         return new SearchMemoResponse(
             processedMessage,
             memos.stream()
-                .map(memo -> MemoResponse.from(memo, tagsList.get(memos.indexOf(memo))))
+                .map(memo -> MemoResponse.fromTag(memo, tagsList.get(memos.indexOf(memo))))
                 .toList()
         );
     }

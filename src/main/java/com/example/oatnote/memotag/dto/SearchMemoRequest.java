@@ -3,6 +3,7 @@ package com.example.oatnote.memotag.dto;
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+import com.example.oatnote.memotag.service.client.dto.AISearchMemosRequest;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,4 +16,7 @@ public record SearchMemoRequest(
     String content
 ) {
 
+    public AISearchMemosRequest toAISearchMemoRequest(String userId) {
+        return new AISearchMemosRequest(content, userId);
+    }
 }

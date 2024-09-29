@@ -2,6 +2,7 @@ package com.example.oatnote.memotag.dto.innerDto;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
+import com.example.oatnote.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -16,7 +17,11 @@ public record TagResponse(
     String name
 ) {
 
-    public static TagResponse from(Tag tag) {
+    public static TagResponse fromRawTag(RawTag tag) {
+        return new TagResponse(tag.id(), tag.name());
+    }
+
+    public static TagResponse fromTag(Tag tag) {
         return new TagResponse(tag.getId(), tag.getName());
     }
 }

@@ -10,12 +10,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.memotag.service.client.dto.AICreateMemoRequest;
-import com.example.oatnote.memotag.service.client.dto.AICreateMemoResponse;
+import com.example.oatnote.memotag.service.client.dto.AICreateStructureRequest;
+import com.example.oatnote.memotag.service.client.dto.AICreateStructureResponse;
+import com.example.oatnote.memotag.service.client.dto.AICreateTagsRequest;
+import com.example.oatnote.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemosRequest;
 import com.example.oatnote.memotag.service.client.dto.AICreateMemosResponse;
-import com.example.oatnote.memotag.service.client.dto.AISearchMemoRequest;
-import com.example.oatnote.memotag.service.client.dto.AISearchMemoResponse;
+import com.example.oatnote.memotag.service.client.dto.AISearchMemosRequest;
+import com.example.oatnote.memotag.service.client.dto.AISearchMemosResponse;
 
 @Service
 public class AIMemoTagClient {
@@ -31,15 +33,24 @@ public class AIMemoTagClient {
         this.aiUrl = aiUrl;
     }
 
-    public AICreateMemoResponse createMemoTags(String content, String userId) {
-        final URI uri = buildUri("/memo");
-        AICreateMemoRequest aiCreateMemoRequest = AICreateMemoRequest.from(content, userId);
-        ResponseEntity<AICreateMemoResponse> aiCreateMemoTagsResponse = restTemplate.postForEntity(
+    public AICreateTagsResponse createTags(AICreateTagsRequest aiCreateTagsRequest) {
+        final URI uri = buildUri("/memo/tag");
+        ResponseEntity<AICreateTagsResponse> aiCreateTagsResponse = restTemplate.postForEntity(
             uri,
-            aiCreateMemoRequest,
-            AICreateMemoResponse.class
+            aiCreateTagsRequest,
+            AICreateTagsResponse.class
         );
-        return aiCreateMemoTagsResponse.getBody();
+        return aiCreateTagsResponse.getBody();
+    }
+
+    public AICreateStructureResponse createStructure(AICreateStructureRequest aiCreateStructureRequest) {
+        final URI uri = buildUri("/memo/structures");
+        ResponseEntity<AICreateStructureResponse> aiCreateStructureResponse = restTemplate.postForEntity(
+            uri,
+            aiCreateStructureRequest,
+            AICreateStructureResponse.class
+        );
+        return aiCreateStructureResponse.getBody();
     }
 
     public AICreateMemosResponse createMemosTags(String content, String userId) {
@@ -54,15 +65,14 @@ public class AIMemoTagClient {
         return aiCreateKakaoMemosResponse.getBody();
     }
 
-    public AISearchMemoResponse searchMemo(String content, String userId) {
+    public AISearchMemosResponse searchMemo(AISearchMemosRequest aiSearchMemosRequest) {
         final URI uri = buildUri("/search");
-        AISearchMemoRequest aiSearchMemoRequest = AISearchMemoRequest.from(content, userId);
-        ResponseEntity<AISearchMemoResponse> aiSearchMemoResponse = restTemplate.postForEntity(
+        ResponseEntity<AISearchMemosResponse> aiSearchMemosResponse = restTemplate.postForEntity(
             uri,
-            aiSearchMemoRequest,
-            AISearchMemoResponse.class
+            aiSearchMemosRequest,
+            AISearchMemosResponse.class
         );
-        return aiSearchMemoResponse.getBody();
+        return aiSearchMemosResponse.getBody();
     }
 
     public AICreateEmbeddingResponse createEmbedding(String name) {

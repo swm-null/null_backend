@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @Document(collection = "tags")
 public class Tag {
 
@@ -34,6 +36,7 @@ public class Tag {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+
     public Tag(String id, String name, String userId, List<Double> embedding) {
         this.id = id;
         this.name = name;
@@ -41,6 +44,15 @@ public class Tag {
         this.embedding = embedding;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public Tag(String id, String name, String userId, List<Double> embedding, LocalDateTime time) {
+        this.id = id;
+        this.name = name;
+        this.userId = userId;
+        this.embedding = embedding;
+        this.createdAt = time;
+        this.updatedAt = time;
     }
 
     public void update(String name, List<Double> embedding) {

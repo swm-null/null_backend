@@ -1,6 +1,6 @@
 package com.example.oatnote.event;
 
-public record UserRegisteredEvent(
+public record WithdrawUserEvent(
     String userId
 ) {
 

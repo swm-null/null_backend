@@ -49,7 +49,7 @@ public class MemoTagRelationService {
         return memoTagRelationRepository.countByTagId(tagId);
     }
 
-    public void deleteAllUserData(String userId) {
+    public void deleteUserAllData(String userId) {
         memoTagRelationRepository.deleteByUserId(userId);
     }
 }

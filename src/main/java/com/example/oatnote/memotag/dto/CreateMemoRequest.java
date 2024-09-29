@@ -3,8 +3,11 @@ package com.example.oatnote.memotag.dto;
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.oatnote.memotag.service.client.dto.AICreateTagsRequest;
+import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,4 +29,19 @@ public record CreateMemoRequest(
     List<String> imageUrls
 ) {
 
+    public AICreateTagsRequest toAICreateMemoRequest(String userId) {
+        return new AICreateTagsRequest(
+            new AICreateTagsRequest.RawMemo(content, imageUrls),
+            userId
+        );
+    }
+
+    public Memo toMemo(String userId, LocalDateTime time) {
+        return new Memo(
+            content,
+            imageUrls,
+            userId,
+            time
+        );
+    }
 }

@@ -67,9 +67,9 @@ public class TagService {
         tagsRelationService.deleteRelation(parentTagId, childTagId);
     }
 
-    public void deleteAllUserData(String userId) {
-        tagEdgeService.deleteAllUserData(userId);
-        tagsRelationService.deleteAllUserData(userId);
+    public void deleteUserAllData(String userId) {
+        tagEdgeService.deleteUserAllData(userId);
+        tagsRelationService.deleteUserAllData(userId);
         tagRepository.deleteByUserId(userId);
     }
 }

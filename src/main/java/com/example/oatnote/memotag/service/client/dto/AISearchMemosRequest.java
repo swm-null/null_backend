@@ -5,12 +5,9 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AISearchMemoRequest(
+public record AISearchMemosRequest(
     String content,
     String userId
 ) {
 
-    public static AISearchMemoRequest from(String content, String userId) {
-        return new AISearchMemoRequest(content, userId);
-    }
 }
