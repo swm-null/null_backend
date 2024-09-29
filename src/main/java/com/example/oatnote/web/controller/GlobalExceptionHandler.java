@@ -36,17 +36,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(OatAuthException.class)
     public ResponseEntity<Object> handleOatAuthException(OatAuthException ex) {
-        return buildErrorResponse(0001, ex.getMessage(), HttpStatus.UNAUTHORIZED);
+        return buildErrorResponse("0001", ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(OatIllegalArgumentException.class)
     public ResponseEntity<Object> handleOatIllegalArgumentException(OatIllegalArgumentException ex) {
-        return buildErrorResponse(1001, ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return buildErrorResponse("1001", ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(OatDataNotFoundException.class)
     public ResponseEntity<Object> handleOatDataNotFoundException(OatDataNotFoundException ex) {
-        return buildErrorResponse(1002, ex.getMessage(), HttpStatus.NOT_FOUND);
+        return buildErrorResponse("1002", ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         String errorMessages = ex.getBindingResult().getAllErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.joining(", "));
-        return buildErrorResponse(1003, errorMessages, HttpStatus.BAD_REQUEST);
+        return buildErrorResponse("1003", errorMessages, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -72,17 +72,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ) {
         log.warn(ex.getMessage());
         requestLogging(request);
-        return buildErrorResponse(1004, ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return buildErrorResponse("1004", ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(OatException.class)
     public ResponseEntity<Object> handleOatException(OatException ex) {
-        return buildErrorResponse(2001, ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse("2001", ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(OatExternalServiceException.class)
     public ResponseEntity<Object> handleOatExternalServiceException(OatExternalServiceException ex) {
-        return buildErrorResponse(2002, ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse("2002", ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
@@ -106,14 +106,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             {}
             """, request.getMethod(), request.getRequestURI(), detail);
         requestLogging(request);
-        return buildErrorResponse(2003, "서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse("2003", "서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ClientAbortException.class)
     public ResponseEntity<Object> handleClientAbortException(HttpServletRequest request, ClientAbortException e) {
         log.warn("클라이언트가 연결을 중단했습니다: {}", e.getMessage());
         requestLogging(request);
-        return buildErrorResponse(2004, "클라이언트에 의해 연결이 중단되었습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse("2004", "클라이언트에 의해 연결이 중단되었습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private ResponseEntity<Object> buildErrorResponse(String errorCode, String message, HttpStatus status) {
