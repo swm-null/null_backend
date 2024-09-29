@@ -36,12 +36,12 @@ public record CreateMemoRequest(
         );
     }
 
-    public Memo toMemo(String userId, LocalDateTime now) {
+    public Memo toMemo(String userId, LocalDateTime time) {
         return new Memo(
             content,
             imageUrls,
             userId,
-            now
+            time
         );
     }
 }

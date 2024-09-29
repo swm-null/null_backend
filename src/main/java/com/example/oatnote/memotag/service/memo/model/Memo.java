@@ -39,13 +39,13 @@ public class Memo {
     @Field("uTime")
     private LocalDateTime updatedAt;
 
-    public Memo(String content, List<String> imageUrls, String userId, LocalDateTime now) {
+    public Memo(String content, List<String> imageUrls, String userId, LocalDateTime time) {
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
         this.userId = userId;
-        this.createdAt = now;
-        this.updatedAt = now;
+        this.createdAt = time;
+        this.updatedAt = time;
     }
 
     public Memo(String content, List<String> imageUrls, String userId, String metadata, List<Double> embedding) {

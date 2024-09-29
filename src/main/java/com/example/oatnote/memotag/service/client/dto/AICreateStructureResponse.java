@@ -37,13 +37,13 @@ public record AICreateStructureResponse(
         List<Double> embedding
     ) {
 
-        public Tag toTag(String userId, LocalDateTime now) {
+        public Tag toTag(String userId, LocalDateTime time) {
             return new Tag(
                 id,
                 name,
                 userId,
                 embedding,
-                now
+                time
             );
         }
     }

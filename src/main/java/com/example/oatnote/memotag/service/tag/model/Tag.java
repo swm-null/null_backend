@@ -46,13 +46,13 @@ public class Tag {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Tag(String id, String name, String userId, List<Double> embedding, LocalDateTime now) {
+    public Tag(String id, String name, String userId, List<Double> embedding, LocalDateTime time) {
         this.id = id;
         this.name = name;
         this.userId = userId;
         this.embedding = embedding;
-        this.createdAt = now;
-        this.updatedAt = now;
+        this.createdAt = time;
+        this.updatedAt = time;
     }
 
     public void update(String name, List<Double> embedding) {
