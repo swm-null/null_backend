@@ -49,7 +49,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(1002, ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         @NonNull MethodArgumentNotValidException ex,
         @NonNull HttpHeaders headers,
@@ -116,7 +116,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(2004, "클라이언트에 의해 연결이 중단되었습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ResponseEntity<Object> buildErrorResponse(int errorCode, String message, HttpStatus status) {
+    private ResponseEntity<Object> buildErrorResponse(String errorCode, String message, HttpStatus status) {
         ErrorResponse errorResponse = new ErrorResponse(errorCode, message);
         return new ResponseEntity<>(errorResponse, status);
     }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record ErrorResponse(
-    int errorCode,
+    String errorCode,
     String message
 ) {
 
