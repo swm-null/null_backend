@@ -1,18 +1,16 @@
 package com.example.oatnote.web.exception;
 
+import com.example.oatnote.web.controller.enums.ErrorEnum;
+
 public class OatExternalServiceException extends OatException{
 
-    private static final String DEFAULT_MESSAGE = "외부 서비스 호출에 실패했습니다.";
+    private static final ErrorEnum ERROR_RESPONSE = ErrorEnum.EXTERNAL_SERVICE_ERROR;
 
-    public OatExternalServiceException(String message) {
-        super(message);
-    }
-
-    public OatExternalServiceException(String message, String detail) {
-        super(message, detail);
+    public OatExternalServiceException(String detail) {
+        super(ERROR_RESPONSE, detail);
     }
 
     public static OatExternalServiceException withDetail(String detail) {
-        return new OatExternalServiceException(DEFAULT_MESSAGE, detail);
+        return new OatExternalServiceException(detail);
     }
 }

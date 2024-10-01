@@ -1,18 +1,16 @@
 package com.example.oatnote.web.exception;
 
+import com.example.oatnote.web.controller.enums.ErrorEnum;
+
 public class OatIllegalArgumentException extends OatException {
 
-    private static final String DEFAULT_MESSAGE = "잘못된 요청입니다.";
+    private static final ErrorEnum ERROR_RESPONSE = ErrorEnum.ILLEGAL_ARGUMENT;
 
-    public OatIllegalArgumentException(String message) {
-        super(message);
-    }
-
-    public OatIllegalArgumentException(String message, String detail) {
-        super(message, detail);
+    public OatIllegalArgumentException(String detail) {
+        super(ERROR_RESPONSE, detail);
     }
 
     public static OatIllegalArgumentException withDetail(String detail) {
-        return new OatIllegalArgumentException(DEFAULT_MESSAGE, detail);
+        return new OatIllegalArgumentException(detail);
     }
 }

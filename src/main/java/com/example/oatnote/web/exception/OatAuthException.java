@@ -1,18 +1,16 @@
 package com.example.oatnote.web.exception;
 
+import com.example.oatnote.web.controller.enums.ErrorEnum;
+
 public class OatAuthException extends OatException {
 
-    private static final String DEFAULT_MESSAGE = "인증에 실패했습니다.";
+    private static final ErrorEnum ERROR_RESPONSE = ErrorEnum.AUTH_EXCEPTION;
 
-    public OatAuthException(String message) {
-        super(message);
-    }
-
-    public OatAuthException(String message, String detail) {
-        super(message, detail);
+    public OatAuthException(String detail) {
+        super(ERROR_RESPONSE, detail);
     }
 
     public static OatAuthException withDetail(String detail) {
-        return new OatAuthException(DEFAULT_MESSAGE, detail);
+        return new OatAuthException(detail);
     }
 }
