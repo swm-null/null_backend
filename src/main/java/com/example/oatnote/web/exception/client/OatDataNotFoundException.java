@@ -1,6 +1,7 @@
-package com.example.oatnote.web.exception;
+package com.example.oatnote.web.exception.client;
 
 import com.example.oatnote.web.controller.enums.ErrorEnum;
+import com.example.oatnote.web.exception.OatException;
 
 public class OatDataNotFoundException extends OatException {
 

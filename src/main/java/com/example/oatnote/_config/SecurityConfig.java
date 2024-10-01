@@ -1,5 +1,10 @@
 package com.example.oatnote._config;
 
+import com.example.oatnote.util.JwtAuthenticationFilter;
+import com.example.oatnote.web.controller.enums.ErrorEnum;
+import com.example.oatnote.web.controller.dto.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,10 +13,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.core.AuthenticationException;
 
-import com.example.oatnote.util.JwtAuthenticationFilter;
-
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -37,7 +43,26 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint(this::OatAuthenticationEntryPoint)
+            )
             .formLogin(AbstractHttpConfigurer::disable);
         return http.build();
+    }
+
+    private void OatAuthenticationEntryPoint(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        AuthenticationException authException
+    ) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+
+        ErrorEnum errorEnum = ErrorEnum.MISSING_TOKEN;
+        ErrorResponse errorResponse = new ErrorResponse(errorEnum.getCode(), errorEnum.getMessage(), null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(errorResponse);
+        response.getWriter().write(json);
     }
 }

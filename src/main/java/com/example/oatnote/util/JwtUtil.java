@@ -8,20 +8,27 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.example.oatnote.web.exception.OatAuthException;
+import com.example.oatnote.web.exception.auth.OatAuthorizationException;
+import com.example.oatnote.web.exception.auth.OatExpiredAccessTokenException;
+import com.example.oatnote.web.exception.auth.OatExpiredRefreshTokenException;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
     private final Key secretKey;
     private final Long accessTokenExpirationTime;
     private final Long refreshTokenExpirationTime;
+
+    private static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH";
 
     public JwtUtil(
         @Value("${jwt.secret-key}") String secretKey,
@@ -34,11 +41,11 @@ public class JwtUtil {
     }
 
     public String generateAccessToken(String userId) {
-        return createToken(userId, accessTokenExpirationTime, "ACCESS");
+        return createToken(userId, accessTokenExpirationTime, ACCESS_TOKEN_TYPE);
     }
 
     public String generateRefreshToken(String userId) {
-        return createToken(userId, refreshTokenExpirationTime, "REFRESH");
+        return createToken(userId, refreshTokenExpirationTime, REFRESH_TOKEN_TYPE);
     }
 
     private String createToken(String subject, long expirationTime, String tokenType) {
@@ -68,19 +75,39 @@ public class JwtUtil {
             .getBody();
     }
 
-    public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public void validateAccessToken(String token) throws OatAuthorizationException {
+        validateTokenType(token, ACCESS_TOKEN_TYPE);
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public void validateRefreshToken(String token) throws OatAuthorizationException {
+        validateTokenType(token, REFRESH_TOKEN_TYPE);
     }
 
-    public void validateToken(String token) throws JwtException {
+    private void validateTokenType(String token, String expectedTokenType) throws OatAuthorizationException {
+        Claims claims;
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            claims = extractAllClaims(token);
+        } catch (ExpiredJwtException e) {
+            throw getExpiredTokenException(expectedTokenType);
         } catch (Exception e) {
-            throw OatAuthException.withDetail("유효하지 않은 토큰입니다.");
+            throw OatAuthorizationException.withDetail("유효하지 않은 토큰입니다.");
         }
+
+        String tokenType = claims.get("token_type", String.class);
+        if (!tokenType.equals(expectedTokenType)) {
+            throw OatAuthorizationException.withDetail("토큰 타입이 올바르지 않습니다.");
+        }
+
+        if (claims.getExpiration().before(new Date())) {
+            throw getExpiredTokenException(expectedTokenType);
+        }
+    }
+
+    private OatAuthorizationException getExpiredTokenException(String expectedTokenType) {
+        return switch (expectedTokenType) {
+            case ACCESS_TOKEN_TYPE -> OatExpiredAccessTokenException.withDetail("액세스 토큰이 만료되었습니다.");
+            case REFRESH_TOKEN_TYPE -> OatExpiredRefreshTokenException.withDetail("리프레시 토큰이 만료되었습니다.");
+            default -> throw OatAuthorizationException.withDetail("알 수 없는 토큰 타입입니다.");
+        };
     }
 }

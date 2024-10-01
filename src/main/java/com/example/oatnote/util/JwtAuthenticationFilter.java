@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.oatnote.web.exception.OatAuthException;
+import com.example.oatnote.web.controller.dto.ErrorResponse;
+import com.example.oatnote.web.exception.auth.OatAuthorizationException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,9 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private static final int BEARER_PREFIX_LENGTH = 7;
-    private static final String TOKEN_EXPIRED_MESSAGE = "JWT Token has expired";
-    private static final String TOKEN_INVALID_MESSAGE = "JWT Token is invalid";
-    private static final String ERROR_PROCESSING_TOKEN_MESSAGE = "An error occurred while processing the JWT token";
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(
@@ -39,16 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain chain
     ) throws ServletException, IOException {
-
-        String accessToken = extractAccessToken(request);
-        if (Objects.nonNull(accessToken)) {
-            try {
-                jwtUtil.validateToken(accessToken);
-                if (jwtUtil.isTokenExpired(accessToken)) {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write(TOKEN_EXPIRED_MESSAGE);
-                    return;
-                }
+        try {
+            String accessToken = extractAccessToken(request);
+            if (Objects.nonNull(accessToken)) {
+                jwtUtil.validateAccessToken(accessToken);
                 String userId = jwtUtil.extractUserId(accessToken);
                 if (Objects.nonNull(userId) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -59,17 +54,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-            } catch (OatAuthException e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write(TOKEN_INVALID_MESSAGE);
-                return;
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write(ERROR_PROCESSING_TOKEN_MESSAGE);
-                return;
             }
+            chain.doFilter(request, response);
+        } catch (OatAuthorizationException e) {
+            setErrorResponse(response, e);
         }
-        chain.doFilter(request, response);
+    }
+
+    private void setErrorResponse(HttpServletResponse response, OatAuthorizationException e) throws IOException {
+        response.setStatus(e.getErrorEnum().getStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+
+        ErrorResponse errorResponse = ErrorResponse.from(e.getErrorEnum(), e.getDetail());
+        String json = objectMapper.writeValueAsString(errorResponse);
+        response.getWriter().write(json);
     }
 
     private String extractAccessToken(HttpServletRequest request) {

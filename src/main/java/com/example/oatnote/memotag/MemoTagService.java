@@ -49,7 +49,7 @@ import com.example.oatnote.memotag.service.memoTagRelation.MemoTagRelationServic
 import com.example.oatnote.memotag.service.tag.TagService;
 import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.memotag.service.tag.model.Tag;
-import com.example.oatnote.web.exception.OatIllegalArgumentException;
+import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;

@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.memotag.service.memo.model.Memo;
-import com.example.oatnote.web.exception.OatDataNotFoundException;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 

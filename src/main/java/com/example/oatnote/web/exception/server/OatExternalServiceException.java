@@ -1,8 +1,9 @@
-package com.example.oatnote.web.exception;
+package com.example.oatnote.web.exception.server;
 
 import com.example.oatnote.web.controller.enums.ErrorEnum;
+import com.example.oatnote.web.exception.OatException;
 
-public class OatExternalServiceException extends OatException{
+public class OatExternalServiceException extends OatException {
 
     private static final ErrorEnum ERROR_RESPONSE = ErrorEnum.EXTERNAL_SERVICE_ERROR;
 

@@ -21,12 +21,12 @@ import org.springframework.web.util.WebUtils;
 
 import com.example.oatnote.web.controller.dto.ErrorResponse;
 import com.example.oatnote.web.controller.enums.ErrorEnum;
-import com.example.oatnote.web.exception.OatAuthException;
-import com.example.oatnote.web.exception.OatDataNotFoundException;
+import com.example.oatnote.web.exception.auth.OatAuthorizationException;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 import com.example.oatnote.web.exception.OatException;
-import com.example.oatnote.web.exception.OatExternalServiceException;
-import com.example.oatnote.web.exception.OatIllegalArgumentException;
-import com.example.oatnote.web.exception.OatIllegalStateException;
+import com.example.oatnote.web.exception.server.OatExternalServiceException;
+import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
+import com.example.oatnote.web.exception.server.OatIllegalStateException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
@@ -55,8 +55,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(e.getErrorEnum(), e.getDetail());
     }
 
-    @ExceptionHandler(OatAuthException.class)
-    public ResponseEntity<Object> handleOatAuthException(OatAuthException e) {
+    @ExceptionHandler(OatAuthorizationException.class)
+    public ResponseEntity<Object> handleOatAuthException(OatAuthorizationException e) {
         log.warn(e.getFullMessage());
         return buildErrorResponse(e.getErrorEnum(), e.getDetail());
     }
