@@ -28,7 +28,7 @@ public record AICreateStructureResponse(
     ) {
 
         public Memo toProcessedMemo(Memo memo) {
-            return memo.process(content, metadata, embedding);
+            return memo.process(metadata, embedding);
         }
     }
 
