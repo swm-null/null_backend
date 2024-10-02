@@ -14,4 +14,8 @@ public class OatExternalServiceException extends OatException {
     public static OatExternalServiceException withDetail(String detail) {
         return new OatExternalServiceException(detail);
     }
+
+    public static OatExternalServiceException withDetail(String detail, String id) {
+        return withDetail(String.format("%s: %s", detail, id));
+    }
 }

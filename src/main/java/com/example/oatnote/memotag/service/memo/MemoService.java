@@ -26,7 +26,7 @@ public class MemoService {
 
     public Memo getMemo(String memoId, String userId) {
         return memoRepository.findByIdAndUserId(memoId, userId)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("메모를 찾지 못했습니다: %s", memoId)));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("메모를 찾지 못했습니다.", memoId));
     }
 
     public List<Memo> getMemos(List<String> memoIds, String userId) {
@@ -40,7 +40,7 @@ public class MemoService {
     public List<Memo> getMemosContainingRegex(String regex, String userId) {
         List<Memo> memos = memoRepository.findByContentRegexAndUserId(regex, userId);
         if (memos.isEmpty()) {
-            throw OatDataNotFoundException.withDetail(String.format("해당 regex 의 메모를 찾지 못했습니다: %s", regex));
+            throw OatDataNotFoundException.withDetail("해당 regex 에 맞는 메모를 찾지 못했습니다.", regex);
         }
         return memos;
     }
@@ -48,7 +48,7 @@ public class MemoService {
     public Memo updateMemo(Memo memo) {
         log.info("메모 업데이트: {} / 유저: {}", memo.getId(), memo.getUserId());
         memoRepository.findByIdAndUserId(memo.getId(), memo.getUserId())
-            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("메모를 찾지 못했습니다: %s", memo.getId())));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("메모를 찾지 못했습니다.", memo.getId()));
         return memoRepository.save(memo);
     }
 

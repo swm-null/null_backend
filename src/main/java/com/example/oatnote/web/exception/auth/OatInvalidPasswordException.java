@@ -14,4 +14,8 @@ public class OatInvalidPasswordException extends OatException {
     public static OatInvalidPasswordException withDetail(String detail) {
         return new OatInvalidPasswordException(detail);
     }
+
+    public static OatInvalidPasswordException withDetail(String detail, String id) {
+        return withDetail(String.format("%s: %s", detail, id));
+    }
 }

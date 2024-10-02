@@ -21,9 +21,9 @@ public class AIResponseErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is4xxClientError()) {
-            throw OatExternalServiceException.withDetail(String.format("BE Client 오류 : %s", statusCode));
+            throw OatExternalServiceException.withDetail("BE Client 오류", statusCode.toString());
         } else if (statusCode.is5xxServerError()) {
-            throw OatExternalServiceException.withDetail(String.format("AI Server 오류 : %s", statusCode));
+            throw OatExternalServiceException.withDetail("AI Server 오류", statusCode.toString());
         }
     }
 }

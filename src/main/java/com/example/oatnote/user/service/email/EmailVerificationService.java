@@ -31,7 +31,7 @@ public class EmailVerificationService {
             sendEmail(email, code);
             saveEmailVerification(email, code, expiryMinutes);
         } catch (MessagingException e) {
-            throw OatExternalServiceException.withDetail(String.format("이메일 전송에 실패했습니다 : %s", email));
+            throw OatExternalServiceException.withDetail("이메일 전송에 실패했습니다.", email);
         }
     }
 
@@ -42,9 +42,9 @@ public class EmailVerificationService {
 
     public void verifyCode(String email, String code) {
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("인증 코드가 발급되지 않았습니다 : %s", email)));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("인증 코드가 발급되지 않았습니다.", email));
         if (!Objects.equals(code, emailVerification.getCode())) {
-            throw OatIllegalArgumentException.withDetail("인증 코드가 일치하지 않습니다.");
+            throw OatIllegalArgumentException.withDetail("인증 코드가 일치하지 않습니다.", email);
         }
         emailVerificationRepository.delete(emailVerification);
     }

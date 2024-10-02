@@ -36,7 +36,7 @@ public class TagService {
 
     public Tag getTag(String tagId, String userId) {
         return tagRepository.findByIdAndUserId(tagId, userId)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("태그를 찾지 못했습니다: %s", tagId)));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("태그를 찾지 못했습니다.", tagId));
     }
 
     public void deleteTag(Tag tag) {

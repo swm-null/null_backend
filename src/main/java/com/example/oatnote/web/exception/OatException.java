@@ -10,12 +10,6 @@ public abstract class OatException extends RuntimeException {
     private final ErrorEnum errorEnum;
     protected final String detail;
 
-    protected OatException(ErrorEnum errorEnum) {
-        super(errorEnum.getMessage());
-        this.errorEnum = errorEnum;
-        this.detail = null;
-    }
-
     protected OatException(ErrorEnum errorEnum, String detail) {
         super(errorEnum.getMessage());
         this.errorEnum = errorEnum;

@@ -14,4 +14,8 @@ public class OatIllegalStateException extends OatException {
     public static OatIllegalStateException withDetail(String detail) {
         return new OatIllegalStateException(detail);
     }
+
+    public static OatIllegalStateException withDetail(String detail, String id) {
+        return withDetail(String.format("%s: %s", detail, id));
+    }
 }
