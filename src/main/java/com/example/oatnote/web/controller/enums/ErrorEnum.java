@@ -26,7 +26,8 @@ public enum ErrorEnum {
     ILLEGAL_STATE("2001", "잘못된 상태입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     EXTERNAL_SERVICE_ERROR("2002", "외부 서비스에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     GENERIC_SERVER_ERROR("2003", "서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    CLIENT_ABORT("2004", "클라이언트가 연결을 중단했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    CLIENT_ABORT("2004", "클라이언트가 연결을 중단했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ;
 
     private final String code;
     private final String message;
