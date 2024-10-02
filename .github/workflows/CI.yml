@@ -27,22 +27,32 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Give permission for Gradle
         run: chmod +x gradlew
 
       - name: Run gradle build
         run: ./gradlew build
 
-      - name: comments test result on PR
-        uses: EnricoMi/publish-unit-test-result-action@v1
+      - name: Comments test result on PR
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: '**/build/test-results/test/TEST-*.xml'
-          token: ${{ secrets.GH_PAT }}
+          github_token: ${{ secrets.GH_PAT }}
 
-      - name: comments test result in failed line if test failed
+      - name: Comments test result in failed line if test failed
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
-          token: ${{ secrets.GH_PAT }}
+          github_token: ${{ secrets.GH_PAT }}
