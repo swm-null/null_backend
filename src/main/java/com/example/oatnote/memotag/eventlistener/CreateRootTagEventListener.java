@@ -1,4 +1,4 @@
-package com.example.oatnote.memotag.service.tag.eventlistener;
+package com.example.oatnote.memotag.eventlistener;
 
 import java.util.ArrayList;
 

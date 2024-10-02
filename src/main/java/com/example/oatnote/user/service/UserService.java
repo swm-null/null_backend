@@ -20,11 +20,10 @@ import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
 import com.example.oatnote.user.service.model.User;
 import com.example.oatnote.util.JwtUtil;
-import com.example.oatnote.web.exception.OatAuthException;
-import com.example.oatnote.web.exception.OatDataNotFoundException;
-import com.example.oatnote.web.exception.OatIllegalArgumentException;
+import com.example.oatnote.web.exception.auth.OatInvalidPasswordException;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
 
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -44,7 +43,7 @@ public class UserService {
         String password = registerUserRequest.password();
         String confirmPassword = registerUserRequest.confirmPassword();
         if (!Objects.equals(password, confirmPassword)) {
-            throw OatIllegalArgumentException.withDetail("비밀번호가 일치하지 않습니다.");
+            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
 
         String email = registerUserRequest.email();
@@ -72,7 +71,7 @@ public class UserService {
 
         String password = loginUserRequest.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw OatIllegalArgumentException.withDetail("비밀번호가 일치하지 않습니다.");
+            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
         String accessToken = jwtUtil.generateAccessToken(user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId());
@@ -81,7 +80,7 @@ public class UserService {
 
     public RefreshUserResponse refreshAccessToken(RefreshUserRequest refreshUserRequest) {
         String refreshToken = refreshUserRequest.refreshToken();
-        jwtUtil.validateToken(refreshToken);
+        jwtUtil.validateRefreshToken(refreshToken);
         String email = jwtUtil.extractUserId(refreshToken);
         String newAccessToken = jwtUtil.generateAccessToken(email);
         return RefreshUserResponse.of(newAccessToken, refreshToken);
@@ -110,7 +109,7 @@ public class UserService {
         String newPassword = findPasswordRequest.newPassword();
         String confirmPassword = findPasswordRequest.confirmPassword();
         if (!Objects.equals(newPassword, confirmPassword)) {
-            throw OatIllegalArgumentException.withDetail("비밀번호가 일치하지 않습니다.");
+            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
 
         String email = findPasswordRequest.email();

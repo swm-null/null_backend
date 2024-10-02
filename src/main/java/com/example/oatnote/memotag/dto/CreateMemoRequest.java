@@ -36,7 +36,7 @@ public record CreateMemoRequest(
         );
     }
 
-    public Memo toMemo(String userId, LocalDateTime time) {
+    public Memo toRawMemo(String userId, LocalDateTime time) {
         return new Memo(
             content,
             imageUrls,

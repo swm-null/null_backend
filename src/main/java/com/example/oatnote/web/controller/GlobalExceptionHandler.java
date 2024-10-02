@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,11 +19,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.WebUtils;
 
-import com.example.oatnote.web.exception.OatAuthException;
-import com.example.oatnote.web.exception.OatDataNotFoundException;
+import com.example.oatnote.web.controller.dto.ErrorResponse;
+import com.example.oatnote.web.controller.enums.ErrorEnum;
+import com.example.oatnote.web.exception.auth.OatAuthorizationException;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 import com.example.oatnote.web.exception.OatException;
-import com.example.oatnote.web.exception.OatExternalServiceException;
-import com.example.oatnote.web.exception.OatIllegalArgumentException;
+import com.example.oatnote.web.exception.server.OatExternalServiceException;
+import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
+import com.example.oatnote.web.exception.server.OatIllegalStateException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
@@ -34,57 +36,44 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(OatAuthException.class)
-    public ResponseEntity<Object> handleOatAuthException(OatAuthException ex) {
-        return buildErrorResponse("0001", ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    // 커스텀 예외 처리
+    @ExceptionHandler(OatException.class)
+    public ResponseEntity<Object> handleOatException(OatException e) {
+        log.warn(e.getFullMessage());
+        return buildErrorResponse(e.getErrorEnum(), e.getDetail());
     }
 
     @ExceptionHandler(OatIllegalArgumentException.class)
-    public ResponseEntity<Object> handleOatIllegalArgumentException(OatIllegalArgumentException ex) {
-        return buildErrorResponse("1001", ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Object> handleOatIllegalArgumentException(OatIllegalArgumentException e) {
+        log.warn(e.getFullMessage());
+        return buildErrorResponse(e.getErrorEnum(), e.getDetail());
+    }
+
+    @ExceptionHandler(OatIllegalStateException.class)
+    public ResponseEntity<Object> handleOatIllegalStateException(OatIllegalStateException e) {
+        log.warn(e.getFullMessage());
+        return buildErrorResponse(e.getErrorEnum(), e.getDetail());
+    }
+
+    @ExceptionHandler(OatAuthorizationException.class)
+    public ResponseEntity<Object> handleOatAuthException(OatAuthorizationException e) {
+        log.warn(e.getFullMessage());
+        return buildErrorResponse(e.getErrorEnum(), e.getDetail());
     }
 
     @ExceptionHandler(OatDataNotFoundException.class)
-    public ResponseEntity<Object> handleOatDataNotFoundException(OatDataNotFoundException ex) {
-        return buildErrorResponse("1002", ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-        @NonNull MethodArgumentNotValidException ex,
-        @NonNull HttpHeaders headers,
-        @NonNull HttpStatusCode status,
-        @NonNull WebRequest webRequest
-    ) {
-        HttpServletRequest request = ((ServletWebRequest)webRequest).getRequest();
-        log.warn("검증 과정에서 문제가 발생했습니다. uri: {} {}", request.getMethod(), request.getRequestURI(), ex);
-        requestLogging(request);
-        String errorMessages = ex.getBindingResult().getAllErrors().stream()
-            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-            .collect(Collectors.joining(", "));
-        return buildErrorResponse("1003", errorMessages, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(
-        HttpServletRequest request,
-        IllegalArgumentException ex
-    ) {
-        log.warn(ex.getMessage());
-        requestLogging(request);
-        return buildErrorResponse("1004", ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(OatException.class)
-    public ResponseEntity<Object> handleOatException(OatException ex) {
-        return buildErrorResponse("2001", ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Object> handleOatDataNotFoundException(OatDataNotFoundException e) {
+        log.warn(e.getFullMessage());
+        return buildErrorResponse(e.getErrorEnum(), e.getDetail());
     }
 
     @ExceptionHandler(OatExternalServiceException.class)
-    public ResponseEntity<Object> handleOatExternalServiceException(OatExternalServiceException ex) {
-        return buildErrorResponse("2002", ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Object> handleOatExternalServiceException(OatExternalServiceException e) {
+        log.warn(e.getFullMessage());
+        return buildErrorResponse(e.getErrorEnum(), e.getDetail());
     }
 
+    // 표준 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(
         HttpServletRequest request,
@@ -106,19 +95,56 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             {}
             """, request.getMethod(), request.getRequestURI(), detail);
         requestLogging(request);
-        return buildErrorResponse("2003", "서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse(ErrorEnum.GENERIC_SERVER_ERROR, null);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(
+        HttpServletRequest request,
+        IllegalArgumentException e
+    ) {
+        log.warn(e.getMessage());
+        requestLogging(request);
+        return buildErrorResponse(ErrorEnum.ILLEGAL_ARGUMENT, null);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(
+        HttpServletRequest request,
+        IllegalStateException e
+    ) {
+        log.warn(e.getMessage());
+        requestLogging(request);
+        return buildErrorResponse(ErrorEnum.ILLEGAL_ARGUMENT, null);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        @NonNull MethodArgumentNotValidException e,
+        @NonNull HttpHeaders headers,
+        @NonNull HttpStatusCode status,
+        @NonNull WebRequest webRequest
+    ) {
+        HttpServletRequest request = ((ServletWebRequest)webRequest).getRequest();
+        String detail = e.getBindingResult().getAllErrors().stream()
+            .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .collect(Collectors.joining(", "));
+        log.warn("검증 과정에서 문제가 발생했습니다. uri: {}, {}, {}, ", request.getMethod(), request.getRequestURI(), detail);
+        requestLogging(request);
+        return buildErrorResponse(ErrorEnum.VALIDATION_ERROR, detail);
     }
 
     @ExceptionHandler(ClientAbortException.class)
     public ResponseEntity<Object> handleClientAbortException(HttpServletRequest request, ClientAbortException e) {
         log.warn("클라이언트가 연결을 중단했습니다: {}", e.getMessage());
         requestLogging(request);
-        return buildErrorResponse("2004", "클라이언트에 의해 연결이 중단되었습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse(ErrorEnum.CLIENT_ABORT, null);
     }
 
-    private ResponseEntity<Object> buildErrorResponse(String errorCode, String message, HttpStatus status) {
-        ErrorResponse errorResponse = new ErrorResponse(errorCode, message);
-        return new ResponseEntity<>(errorResponse, status);
+    // 공통 메서드
+    private ResponseEntity<Object> buildErrorResponse(ErrorEnum errorEnum, String detail) {
+        ErrorResponse errorResponse = ErrorResponse.from(errorEnum, detail);
+        return new ResponseEntity<>(errorResponse, errorEnum.getStatus());
     }
 
     private void requestLogging(HttpServletRequest request) {
@@ -127,8 +153,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("Request body: {}", getRequestBody(request));
     }
 
-    private Map<String, Object> getHeaders(HttpServletRequest request) {
-        Map<String, Object> headers = new HashMap<>();
+    private Map<String, String> getHeaders(HttpServletRequest request) {
+        Map<String, String> headers = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
@@ -137,8 +163,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return headers;
     }
 
-    private String getQueryString(HttpServletRequest request) {
-        return (request.getQueryString() == null) ? " - " : request.getQueryString();
+    private String getQueryString(HttpServletRequest httpRequest) {
+        String queryString = httpRequest.getQueryString();
+        if (queryString == null) {
+            return " - ";
+        }
+        return queryString;
     }
 
     private String getRequestBody(HttpServletRequest request) {
@@ -147,9 +177,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             return " - ";
         }
         try {
+            // body 가 읽히지 않고 예외처리 되는 경우에 캐시하기 위함
+            wrapper.getInputStream().readAllBytes();
             byte[] buf = wrapper.getContentAsByteArray();
-            return (buf.length == 0) ? " - " : new String(buf, wrapper.getCharacterEncoding());
-        } catch (Exception e) {
+            if (buf.length == 0) {
+                return " - ";
+            }
+            return new String(buf, wrapper.getCharacterEncoding());
+        } catch (Exception e
+        ) {
             return " - ";
         }
     }

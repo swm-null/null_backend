@@ -10,7 +10,7 @@ import com.example.oatnote.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.memotag.service.tag.model.Tag;
 import com.example.oatnote.memotag.service.tag.relation.TagsRelationService;
-import com.example.oatnote.web.exception.OatDataNotFoundException;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 

@@ -67,6 +67,9 @@ public class Memo {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void process(String content, String metadata, List<Double> embedding) {
+    public Memo process(String metadata, List<Double> embedding) {
+        this.metadata = metadata;
+        this.embedding = embedding;
+        return this;
     }
 }

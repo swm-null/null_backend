@@ -8,9 +8,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.user.service.email.model.EmailVerification;
-import com.example.oatnote.web.exception.OatDataNotFoundException;
-import com.example.oatnote.web.exception.OatExternalServiceException;
-import com.example.oatnote.web.exception.OatIllegalArgumentException;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.exception.server.OatExternalServiceException;
+import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
