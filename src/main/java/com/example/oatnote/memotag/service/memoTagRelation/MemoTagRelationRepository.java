@@ -8,15 +8,15 @@ import com.example.oatnote.memotag.service.memoTagRelation.model.MemoTagRelation
 
 public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelation, String> {
 
-    List<MemoTagRelation> findByMemoIdAndIsLinkedTrue(String memoId);
+    List<MemoTagRelation> findByMemoIdAndIsLinkedTrueAndUserId(String memoId, String userId);
 
-    List<MemoTagRelation> findByTagId(String tagId);
+    List<MemoTagRelation> findByTagIdAndUserId(String tagId, String userId);
 
-    void deleteByMemoId(String memoId);
+    void deleteByMemoIdAndUserId(String memoId, String userId);
 
-    void deleteByTagId(String tagId);
-
-    Integer countByTagId(String tagId);
+    void deleteByTagIdAndUserId(String tagId, String userId);
 
     void deleteByUserId(String userId);
+
+    Integer countByTagIdAndUserId(String tagId, String userId);
 }

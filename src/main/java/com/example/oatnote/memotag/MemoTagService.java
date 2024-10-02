@@ -106,11 +106,15 @@ public class MemoTagService {
 
         tagId = Objects.requireNonNullElse(tagId, userId);
 
-        Integer total = memoTagRelationService.countMemos(tagId);
+        Integer total = memoTagRelationService.countMemos(tagId, userId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
         PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
 
-        Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
+        Page<Memo> result = memoService.getPagedMemos(
+            memoTagRelationService.getMemoIds(tagId, userId),
+            pageRequest,
+            userId
+        );
         Page<MemoResponse> memoTagsPage = result.map(
             memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId))
         );
@@ -193,13 +197,13 @@ public class MemoTagService {
     }
 
     public void deleteMemo(String memoId, String userId) {
-        memoTagRelationService.deleteRelationsByMemoId(memoId);
+        memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         Memo memo = memoService.getMemo(memoId, userId);
         memoService.deleteMemo(memo);
     }
 
     public void deleteTag(String tagId, String userId) {
-        memoTagRelationService.deleteRelationsByTagId(tagId);
+        memoTagRelationService.deleteRelationsByTagId(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
         tagService.deleteTag(tag);
     }
@@ -313,7 +317,7 @@ public class MemoTagService {
     }
 
     List<Tag> getLinkedTags(String memoId, String userId) {
-        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId);
+        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId, userId);
         return tagService.getTags(tagIds, userId);
     }
 }
