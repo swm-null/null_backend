@@ -221,8 +221,7 @@ public class MemoTagService {
             rawMemo,
             userId
         );
-        AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(
-            aiCreateStructureRequest);
+        AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
         processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
     }
 
