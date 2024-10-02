@@ -247,7 +247,7 @@ public class MemoTagService {
         tagService.createTagEdge(new TagEdge(userId, aiCreateStructureResponse.newStructure()));
 
         Memo processedMemo = aiCreateStructureResponse.processedMemos().get(0).toProcessedMemo(rawMemo);
-        memoService.saveMemo(processedMemo);
+        memoService.createMemo(processedMemo);
         for (String parentTagId : aiCreateStructureResponse.processedMemos().get(0).parentTagIds()) {
             memoTagRelationService.createRelation(processedMemo.getId(), parentTagId, IS_LINKED_MEMO_TAG, userId);
             List<String> parentTagIds = tagService.getParentTagsIds(parentTagId);
@@ -263,7 +263,7 @@ public class MemoTagService {
             "",
             aiMemoTagsResponse.embedding()
         );
-        Memo createdMemo = memoService.saveMemo(memo);
+        Memo createdMemo = memoService.createMemo(memo);
         for (var newTag : aiMemoTagsResponse.newTags()) {
             Tag tag = new Tag(
                 newTag.id(),
