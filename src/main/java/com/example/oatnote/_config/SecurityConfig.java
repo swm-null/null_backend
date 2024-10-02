@@ -25,6 +25,7 @@ import java.io.IOException;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ObjectMapper objectMapper;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -60,8 +61,6 @@ public class SecurityConfig {
 
         ErrorEnum errorEnum = ErrorEnum.MISSING_TOKEN;
         ErrorResponse errorResponse = new ErrorResponse(errorEnum.getCode(), errorEnum.getMessage(), null);
-
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(errorResponse);
         response.getWriter().write(json);
     }

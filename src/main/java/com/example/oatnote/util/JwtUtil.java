@@ -17,9 +17,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public class JwtUtil {
 
@@ -96,10 +94,6 @@ public class JwtUtil {
         String tokenType = claims.get("token_type", String.class);
         if (!tokenType.equals(expectedTokenType)) {
             throw OatAuthorizationException.withDetail("토큰 타입이 올바르지 않습니다.");
-        }
-
-        if (claims.getExpiration().before(new Date())) {
-            throw getExpiredTokenException(expectedTokenType);
         }
     }
 

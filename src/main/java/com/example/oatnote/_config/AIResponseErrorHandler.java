@@ -1,4 +1,4 @@
-package com.example.oatnote.memotag.service.client.exception;
+package com.example.oatnote._config;
 
 import java.io.IOException;
 
