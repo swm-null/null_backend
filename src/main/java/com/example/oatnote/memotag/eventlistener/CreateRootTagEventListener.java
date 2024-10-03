@@ -25,6 +25,6 @@ public class CreateRootTagEventListener {
             event.userId(),
             new ArrayList<>()
         );
-        tagService.saveTag(rootTag);
+        tagService.createTag(rootTag);
     }
 }

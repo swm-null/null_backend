@@ -13,17 +13,20 @@ import com.example.oatnote.memotag.service.tag.relation.TagsRelationService;
 import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TagService {
 
     private final TagEdgeService tagEdgeService;
     private final TagsRelationService tagsRelationService;
     private final TagRepository tagRepository;
 
-    public Tag saveTag(Tag tag) {
-        return tagRepository.save(tag);
+    public void createTag(Tag tag) {
+        log.info("태그 생성 - 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
+        tagRepository.insert(tag);
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
@@ -39,7 +42,15 @@ public class TagService {
             .orElseThrow(() -> OatDataNotFoundException.withDetail("태그를 찾지 못했습니다.", tagId));
     }
 
+    public Tag updateTag(Tag tag) {
+        log.info("태그 업데이트 - 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
+        tagRepository.findByIdAndUserId(tag.getId(), tag.getUserId())
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("태그를 찾지 못했습니다.", tag.getId()));
+        return tagRepository.save(tag);
+    }
+
     public void deleteTag(Tag tag) {
+        log.info("태그 삭제 - 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
         tagRepository.delete(tag);
     }
 
@@ -63,8 +74,8 @@ public class TagService {
         return tagsRelationService.getParentTagsIds(childTagId);
     }
 
-    public void deleteRelation(String parentTagId, String childTagId) {
-        tagsRelationService.deleteRelation(parentTagId, childTagId);
+    public void deleteRelation(String parentTagId, String childTagId, String userId) {
+        tagsRelationService.deleteRelation(parentTagId, childTagId, userId);
     }
 
     public void deleteUserAllData(String userId) {

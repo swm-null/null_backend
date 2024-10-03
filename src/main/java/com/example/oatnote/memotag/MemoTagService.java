@@ -192,7 +192,7 @@ public class MemoTagService {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
         Tag tag = tagService.getTag(tagId, userId);
         tag.update(updateTagRequest.name(), aiCreateEmbeddingResponse.embedding());
-        Tag updatedTag = tagService.saveTag(tag);
+        Tag updatedTag = tagService.updateTag(tag);
         return UpdateTagResponse.from(updatedTag);
     }
 
@@ -237,7 +237,7 @@ public class MemoTagService {
     ) {
         for (NewTag newTag : aiCreateStructureResponse.newTags()) {
             Tag tag = newTag.toTag(userId, now);
-            tagService.saveTag(tag);
+            tagService.createTag(tag);
         }
 
         for (AddedRelation addedRelation : aiCreateStructureResponse.tagsRelations().added()) {
@@ -245,7 +245,7 @@ public class MemoTagService {
         }
 
         for (DeletedRelation deletedRelation : aiCreateStructureResponse.tagsRelations().deleted()) {
-            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
         }
 
         tagService.createTagEdge(new TagEdge(userId, aiCreateStructureResponse.newStructure()));
@@ -275,7 +275,7 @@ public class MemoTagService {
                 userId,
                 newTag.embedding()
             );
-            tagService.saveTag(tag);
+            tagService.createTag(tag);
         }
         return createdMemo;
     }
@@ -285,7 +285,7 @@ public class MemoTagService {
             tagService.createRelation(addRelation.parentId(), addRelation.childId(), userId);
         }
         for (Relation deletedRelation : processedMemoTags.tagsRelations().deleted()) {
-            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
         }
 
         List<Tag> tags = new ArrayList<>();
