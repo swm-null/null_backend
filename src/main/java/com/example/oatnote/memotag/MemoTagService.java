@@ -22,8 +22,8 @@ import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.memotag.dto.PagedMemosResponse;
-import com.example.oatnote.memotag.dto.PagedTagsResponse;
+import com.example.oatnote.memotag.dto.MemosResponse;
+import com.example.oatnote.memotag.dto.TagsResponse;
 import com.example.oatnote.memotag.dto.SearchMemoRequest;
 import com.example.oatnote.memotag.dto.SearchMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
@@ -93,7 +93,7 @@ public class MemoTagService {
         tagService.createTagEdge(tagEdge);
     }
 
-    public PagedMemosResponse getMemos(
+    public MemosResponse getMemos(
         String tagId,
         Integer memoPage,
         Integer memoLimit,
@@ -118,7 +118,7 @@ public class MemoTagService {
         Page<MemoResponse> memoTagsPage = result.map(
             memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId))
         );
-        return PagedMemosResponse.from(memoTagsPage, criteria);
+        return MemosResponse.from(memoTagsPage, criteria);
     }
 
     public List<TagResponse> getChildTags(String parentTagId, String userId) {
@@ -148,15 +148,15 @@ public class MemoTagService {
         PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), SortOrderTypeEnum.NAME);
 
         Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest, userId);
-        Page<PagedTagsResponse> pagedTags = result.map(
-            tag -> new PagedTagsResponse(
+        Page<TagsResponse> pagedTags = result.map(
+            tag -> new TagsResponse(
                 TagResponse.fromTag(tag),
                 tagService.getChildTags(tag.getId(), userId).stream()
                     .map(TagResponse::fromTag)
                     .toList()
             )
         );
-        Page<PagedMemosResponse> pagedMemos = pagedTags.map(
+        Page<MemosResponse> pagedMemos = pagedTags.map(
             pagedTag -> getMemos(pagedTag.tag().id(), memoPage, memoLimit, sortOrder, userId)
         );
         return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);

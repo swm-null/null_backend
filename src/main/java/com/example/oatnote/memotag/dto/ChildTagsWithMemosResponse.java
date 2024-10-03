@@ -27,16 +27,16 @@ public record ChildTagsWithMemosResponse(
     Integer currentPage,
 
     @Schema(description = "페이징된 자식 태그 리스트", requiredMode = REQUIRED)
-    List<PagedTagsResponse> pagedTags,
+    List<TagsResponse> pagedTags,
 
     @Schema(description = "페이징된 자식 태그별 메모 리스트", requiredMode = REQUIRED)
-    List<PagedMemosResponse> pagedMemos
+    List<MemosResponse> pagedMemos
 ) {
 
     public static ChildTagsWithMemosResponse from(
-        Page<PagedTagsResponse> pagedTagResult,
+        Page<TagsResponse> pagedTagResult,
         Criteria tagCriteria,
-        Page<PagedMemosResponse> pagedMemoResult
+        Page<MemosResponse> pagedMemoResult
     ) {
         return new ChildTagsWithMemosResponse(
             pagedTagResult.getTotalElements(),

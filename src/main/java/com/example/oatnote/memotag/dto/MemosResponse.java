@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record PagedMemosResponse(
+public record MemosResponse(
     @Schema(description = "총 메모의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
 
@@ -31,11 +31,11 @@ public record PagedMemosResponse(
     List<MemoResponse> memos
 ) {
 
-    public static PagedMemosResponse from(
+    public static MemosResponse from(
         Page<MemoResponse> pagedResult,
         Criteria criteria
     ) {
-        return new PagedMemosResponse(
+        return new MemosResponse(
             pagedResult.getTotalElements(),
             pagedResult.getContent().size(),
             pagedResult.getTotalPages(),

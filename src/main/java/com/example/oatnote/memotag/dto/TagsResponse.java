@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record PagedTagsResponse(
+public record TagsResponse(
     @Schema(description = "태그")
     TagResponse tag,
 
@@ -18,11 +18,11 @@ public record PagedTagsResponse(
     List<TagResponse> childTags
 ) {
 
-    public PagedTagsResponse from(
+    public TagsResponse from(
         Tag tag,
         List<Tag> childTags
     ) {
-        return new PagedTagsResponse(
+        return new TagsResponse(
             TagResponse.fromTag(tag),
             childTags.stream().map(TagResponse::fromTag).toList()
         );
