@@ -20,6 +20,7 @@ public class SearchHistoryService {
     private final SearchHistoryRepository searchHistoryRepository;
 
     public void createSearchHistory(SearchHistory searchHistory) {
+        log.info("검색 히스토리 생성 - 검색어: {} / 유저: {}", searchHistory.getSearchTerm(), searchHistory.getUserId());
         searchHistoryRepository.insert(searchHistory);
     }
 
