@@ -1,12 +1,9 @@
 package com.example.oatnote.memotag.service.searchhistory;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.memotag.service.searchhistory.model.SearchHistory;
 
 import lombok.RequiredArgsConstructor;
