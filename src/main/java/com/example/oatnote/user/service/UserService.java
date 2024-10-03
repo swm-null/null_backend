@@ -54,15 +54,9 @@ public class UserService {
             throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.", email);
         }
 
-        String code = registerUserRequest.code();
-        String name = registerUserRequest.name();
-        emailVerificationService.verifyCode(email, code);
+        emailVerificationService.verifyCode(email, registerUserRequest.code());
 
-        User user = new User(
-            email,
-            passwordEncoder.encode(password),
-            name
-        );
+        User user = registerUserRequest.toUser(passwordEncoder.encode(password));
         User createdUser = userRepository.save(user);
         eventPublisher.publishEvent(new RegisterUserEvent(createdUser.getId()));
         log.info("회원가입 완료 - 이메일: {} / 유저: {}", email, createdUser.getId());
