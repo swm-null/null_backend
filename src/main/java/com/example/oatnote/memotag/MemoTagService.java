@@ -23,6 +23,7 @@ import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.memotag.dto.MemosResponse;
+import com.example.oatnote.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.memotag.dto.TagsResponse;
 import com.example.oatnote.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.memotag.dto.SearchMemosResponse;
@@ -32,6 +33,7 @@ import com.example.oatnote.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.memotag.dto.enums.SortOrderTypeEnum;
 import com.example.oatnote.memotag.dto.innerDto.MemoResponse;
+import com.example.oatnote.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.memotag.service.client.dto.AICreateEmbeddingResponse;
@@ -46,6 +48,8 @@ import com.example.oatnote.memotag.service.client.dto.innerDto.ProcessedMemoTags
 import com.example.oatnote.memotag.service.memo.MemoService;
 import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.example.oatnote.memotag.service.memoTagRelation.MemoTagRelationService;
+import com.example.oatnote.memotag.service.searchhistory.SearchHistoryService;
+import com.example.oatnote.memotag.service.searchhistory.model.SearchHistory;
 import com.example.oatnote.memotag.service.tag.TagService;
 import com.example.oatnote.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.memotag.service.tag.model.Tag;
@@ -62,6 +66,7 @@ public class MemoTagService {
     private final MemoService memoService;
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
+    private final SearchHistoryService searchHistoryService;
     private final ApplicationEventPublisher eventPublisher;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
@@ -162,6 +167,20 @@ public class MemoTagService {
         return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);
     }
 
+    public SearchHistoriesResponse getSearchHistories(
+        String searchTerm,
+        Integer searchHistoryPage,
+        Integer searchHistoryLimit,
+        String userId
+    ) {
+        Integer total = searchHistoryService.countSearchHistories(userId);
+        Criteria criteria = Criteria.of(searchHistoryPage, searchHistoryLimit, total);
+        PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), SortOrderTypeEnum.LATEST);
+        Page<SearchHistory> result = searchHistoryService.getSearchHistories(searchTerm, pageRequest, userId);
+        Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
+        return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
+    }
+
     public SearchMemosResponse searchMemos(SearchMemosRequest searchMemosRequest, String userId) {
         AISearchMemosRequest aiSearchMemosRequest = searchMemosRequest.toAISearchMemoRequest(userId);
         AISearchMemosResponse aiSearchMemosResponse = aiMemoTagClient.searchMemo(aiSearchMemosRequest);
@@ -174,7 +193,15 @@ public class MemoTagService {
         List<List<Tag>> tagsList = memos.stream()
             .map(memo -> getLinkedTags(memo.getId(), userId))
             .toList();
-        return SearchMemosResponse.from(aiSearchMemosResponse.processedMessage(), memos, tagsList);
+
+        SearchMemosResponse searchMemosResponse = SearchMemosResponse.from(
+            aiSearchMemosResponse.processedMessage(),
+            memos,
+            tagsList
+        );
+        SearchHistory searchHistory = searchMemosRequest.toSearchHistory(searchMemosResponse, userId);
+        searchHistoryService.createSearchHistory(searchHistory);
+        return searchMemosResponse;
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {

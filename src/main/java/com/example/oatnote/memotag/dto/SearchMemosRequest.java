@@ -4,6 +4,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import com.example.oatnote.memotag.service.client.dto.AISearchMemosRequest;
+import com.example.oatnote.memotag.service.searchhistory.model.SearchHistory;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,5 +19,9 @@ public record SearchMemosRequest(
 
     public AISearchMemosRequest toAISearchMemoRequest(String userId) {
         return new AISearchMemosRequest(content, userId);
+    }
+
+    public SearchHistory toSearchHistory(SearchMemosResponse searchMemosResponse, String userId) {
+        return new SearchHistory(content, searchMemosResponse, userId);
     }
 }
