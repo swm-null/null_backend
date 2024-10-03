@@ -24,8 +24,8 @@ import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.memotag.dto.MemosResponse;
 import com.example.oatnote.memotag.dto.TagsResponse;
-import com.example.oatnote.memotag.dto.SearchMemoRequest;
-import com.example.oatnote.memotag.dto.SearchMemoResponse;
+import com.example.oatnote.memotag.dto.SearchMemosRequest;
+import com.example.oatnote.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
@@ -162,8 +162,8 @@ public class MemoTagService {
         return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);
     }
 
-    public SearchMemoResponse searchMemos(SearchMemoRequest searchMemoRequest, String userId) {
-        AISearchMemosRequest aiSearchMemosRequest = searchMemoRequest.toAISearchMemoRequest(userId);
+    public SearchMemosResponse searchMemos(SearchMemosRequest searchMemosRequest, String userId) {
+        AISearchMemosRequest aiSearchMemosRequest = searchMemosRequest.toAISearchMemoRequest(userId);
         AISearchMemosResponse aiSearchMemosResponse = aiMemoTagClient.searchMemo(aiSearchMemosRequest);
 
         List<Memo> memos = switch (aiSearchMemosResponse.type()) {
@@ -174,7 +174,7 @@ public class MemoTagService {
         List<List<Tag>> tagsList = memos.stream()
             .map(memo -> getLinkedTags(memo.getId(), userId))
             .toList();
-        return SearchMemoResponse.from(aiSearchMemosResponse.processedMessage(), memos, tagsList);
+        return SearchMemosResponse.from(aiSearchMemosResponse.processedMessage(), memos, tagsList);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {

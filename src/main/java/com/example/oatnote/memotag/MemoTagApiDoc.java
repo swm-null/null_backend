@@ -17,8 +17,9 @@ import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.memotag.dto.MemosResponse;
-import com.example.oatnote.memotag.dto.SearchMemoRequest;
-import com.example.oatnote.memotag.dto.SearchMemoResponse;
+import com.example.oatnote.memotag.dto.SearchHistoriesResponse;
+import com.example.oatnote.memotag.dto.SearchMemosRequest;
+import com.example.oatnote.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
@@ -126,10 +127,26 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
+    @Operation(summary = "메모 검색 히스토리 조회")
+    @GetMapping("memos/search/histories")
+    ResponseEntity<SearchHistoriesResponse> getSearchHistories(
+        @RequestParam(name = "searchHistoryPage", defaultValue = "1") Integer historyPage,
+        @RequestParam(name = "searchHistoryLimit", defaultValue = "15") Integer historyLimit,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
     @Operation(summary = "AI 검색을 통한 메모 조회")
     @PostMapping("/memos/search")
-    ResponseEntity<SearchMemoResponse> searchMemos(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
+    ResponseEntity<SearchMemosResponse> searchMemos(
+        @RequestBody @Valid SearchMemosRequest searchMemosRequest,
         @AuthenticationPrincipal String userId
     );
 

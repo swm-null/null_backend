@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record SearchMemoRequest(
+public record SearchMemosRequest(
     @Schema(description = "내용", example = "내 일정이 어떻게 되었더라?", requiredMode = REQUIRED)
     @NotBlank(message = "내용은 비워둘 수 없습니다.")
     String content
