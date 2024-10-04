@@ -9,8 +9,8 @@ import com.example.oatnote.memotag.service.searchhistory.model.SearchHistory;
 
 public interface SearchHistoryRepository extends MongoRepository<SearchHistory, String> {
 
-    @Query("{ 'searchTerm': { $regex: ?0, $options: 'i' }, 'userId': ?1 }")
-    Page<SearchHistory> findBySearchTermContainingAndUserId(String searchTerm, Pageable pageable, String userId);
+    @Query("{ 'query': { $regex: ?0, $options: 'i' }, 'userId': ?1 }")
+    Page<SearchHistory> findBySearchTermContainingAndUserId(String query, Pageable pageable, String userId);
 
     Integer countByUserId(String userId);
 }

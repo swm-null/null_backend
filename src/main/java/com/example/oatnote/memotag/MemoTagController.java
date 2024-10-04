@@ -106,13 +106,13 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/search/histories")
     public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
+        @RequestParam(name = "query", defaultValue = "") String query,
         @RequestParam(name = "searchHistoryPage", defaultValue = "1") Integer searchHistoryPage,
         @RequestParam(name = "searchHistoryLimit", defaultValue = "15") Integer searchHistoryLimit,
         @AuthenticationPrincipal String userId
     ) {
         SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(
-            searchTerm,
+            query,
             searchHistoryPage,
             searchHistoryLimit,
             userId

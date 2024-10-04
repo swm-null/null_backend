@@ -130,7 +130,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 검색 히스토리 조회")
     @GetMapping("memos/search/histories")
     ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(name = "searchTerm", defaultValue = "") String searchTerm,
+        @RequestParam(name = "query", defaultValue = "") String query,
         @RequestParam(name = "searchHistoryPage", defaultValue = "1") Integer historyPage,
         @RequestParam(name = "searchHistoryLimit", defaultValue = "15") Integer historyLimit,
         @AuthenticationPrincipal String userId
