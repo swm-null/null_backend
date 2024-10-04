@@ -13,4 +13,8 @@ public class OatExpiredAccessTokenException extends OatAuthorizationException {
     public static OatExpiredAccessTokenException withDetail(String detail) {
         return new OatExpiredAccessTokenException(detail);
     }
+
+    public static OatExpiredAccessTokenException withDetail(String detail, String id) {
+        return withDetail(String.format("%s: %s", detail, id));
+    }
 }

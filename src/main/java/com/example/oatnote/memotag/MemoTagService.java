@@ -106,11 +106,15 @@ public class MemoTagService {
 
         tagId = Objects.requireNonNullElse(tagId, userId);
 
-        Integer total = memoTagRelationService.countMemos(tagId);
+        Integer total = memoTagRelationService.countMemos(tagId, userId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
         PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
 
-        Page<Memo> result = memoService.getPagedMemos(memoTagRelationService.getMemoIds(tagId), pageRequest, userId);
+        Page<Memo> result = memoService.getPagedMemos(
+            memoTagRelationService.getMemoIds(tagId, userId),
+            pageRequest,
+            userId
+        );
         Page<MemoResponse> memoTagsPage = result.map(
             memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId))
         );
@@ -188,18 +192,18 @@ public class MemoTagService {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
         Tag tag = tagService.getTag(tagId, userId);
         tag.update(updateTagRequest.name(), aiCreateEmbeddingResponse.embedding());
-        Tag updatedTag = tagService.saveTag(tag);
+        Tag updatedTag = tagService.updateTag(tag);
         return UpdateTagResponse.from(updatedTag);
     }
 
     public void deleteMemo(String memoId, String userId) {
-        memoTagRelationService.deleteRelationsByMemoId(memoId);
+        memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         Memo memo = memoService.getMemo(memoId, userId);
         memoService.deleteMemo(memo);
     }
 
     public void deleteTag(String tagId, String userId) {
-        memoTagRelationService.deleteRelationsByTagId(tagId);
+        memoTagRelationService.deleteRelationsByTagId(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
         tagService.deleteTag(tag);
     }
@@ -233,7 +237,7 @@ public class MemoTagService {
     ) {
         for (NewTag newTag : aiCreateStructureResponse.newTags()) {
             Tag tag = newTag.toTag(userId, now);
-            tagService.saveTag(tag);
+            tagService.createTag(tag);
         }
 
         for (AddedRelation addedRelation : aiCreateStructureResponse.tagsRelations().added()) {
@@ -241,13 +245,13 @@ public class MemoTagService {
         }
 
         for (DeletedRelation deletedRelation : aiCreateStructureResponse.tagsRelations().deleted()) {
-            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
         }
 
         tagService.createTagEdge(new TagEdge(userId, aiCreateStructureResponse.newStructure()));
 
         Memo processedMemo = aiCreateStructureResponse.processedMemos().get(0).toProcessedMemo(rawMemo);
-        memoService.saveMemo(processedMemo);
+        memoService.createMemo(processedMemo);
         for (String parentTagId : aiCreateStructureResponse.processedMemos().get(0).parentTagIds()) {
             memoTagRelationService.createRelation(processedMemo.getId(), parentTagId, IS_LINKED_MEMO_TAG, userId);
             List<String> parentTagIds = tagService.getParentTagsIds(parentTagId);
@@ -263,7 +267,7 @@ public class MemoTagService {
             "",
             aiMemoTagsResponse.embedding()
         );
-        Memo createdMemo = memoService.saveMemo(memo);
+        Memo createdMemo = memoService.createMemo(memo);
         for (var newTag : aiMemoTagsResponse.newTags()) {
             Tag tag = new Tag(
                 newTag.id(),
@@ -271,7 +275,7 @@ public class MemoTagService {
                 userId,
                 newTag.embedding()
             );
-            tagService.saveTag(tag);
+            tagService.createTag(tag);
         }
         return createdMemo;
     }
@@ -281,7 +285,7 @@ public class MemoTagService {
             tagService.createRelation(addRelation.parentId(), addRelation.childId(), userId);
         }
         for (Relation deletedRelation : processedMemoTags.tagsRelations().deleted()) {
-            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId());
+            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
         }
 
         List<Tag> tags = new ArrayList<>();
@@ -313,7 +317,7 @@ public class MemoTagService {
     }
 
     List<Tag> getLinkedTags(String memoId, String userId) {
-        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId);
+        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId, userId);
         return tagService.getTags(tagIds, userId);
     }
 }

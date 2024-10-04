@@ -2,6 +2,9 @@ package com.example.oatnote.user.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+import java.util.Objects;
+
+import com.example.oatnote.user.service.model.User;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -41,4 +44,7 @@ public record RegisterUserRequest(
     String code
 ) {
 
+    public User toUser(String encodedPassword) {
+        return new User(email, encodedPassword, name);
+    }
 }

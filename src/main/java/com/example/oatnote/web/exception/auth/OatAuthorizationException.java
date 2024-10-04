@@ -14,4 +14,8 @@ public class OatAuthorizationException extends OatException {
     public static OatAuthorizationException withDetail(String detail) {
         return new OatAuthorizationException(ERROR_RESPONSE, detail);
     }
+
+    public static OatAuthorizationException withDetail(String detail, String id) {
+        return withDetail(String.format("%s : %s", detail, id));
+    }
 }

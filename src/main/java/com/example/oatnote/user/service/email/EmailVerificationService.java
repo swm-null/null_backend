@@ -15,9 +15,11 @@ import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailVerificationService {
 
     private final EmailVerificationRepository emailVerificationRepository;
@@ -26,25 +28,28 @@ public class EmailVerificationService {
     private static final int CODE_LENGTH = 6;
 
     public void sendCode(String email, int expiryMinutes) {
+        log.info("이메일 인증 코드 전송 - 이메일: {}", email);
         try {
             String code = RandomStringUtils.randomNumeric(CODE_LENGTH);
             sendEmail(email, code);
             saveEmailVerification(email, code, expiryMinutes);
         } catch (MessagingException e) {
-            throw OatExternalServiceException.withDetail(String.format("이메일 전송에 실패했습니다 : %s", email));
+            throw OatExternalServiceException.withDetail("이메일 전송에 실패했습니다.", email);
         }
     }
 
     public void saveEmailVerification(String email, String code, int expiryMinutes) {
+        log.info("이메일 인증 코드 저장 - 이메일: {}", email);
         emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
         emailVerificationRepository.save(new EmailVerification(email, code, expiryMinutes));
     }
 
     public void verifyCode(String email, String code) {
+        log.info("이메일 인증 코드 확인 - 이메일: {}", email);
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail(String.format("인증 코드가 발급되지 않았습니다 : %s", email)));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("인증 코드가 발급되지 않았습니다.", email));
         if (!Objects.equals(code, emailVerification.getCode())) {
-            throw OatIllegalArgumentException.withDetail("인증 코드가 일치하지 않습니다.");
+            throw OatIllegalArgumentException.withDetail("인증 코드가 일치하지 않습니다.", email);
         }
         emailVerificationRepository.delete(emailVerification);
     }

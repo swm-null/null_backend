@@ -14,4 +14,8 @@ public class OatDataNotFoundException extends OatException {
     public static OatDataNotFoundException withDetail(String detail) {
         return new OatDataNotFoundException(detail);
     }
+
+    public static OatDataNotFoundException withDetail(String detail, String id) {
+        return withDetail(String.format("%s: %s", detail, id));
+    }
 }

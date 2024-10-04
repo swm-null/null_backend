@@ -7,49 +7,49 @@ import org.springframework.stereotype.Service;
 import com.example.oatnote.memotag.service.memoTagRelation.model.MemoTagRelation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
     public void createRelation(String memoId, String tagId, boolean isLinked, String userId) {
+        log.info("메모-태그 릴레이션 생성 - 메모: {} / 태그: {} / 유저: {}", memoId, tagId, userId);
         MemoTagRelation memoTagRelation = new MemoTagRelation(memoId, tagId, isLinked, userId);
-        memoTagRelationRepository.save(memoTagRelation);
+        memoTagRelationRepository.insert(memoTagRelation);
     }
 
-    public List<String> getMemoIds(String tagId) {
-        return memoTagRelationRepository.findByTagId(tagId).stream()
+    public List<String> getMemoIds(String tagId, String userId) {
+        return memoTagRelationRepository.findByTagIdAndUserId(tagId, userId).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }
 
-    public List<String> getMemoIds(List<String> tagIds) {
-        return tagIds.stream()
-            .flatMap(tagId -> getMemoIds(tagId).stream())
-            .toList();
-    }
-
-    public List<String> getLinkedTagIds(String memoId) {
-        return memoTagRelationRepository.findByMemoIdAndIsLinkedTrue(memoId).stream()
+    public List<String> getLinkedTagIds(String memoId, String userId) {
+        return memoTagRelationRepository.findByMemoIdAndIsLinkedTrueAndUserId(memoId, userId).stream()
             .map(MemoTagRelation::getTagId)
             .toList();
     }
 
-    public void deleteRelationsByMemoId(String memoId) {
-        memoTagRelationRepository.deleteByMemoId(memoId);
+    public void deleteRelationsByMemoId(String memoId, String userId) {
+        log.info("메모-태그 릴레이션 삭제 - 메모: {} / 유저: {}", memoId, userId);
+        memoTagRelationRepository.deleteByMemoIdAndUserId(memoId, userId);
     }
 
-    public void deleteRelationsByTagId(String tagId) {
-        memoTagRelationRepository.deleteByTagId(tagId);
-    }
-
-    public Integer countMemos(String tagId) {
-        return memoTagRelationRepository.countByTagId(tagId);
+    public void deleteRelationsByTagId(String tagId, String userId) {
+        log.info("메모-태그 릴레이션 삭제 - 태그: {} / 유저: {}", tagId, userId);
+        memoTagRelationRepository.deleteByTagIdAndUserId(tagId, userId);
     }
 
     public void deleteUserAllData(String userId) {
+        log.info("메모-태그 릴레이션 전체 삭제 - 유저: {}", userId);
         memoTagRelationRepository.deleteByUserId(userId);
+    }
+
+    public Integer countMemos(String tagId, String userId) {
+        return memoTagRelationRepository.countByTagIdAndUserId(tagId, userId);
     }
 }
