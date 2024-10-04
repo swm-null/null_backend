@@ -18,9 +18,10 @@ import com.example.oatnote.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.memotag.dto.PagedMemosResponse;
-import com.example.oatnote.memotag.dto.SearchMemoRequest;
-import com.example.oatnote.memotag.dto.SearchMemoResponse;
+import com.example.oatnote.memotag.dto.MemosResponse;
+import com.example.oatnote.memotag.dto.SearchHistoriesResponse;
+import com.example.oatnote.memotag.dto.SearchMemosRequest;
+import com.example.oatnote.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateTagRequest;
@@ -55,21 +56,21 @@ public class MemoTagController implements MemoTagApiDoc {
     }
 
     @GetMapping("/tag/memos")
-    public ResponseEntity<PagedMemosResponse> getMemosByTag(
+    public ResponseEntity<MemosResponse> getMemosByTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
         @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     ) {
-        PagedMemosResponse pagedMemosResponse = memoTagService.getMemos(
+        MemosResponse memosResponse = memoTagService.getMemos(
             tagId,
             memoPage,
             memoLimit,
             sortOrder,
             userId
         );
-        return ResponseEntity.status(HttpStatus.OK).body(pagedMemosResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(memosResponse);
     }
 
     @GetMapping("/childTags")
@@ -103,13 +104,29 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(childTagsWithMemosResponse);
     }
 
-    @PostMapping("/memos/search")
-    public ResponseEntity<SearchMemoResponse> searchMemos(
-        @RequestBody @Valid SearchMemoRequest searchMemoRequest,
+    @GetMapping("/memos/search/histories")
+    public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
+        @RequestParam(name = "query", defaultValue = "") String query,
+        @RequestParam(name = "searchHistoryPage", defaultValue = "1") Integer searchHistoryPage,
+        @RequestParam(name = "searchHistoryLimit", defaultValue = "15") Integer searchHistoryLimit,
         @AuthenticationPrincipal String userId
     ) {
-        SearchMemoResponse searchMemoResponse = memoTagService.searchMemos(searchMemoRequest, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemoResponse);
+        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(
+            query,
+            searchHistoryPage,
+            searchHistoryLimit,
+            userId
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);
+    }
+
+    @PostMapping("/memos/search")
+    public ResponseEntity<SearchMemosResponse> searchMemos(
+        @RequestBody @Valid SearchMemosRequest searchMemosRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        SearchMemosResponse searchMemosResponse = memoTagService.searchMemos(searchMemosRequest, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemosResponse);
     }
 
     @PutMapping("/memo/{memoId}")
