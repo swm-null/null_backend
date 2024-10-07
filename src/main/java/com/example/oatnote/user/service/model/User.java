@@ -25,6 +25,9 @@ public class User {
 
     private String name;
 
+    @Field(name = "profileImgUrl")
+    private String profileImageUrl;
+
     @Field(name = "cTime")
     private LocalDateTime createdAt;
 

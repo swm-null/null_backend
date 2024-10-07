@@ -14,6 +14,7 @@ import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
+import com.example.oatnote.user.dto.UserInfoResponse;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -100,6 +101,19 @@ public interface UserApiDoc {
     ResponseEntity<Void> findPassword(
         @RequestBody @Valid FindPasswordRequest findPasswordRequest
     );
+
+    @Operation(summary = "유저 본인 정보 조회")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping("/user/me")
+    ResponseEntity<UserInfoResponse> getUserInfo(
+        @AuthenticationPrincipal String userId
+    );
+
 
     @Operation(summary = "회원 탈퇴")
     @ApiResponses({
