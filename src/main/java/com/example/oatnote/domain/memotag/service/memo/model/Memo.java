@@ -33,6 +33,8 @@ public class Memo {
 
     private List<Double> embedding;
 
+    private List<Double> embeddingMetadata;
+
     @Field("cTime")
     private LocalDateTime createdAt;
 
@@ -67,9 +69,10 @@ public class Memo {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Memo process(String metadata, List<Double> embedding) {
+    public Memo process(String metadata, List<Double> embedding, List<Double> embeddingMetadata) {
         this.metadata = metadata;
         this.embedding = embedding;
+        this.embeddingMetadata = embeddingMetadata;
         return this;
     }
 }

@@ -22,12 +22,13 @@ public record AICreateStructureResponse(
         String content,
         String metadata,
         List<Double> embedding,
+        List<Double> embeddingMetadata,
         LocalDateTime timestamp,
         List<String> parentTagIds
     ) {
 
         public Memo toProcessedMemo(Memo memo) {
-            return memo.process(metadata, embedding);
+            return memo.process(metadata, embedding, embeddingMetadata);
         }
     }
 
