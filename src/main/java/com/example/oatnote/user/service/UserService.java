@@ -16,6 +16,8 @@ import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
+import com.example.oatnote.user.dto.UpdateUserInfoRequest;
+import com.example.oatnote.user.dto.UpdateUserInfoResponse;
 import com.example.oatnote.user.dto.UserInfoResponse;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
@@ -138,6 +140,19 @@ public class UserService {
         log.info("회원탈퇴 - 유저: {}", userId);
         userRepository.deleteById(userId);
         eventPublisher.publishEvent(new WithdrawUserEvent(userId));
+    }
+
+    public UpdateUserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", userId));
+        user.update(
+            updateUserInfoRequest.email(),
+            updateUserInfoRequest.name(),
+            updateUserInfoRequest.profileImageUrl()
+        );
+        User updatedUser = userRepository.save(user);
+        return UpdateUserInfoResponse.from(updatedUser);
+
     }
 }
 
