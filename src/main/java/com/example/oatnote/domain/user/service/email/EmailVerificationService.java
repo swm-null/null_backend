@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.user.service.email;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,22 +33,26 @@ public class EmailVerificationService {
         try {
             String code = RandomStringUtils.randomNumeric(CODE_LENGTH);
             sendEmail(email, code);
-            saveEmailVerification(email, code, expiryMinutes);
+            insertEmailVerification(email, code, expiryMinutes);
         } catch (MessagingException e) {
             throw OatExternalServiceException.withDetail("이메일 전송에 실패했습니다.", email);
         }
     }
 
-    public void saveEmailVerification(String email, String code, int expiryMinutes) {
+    public void insertEmailVerification(String email, String code, int expiryMinutes) {
         log.info("이메일 인증 코드 저장 - 이메일: {}", email);
-        emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
-        emailVerificationRepository.save(new EmailVerification(email, code, expiryMinutes));
+        if (emailVerificationRepository.existsByEmail(email)) {
+            emailVerificationRepository.deleteByEmail(email);
+        }
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(expiryMinutes);
+        emailVerificationRepository.insert(new EmailVerification(email, code, expiryTime));
     }
 
     public void verifyCode(String email, String code) {
         log.info("이메일 인증 코드 확인 - 이메일: {}", email);
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("인증 코드가 발급되지 않았습니다.", email));
+
         if (!Objects.equals(code, emailVerification.getCode())) {
             throw OatIllegalArgumentException.withDetail("인증 코드가 일치하지 않습니다.", email);
         }

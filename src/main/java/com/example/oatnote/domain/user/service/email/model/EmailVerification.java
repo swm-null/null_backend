@@ -1,6 +1,7 @@
 package com.example.oatnote.domain.user.service.email.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,6 +14,8 @@ import lombok.Getter;
 public class EmailVerification {
 
     @Id
+    private String id;
+
     private String email;
 
     private String code;
@@ -20,9 +23,10 @@ public class EmailVerification {
     @Field("eTime")
     private LocalDateTime expiryTime;
 
-    public EmailVerification(String email, String code, int expiryTime) {
+    public EmailVerification(String email, String code, LocalDateTime expiryTime) {
+        this.id = UUID.randomUUID().toString();
         this.email = email;
         this.code = code;
-        this.expiryTime = LocalDateTime.now().plusMinutes(expiryTime);
+        this.expiryTime = expiryTime;
     }
 }

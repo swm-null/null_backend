@@ -6,8 +6,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.event.RegisterUserEvent;
-import com.example.oatnote.event.WithdrawUserEvent;
 import com.example.oatnote.domain.user.dto.CheckEmailRequest;
 import com.example.oatnote.domain.user.dto.FindPasswordRequest;
 import com.example.oatnote.domain.user.dto.LoginUserRequest;
@@ -16,9 +14,14 @@ import com.example.oatnote.domain.user.dto.RefreshUserRequest;
 import com.example.oatnote.domain.user.dto.RefreshUserResponse;
 import com.example.oatnote.domain.user.dto.RegisterUserRequest;
 import com.example.oatnote.domain.user.dto.SendCodeRequest;
+import com.example.oatnote.domain.user.dto.UpdateUserInfoRequest;
+import com.example.oatnote.domain.user.dto.UpdateUserInfoResponse;
+import com.example.oatnote.domain.user.dto.UserInfoResponse;
 import com.example.oatnote.domain.user.dto.VerifyCodeRequest;
 import com.example.oatnote.domain.user.service.email.EmailVerificationService;
 import com.example.oatnote.domain.user.service.model.User;
+import com.example.oatnote.event.RegisterUserEvent;
+import com.example.oatnote.event.WithdrawUserEvent;
 import com.example.oatnote.util.JwtUtil;
 import com.example.oatnote.web.exception.auth.OatInvalidPasswordException;
 import com.example.oatnote.web.exception.client.OatDataNotFoundException;
@@ -106,7 +109,7 @@ public class UserService {
         String email = verifyCodeRequest.email();
         String code = verifyCodeRequest.code();
         emailVerificationService.verifyCode(email, code);
-        emailVerificationService.saveEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
+        emailVerificationService.insertEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
     }
 
     public void findPassword(FindPasswordRequest findPasswordRequest) {
@@ -127,10 +130,29 @@ public class UserService {
         log.info("비밀번호 찾기 후 변경 - 유저: {}", user.getId());
     }
 
+    public UserInfoResponse getUserInfo(String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", userId));
+        return UserInfoResponse.from(user);
+    }
+
     public void withdraw(String userId) {
         log.info("회원탈퇴 - 유저: {}", userId);
         userRepository.deleteById(userId);
         eventPublisher.publishEvent(new WithdrawUserEvent(userId));
+    }
+
+    public UpdateUserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", userId));
+        user.update(
+            updateUserInfoRequest.email(),
+            updateUserInfoRequest.name(),
+            updateUserInfoRequest.profileImageUrl()
+        );
+        User updatedUser = userRepository.save(user);
+        return UpdateUserInfoResponse.from(updatedUser);
+
     }
 }
 

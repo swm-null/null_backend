@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Size;
 public record FindPasswordRequest(
     @Schema(description = "이메일 주소", example = "user@example.com", requiredMode = REQUIRED)
     @Email(message = "유효한 이메일 주소를 입력하세요.")
+    @NotBlank(message = "이메일은 비어있을 수 없습니다.")
     String email,
 
     @Schema(description = "새 비밀번호", example = "password123!", requiredMode = REQUIRED)
