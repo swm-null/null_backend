@@ -16,6 +16,7 @@ import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
+import com.example.oatnote.user.dto.UserInfoResponse;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
 import com.example.oatnote.user.service.model.User;
@@ -125,6 +126,12 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         log.info("비밀번호 찾기 후 변경 - 유저: {}", user.getId());
+    }
+
+    public UserInfoResponse getUserInfo(String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", userId));
+        return UserInfoResponse.from(user);
     }
 
     public void withdraw(String userId) {

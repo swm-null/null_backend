@@ -16,6 +16,7 @@ import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
+import com.example.oatnote.user.dto.UserInfoResponse;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.UserService;
 
@@ -82,6 +83,14 @@ public class UserController implements UserApiDoc {
     ) {
         userService.findPassword(findPasswordRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/user/me")
+    public ResponseEntity<UserInfoResponse> getUserInfo(
+        @AuthenticationPrincipal String userId
+    ) {
+        UserInfoResponse userInfoResponse = userService.getUserInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(userInfoResponse);
     }
 
     @DeleteMapping("/user")
