@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 public record VerifyCodeRequest(
     @Schema(description = "이메일 주소", example = "user@example.com", requiredMode = REQUIRED)
     @Email(message = "유효한 이메일 주소를 입력하세요.")
+    @NotBlank(message = "이메일은 비어있을 수 없습니다.")
     String email,
 
     @Schema(description = "인증 코드", example = "123456", requiredMode = REQUIRED)
