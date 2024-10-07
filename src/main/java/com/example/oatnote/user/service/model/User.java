@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.example.oatnote.user.dto.UpdateUserInfoRequest;
+
 import lombok.Getter;
 
 @Getter
@@ -24,6 +26,9 @@ public class User {
     private String password;
 
     private String name;
+
+    @Field(name = "profileImgUrl")
+    private String profileImageUrl;
 
     @Field(name = "cTime")
     private LocalDateTime createdAt;
@@ -42,6 +47,13 @@ public class User {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void update(String email, String name, String profileImageUrl) {
+        this.email = email;
+        this.name = name;
+        this.profileImageUrl = profileImageUrl;
         this.updatedAt = LocalDateTime.now();
     }
 }

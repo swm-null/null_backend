@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +17,9 @@ import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
+import com.example.oatnote.user.dto.UpdateUserInfoRequest;
+import com.example.oatnote.user.dto.UpdateUserInfoResponse;
+import com.example.oatnote.user.dto.UserInfoResponse;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.UserService;
 
@@ -82,6 +86,23 @@ public class UserController implements UserApiDoc {
     ) {
         userService.findPassword(findPasswordRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/user/me")
+    public ResponseEntity<UserInfoResponse> getUserInfo(
+        @AuthenticationPrincipal String userId
+    ) {
+        UserInfoResponse userInfoResponse = userService.getUserInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(userInfoResponse);
+    }
+
+    @PutMapping("/user/me")
+    public ResponseEntity<UpdateUserInfoResponse> updateUserInfo(
+        @RequestBody @Valid UpdateUserInfoRequest updateUserInfoRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        UpdateUserInfoResponse updateUserInfoResponse = userService.updateUserInfo(updateUserInfoRequest, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(updateUserInfoResponse);
     }
 
     @DeleteMapping("/user")
