@@ -23,10 +23,10 @@ public class EmailVerification {
     @Field("eTime")
     private LocalDateTime expiryTime;
 
-    public EmailVerification(String email, String code, int expiryTime) {
+    public EmailVerification(String email, String code, LocalDateTime expiryTime) {
         this.id = UUID.randomUUID().toString();
         this.email = email;
         this.code = code;
-        this.expiryTime = LocalDateTime.now().plusMinutes(expiryTime);
+        this.expiryTime = expiryTime;
     }
 }

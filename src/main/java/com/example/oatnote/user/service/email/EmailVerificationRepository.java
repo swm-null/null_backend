@@ -10,7 +10,7 @@ public interface EmailVerificationRepository extends MongoRepository<EmailVerifi
 
     Optional<EmailVerification> findByEmail(String email);
 
-    boolean existsByEmail(String email);
-
     void deleteByEmail(String email);
+
+    boolean existsByEmail(String email);
 }

@@ -109,7 +109,7 @@ public class UserService {
         String email = verifyCodeRequest.email();
         String code = verifyCodeRequest.code();
         emailVerificationService.verifyCode(email, code);
-        emailVerificationService.saveEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
+        emailVerificationService.insertEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
     }
 
     public void findPassword(FindPasswordRequest findPasswordRequest) {
