@@ -40,7 +40,9 @@ public class EmailVerificationService {
 
     public void saveEmailVerification(String email, String code, int expiryMinutes) {
         log.info("이메일 인증 코드 저장 - 이메일: {}", email);
-        emailVerificationRepository.findByEmail(email).ifPresent(emailVerificationRepository::delete);
+        if (emailVerificationRepository.existsByEmail(email)) {
+            emailVerificationRepository.deleteByEmail(email);
+        }
         emailVerificationRepository.save(new EmailVerification(email, code, expiryMinutes));
     }
 
