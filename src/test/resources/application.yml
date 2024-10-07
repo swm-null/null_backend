@@ -21,3 +21,13 @@ jwt:
     expiration-ms: 600000
   refresh-token:
     expiration-ms: 86400000
+
+aws:
+  access-key: test
+  secret-key: test
+  region:
+    static: ap-northeast-2
+  s3:
+    bucket-name: test
+  cloudfront:
+    custom-domain: test
