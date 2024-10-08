@@ -33,6 +33,8 @@ public class Memo {
 
     private List<Double> embedding;
 
+    private List<Double> embeddingMetadata;
+
     @Field("cTime")
     private LocalDateTime createdAt;
 
@@ -48,28 +50,21 @@ public class Memo {
         this.updatedAt = time;
     }
 
-    public Memo(String content, List<String> imageUrls, String userId, String metadata, List<Double> embedding) {
-        this.id = UUID.randomUUID().toString();
+    public void update(
+        String content,
+        List<String> imageUrls,
+        List<Double> embedding
+    ) {
         this.content = content;
         this.imageUrls = imageUrls;
-        this.userId = userId;
-        this.metadata = metadata;
-        this.embedding = embedding;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void update(String content, List<String> imageUrls, String metadata, List<Double> embedding) {
-        this.content = content;
-        this.imageUrls = imageUrls;
-        this.metadata = metadata;
         this.embedding = embedding;
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Memo process(String metadata, List<Double> embedding) {
+    public Memo process(String metadata, List<Double> embedding, List<Double> embeddingMetadata) {
         this.metadata = metadata;
         this.embedding = embedding;
+        this.embeddingMetadata = embeddingMetadata;
         return this;
     }
 }

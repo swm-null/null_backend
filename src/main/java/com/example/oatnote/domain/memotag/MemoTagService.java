@@ -70,7 +70,6 @@ public class MemoTagService {
     private final ApplicationEventPublisher eventPublisher;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
-    private final static String TEMP_USER_ID = "70c0d720-fa31-4220-86ff-35163e956bd9"; //todo 삭제
 
     public CreateMemoResponse createMemoTags(CreateMemoRequest createMemoRequest, String userId) {
         LocalDateTime now = LocalDateTime.now();
@@ -84,18 +83,8 @@ public class MemoTagService {
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
-    public void createMemosTags(CreateMemosRequest createMemosRequest) { //todo refactor
-        AICreateMemosResponse aiCreateMemosResponse = aiMemoTagClient.createMemosTags(
-            createMemosRequest.content(),
-            TEMP_USER_ID
-        );
-        for (var aiMemoTagsResponse : aiCreateMemosResponse.processedMemoTags()) {
-            Memo savedMemo = createMemoTags(aiMemoTagsResponse, TEMP_USER_ID);
-            updateMemosTagsRelations(aiMemoTagsResponse, savedMemo, TEMP_USER_ID);
-        }
-
-        TagEdge tagEdge = new TagEdge(TEMP_USER_ID, aiCreateMemosResponse.newStructure());
-        tagService.createTagEdge(tagEdge);
+    public void createMemosTags(CreateMemosRequest createMemosRequest) {
+        //todo refactor
     }
 
     public MemosResponse getMemos(
@@ -209,8 +198,11 @@ public class MemoTagService {
             updateMemoRequest.content()
         );
         Memo memo = memoService.getMemo(memoId, userId);
-        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), null,
-            aiCreateEmbeddingResponse.embedding());
+        memo.update( //todo metadata
+            updateMemoRequest.content(),
+            updateMemoRequest.imageUrls(),
+            aiCreateEmbeddingResponse.embedding()
+        );
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
@@ -284,45 +276,6 @@ public class MemoTagService {
             List<String> parentTagIds = tagService.getParentTagsIds(parentTagId);
             createParentTagsRelations(processedMemo.getId(), parentTagIds, userId);
         }
-    }
-
-    Memo createMemoTags(ProcessedMemoTags aiMemoTagsResponse, String userId) {
-        Memo memo = new Memo(
-            aiMemoTagsResponse.content(),
-            new ArrayList<>(),
-            userId,
-            "",
-            aiMemoTagsResponse.embedding()
-        );
-        Memo createdMemo = memoService.createMemo(memo);
-        for (var newTag : aiMemoTagsResponse.newTags()) {
-            Tag tag = new Tag(
-                newTag.id(),
-                newTag.name(),
-                userId,
-                newTag.embedding()
-            );
-            tagService.createTag(tag);
-        }
-        return createdMemo;
-    }
-
-    List<Tag> updateMemosTagsRelations(ProcessedMemoTags processedMemoTags, Memo savedMemo, String userId) {
-        for (Relation addRelation : processedMemoTags.tagsRelations().added()) {
-            tagService.createRelation(addRelation.parentId(), addRelation.childId(), userId);
-        }
-        for (Relation deletedRelation : processedMemoTags.tagsRelations().deleted()) {
-            tagService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
-        }
-
-        List<Tag> tags = new ArrayList<>();
-        for (String linkedTagId : processedMemoTags.parentTagIds()) {
-            tags.add(tagService.getTag(linkedTagId, userId));
-            memoTagRelationService.createRelation(savedMemo.getId(), linkedTagId, IS_LINKED_MEMO_TAG, userId);
-            List<String> parentTagIds = tagService.getParentTagsIds(linkedTagId);
-            createParentTagsRelations(savedMemo.getId(), parentTagIds, userId);
-        }
-        return tags;
     }
 
     void createParentTagsRelations(String memoId, List<String> parentTagIds, String userId) {
