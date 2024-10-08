@@ -20,6 +20,7 @@ public record AICreateStructureResponse(
     @JsonNaming(SnakeCaseStrategy.class)
     public record ProcessedMemo(
         String content,
+        List<String> imageUrls,
         String metadata,
         List<Double> embedding,
         List<Double> embeddingMetadata,

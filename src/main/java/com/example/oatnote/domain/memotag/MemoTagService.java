@@ -198,8 +198,11 @@ public class MemoTagService {
             updateMemoRequest.content()
         );
         Memo memo = memoService.getMemo(memoId, userId);
-        memo.update(updateMemoRequest.content(), updateMemoRequest.imageUrls(), null,
-            aiCreateEmbeddingResponse.embedding());
+        memo.update( //todo metadata
+            updateMemoRequest.content(),
+            updateMemoRequest.imageUrls(),
+            aiCreateEmbeddingResponse.embedding()
+        );
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }

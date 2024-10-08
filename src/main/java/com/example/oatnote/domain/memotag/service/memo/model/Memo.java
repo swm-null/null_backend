@@ -50,21 +50,13 @@ public class Memo {
         this.updatedAt = time;
     }
 
-    public Memo(String content, List<String> imageUrls, String userId, String metadata, List<Double> embedding) {
-        this.id = UUID.randomUUID().toString();
+    public void update(
+        String content,
+        List<String> imageUrls,
+        List<Double> embedding
+    ) {
         this.content = content;
         this.imageUrls = imageUrls;
-        this.userId = userId;
-        this.metadata = metadata;
-        this.embedding = embedding;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void update(String content, List<String> imageUrls, String metadata, List<Double> embedding) {
-        this.content = content;
-        this.imageUrls = imageUrls;
-        this.metadata = metadata;
         this.embedding = embedding;
         this.updatedAt = LocalDateTime.now();
     }
