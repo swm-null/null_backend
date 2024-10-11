@@ -33,7 +33,7 @@ public class TagEdge {
         this.tagEdges = tagEdges;
     }
 
-    public static TagEdge of(String userId, Map<String, List<String>> stringListMap) {
-        return new TagEdge(userId, stringListMap);
+    public static TagEdge of(String userId, Map<String, List<String>> tagEdges) {
+        return new TagEdge(userId, tagEdges);
     }
 }

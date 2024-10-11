@@ -13,9 +13,9 @@ public interface TagRepository extends MongoRepository<Tag, String> {
 
     Optional<Tag> findByIdAndUserId(String tagId, String userId);
 
-    Page<Tag> findByIdInAndUserIdOrderByName(List<String> tagsIds, Pageable pageable, String userId);
+    Page<Tag> findByIdInAndUserIdOrderByUpdatedAtDesc(List<String> tagsIds, Pageable pageable, String userId);
 
-    List<Tag> findByIdInAndUserIdOrderByName(List<String> tagIds, String userIdt);
+    List<Tag> findByIdInAndUserIdOrderByUpdatedAtDesc(List<String> tagIds, String userId);
 
     void deleteByUserId(String userId);
 }

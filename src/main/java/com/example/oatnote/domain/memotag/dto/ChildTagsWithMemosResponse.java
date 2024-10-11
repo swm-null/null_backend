@@ -36,14 +36,14 @@ public record ChildTagsWithMemosResponse(
     public static ChildTagsWithMemosResponse from(
         TagWithMemosResponse tagWithMemosResponse,
         Page<TagWithMemosResponse> pageResult,
-        Criteria Criteria
+        Criteria criteria
     ) {
         return new ChildTagsWithMemosResponse(
             tagWithMemosResponse,
             pageResult.getTotalElements(),
             pageResult.getContent().size(),
             pageResult.getTotalPages(),
-            Criteria.getPage() + 1,
+            criteria.getCurrentPage(),
             pageResult.getContent()
         );
     }

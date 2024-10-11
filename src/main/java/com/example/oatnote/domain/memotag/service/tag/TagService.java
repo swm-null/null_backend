@@ -39,7 +39,7 @@ public class TagService {
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserIdOrderByName(tagIds, userId);
+        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
     }
 
     public List<Tag> getChildTags(String tagId, String userId) {
@@ -49,7 +49,7 @@ public class TagService {
 
     public Page<Tag> getPagedChildTags(String tagId, PageRequest pageRequest, String userId) {
         List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
-        return tagRepository.findByIdInAndUserIdOrderByName(childTagIds, pageRequest, userId);
+        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(childTagIds, pageRequest, userId);
     }
 
     public Tag updateTag(Tag tag) {

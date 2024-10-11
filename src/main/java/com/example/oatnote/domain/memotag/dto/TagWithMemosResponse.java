@@ -39,14 +39,14 @@ public record TagWithMemosResponse(
     public static TagWithMemosResponse from(
         Tag tag,
         Page<MemoResponse> pageResult,
-        Criteria Criteria
+        Criteria criteria
     ) {
         return new TagWithMemosResponse(
             TagResponse.fromTag(tag),
             pageResult.getTotalElements(),
             pageResult.getContent().size(),
             pageResult.getTotalPages(),
-            Criteria.getPage() + 1,
+            criteria.getCurrentPage(),
             pageResult.getContent()
         );
     }
