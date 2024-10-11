@@ -16,7 +16,6 @@ import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;

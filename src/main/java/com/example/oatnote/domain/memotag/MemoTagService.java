@@ -3,10 +3,8 @@ package com.example.oatnote.domain.memotag;
 import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.NewTag;
 import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.TagsRelations.AddedRelation;
 import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.TagsRelations.DeletedRelation;
-import static com.example.oatnote.domain.memotag.service.client.dto.innerDto.ProcessedMemoTags.TagsRelations.Relation;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,9 +20,8 @@ import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
-import com.example.oatnote.domain.memotag.dto.TagsResponse;
+import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
@@ -37,14 +34,12 @@ import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.innerDto.ProcessedMemoTags;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -87,7 +82,7 @@ public class MemoTagService {
         //todo refactor
     }
 
-    public MemosResponse getMemos(
+    public TagWithMemosResponse getTagWithMemos(
         String tagId,
         Integer memoPage,
         Integer memoLimit,
@@ -99,20 +94,19 @@ public class MemoTagService {
         }
 
         tagId = Objects.requireNonNullElse(tagId, userId);
+        Tag tag = tagService.getTag(tagId, userId);
 
         Integer total = memoTagRelationService.countMemos(tagId, userId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
         PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
 
-        Page<Memo> result = memoService.getPagedMemos(
+        Page<MemoResponse> pageMemos = memoService.getPagedMemos(
             memoTagRelationService.getMemoIds(tagId, userId),
             pageRequest,
             userId
-        );
-        Page<MemoResponse> memoTagsPage = result.map(
-            memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId))
-        );
-        return MemosResponse.from(memoTagsPage, criteria);
+        ).map(memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId)));
+
+        return TagWithMemosResponse.from(tag, pageMemos, criteria);
     }
 
     public List<TagResponse> getChildTags(String parentTagId, String userId) {
@@ -125,7 +119,7 @@ public class MemoTagService {
     }
 
     public ChildTagsWithMemosResponse getChildTagsWithMemos(
-        String parentTagId,
+        String tagId,
         Integer tagPage,
         Integer tagLimit,
         Integer memoPage,
@@ -133,27 +127,7 @@ public class MemoTagService {
         SortOrderTypeEnum sortOrder,
         String userId
     ) {
-        parentTagId = Objects.requireNonNullElse(parentTagId, userId);
 
-        List<String> childTagsIds = tagService.getChildTagsIds(parentTagId);
-
-        Integer total = childTagsIds.size();
-        Criteria criteria = Criteria.of(tagPage, tagLimit, total);
-        PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), SortOrderTypeEnum.NAME);
-
-        Page<Tag> result = tagService.getPagedTags(childTagsIds, pageRequest, userId);
-        Page<TagsResponse> pagedTags = result.map(
-            tag -> new TagsResponse(
-                TagResponse.fromTag(tag),
-                tagService.getChildTags(tag.getId(), userId).stream()
-                    .map(TagResponse::fromTag)
-                    .toList()
-            )
-        );
-        Page<MemosResponse> pagedMemos = pagedTags.map(
-            pagedTag -> getMemos(pagedTag.tag().id(), memoPage, memoLimit, sortOrder, userId)
-        );
-        return ChildTagsWithMemosResponse.from(pagedTags, criteria, pagedMemos);
     }
 
     public SearchHistoriesResponse getSearchHistories(
