@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @Document(collection = "search_histories")
 public class SearchHistory {
 

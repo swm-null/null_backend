@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @Document(collection = "tag_edges")
 public class TagEdge {
 
@@ -25,9 +27,13 @@ public class TagEdge {
     @Field("edges")
     private Map<String, List<String>> tagEdges;
 
-    public TagEdge(String userId, Map<String, List<String>> tagEdges) {
+    private TagEdge(String userId, Map<String, List<String>> tagEdges) {
         this.id = UUID.randomUUID().toString();
         this.userId = userId;
         this.tagEdges = tagEdges;
+    }
+
+    public static TagEdge of(String userId, Map<String, List<String>> tagEdges) {
+        return new TagEdge(userId, tagEdges);
     }
 }

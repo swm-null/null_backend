@@ -18,29 +18,9 @@ public class Criteria {
     private final int page;
     private final int limit;
 
-    public static Criteria of(Integer page, Integer limit) {
-        return new Criteria(validateAndCalculatePage(page), validateAndCalculateLimit(limit));
-    }
-
     public static Criteria of(Integer page, Integer limit, Integer total) {
         int validatedLimit = validateAndCalculateLimit(limit);
         return new Criteria(validateAndCalculatePage(page, validatedLimit, total), validatedLimit);
-    }
-
-    public enum Sort {
-        CREATED_AT_ASC,
-        CREATED_AT_DESC
-    }
-
-    private static int validateAndCalculatePage(Integer page) {
-        if (Objects.isNull(page)) {
-            page = DEFAULT_PAGE;
-        }
-        if (page < MIN_PAGE) {
-            page = MIN_PAGE;
-        }
-        page -= 1; // start from 0
-        return page;
     }
 
     private static int validateAndCalculatePage(Integer page, Integer limit, Integer total) {
@@ -70,6 +50,10 @@ public class Criteria {
             limit = MAX_LIMIT;
         }
         return limit;
+    }
+
+    public int getCurrentPage() {
+        return page + 1;
     }
 }
 

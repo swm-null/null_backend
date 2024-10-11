@@ -18,15 +18,15 @@ import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
-import com.example.oatnote.domain.memotag.dto.enums.SortOrderTypeEnum;
+import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 
 import jakarta.validation.Valid;
@@ -56,21 +56,21 @@ public class MemoTagController implements MemoTagApiDoc {
     }
 
     @GetMapping("/tag/memos")
-    public ResponseEntity<MemosResponse> getMemosByTag(
+    public ResponseEntity<TagWithMemosResponse> getTagWithMemos(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
-        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
+        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     ) {
-        MemosResponse memosResponse = memoTagService.getMemos(
+        TagWithMemosResponse tagWithMemosResponse = memoTagService.getTagWithMemos(
             tagId,
             memoPage,
             memoLimit,
             sortOrder,
             userId
         );
-        return ResponseEntity.status(HttpStatus.OK).body(memosResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(tagWithMemosResponse);
     }
 
     @GetMapping("/childTags")
@@ -89,7 +89,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
-        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
+        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     ) {
         ChildTagsWithMemosResponse childTagsWithMemosResponse = memoTagService.getChildTagsWithMemos(

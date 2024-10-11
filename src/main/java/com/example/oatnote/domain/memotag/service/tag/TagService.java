@@ -1,11 +1,15 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
+import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
@@ -29,17 +33,23 @@ public class TagService {
         tagRepository.insert(tag);
     }
 
-    public List<Tag> getTags(List<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserId(tagIds, userId);
-    }
-
-    public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest, String userId) {
-        return tagRepository.findByIdInAndUserId(tagsIds, pageRequest, userId);
-    }
-
     public Tag getTag(String tagId, String userId) {
         return tagRepository.findByIdAndUserId(tagId, userId)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("태그를 찾지 못했습니다.", tagId));
+    }
+
+    public List<Tag> getTags(List<String> tagIds, String userId) {
+        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
+    }
+
+    public List<Tag> getChildTags(String tagId, String userId) {
+        List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
+        return getTags(childTagIds, userId);
+    }
+
+    public Page<Tag> getPagedChildTags(String tagId, PageRequest pageRequest, String userId) {
+        List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
+        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(childTagIds, pageRequest, userId);
     }
 
     public Tag updateTag(Tag tag) {
@@ -54,33 +64,36 @@ public class TagService {
         tagRepository.delete(tag);
     }
 
-    public void createTagEdge(TagEdge tagEdge) {
-        tagEdgeService.createTagEdge(tagEdge);
-    }
-
-    public void createRelation(String parentTagId, String childTagId, String userId) {
-        tagsRelationService.createRelation(parentTagId, childTagId, userId);
-    }
-
-    public List<String> getChildTagsIds(String parentTagId) {
-        return tagsRelationService.getChildTagsIds(parentTagId);
-    }
-
-    public List<Tag> getChildTags(String parentTagId, String userId) {
-        return getTags(getChildTagsIds(parentTagId), userId);
-    }
-
-    public List<String> getParentTagsIds(String childTagId) {
-        return tagsRelationService.getParentTagsIds(childTagId);
-    }
-
-    public void deleteRelation(String parentTagId, String childTagId, String userId) {
-        tagsRelationService.deleteRelation(parentTagId, childTagId, userId);
+    public List<String> getParentTagsIds(String childTagId, String userId) {
+        return tagsRelationService.getParentTagsIds(childTagId, userId);
     }
 
     public void deleteUserAllData(String userId) {
+        log.info("태그 전체 삭제 - 유저: {}", userId);
+        tagRepository.deleteByUserId(userId);
         tagEdgeService.deleteUserAllData(userId);
         tagsRelationService.deleteUserAllData(userId);
-        tagRepository.deleteByUserId(userId);
+    }
+
+    public Integer countChildTags(String tagId, String userId) {
+        List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
+        return childTagIds.size();
+    }
+
+    public void processTags(AICreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
+        for (NewTag newTag : aiCreateStructureResponse.newTags()) {
+            Tag tag = newTag.toTag(userId, time);
+            createTag(tag);
+        }
+
+        for (TagsRelations.AddedRelation addedRelation : aiCreateStructureResponse.tagsRelations().added()) {
+            tagsRelationService.createRelation(addedRelation.parentId(), addedRelation.childId(), userId);
+        }
+
+        for (TagsRelations.DeletedRelation deletedRelation : aiCreateStructureResponse.tagsRelations().deleted()) {
+            tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
+        }
+
+        tagEdgeService.createTagEdge(TagEdge.of(userId, aiCreateStructureResponse.newStructure()));
     }
 }

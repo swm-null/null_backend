@@ -23,7 +23,7 @@ public record SearchHistoriesResponse(
             pagedResult.getTotalElements(),
             pagedResult.getContent().size(),
             pagedResult.getTotalPages(),
-            criteria.getPage() + 1,
+            criteria.getCurrentPage(),
             pagedResult.getContent()
         );
     }

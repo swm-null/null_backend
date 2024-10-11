@@ -8,9 +8,9 @@ import com.example.oatnote.domain.memotag.service.tag.relation.model.TagsRelatio
 
 public interface TagsRelationRepository extends MongoRepository<TagsRelation, String> {
 
-    List<TagsRelation> findByParentTagId(String parentTagId);
+    List<TagsRelation> findByParentTagIdAndUserId(String parentTagId, String userId);
 
-    List<TagsRelation> findByChildTagId(String parentTagId);
+    List<TagsRelation> findByChildTagIdAndUserId(String parentTagId, String userId);
 
     void deleteByParentTagIdAndChildTagIdAndUserId(String parentTagId, String childTagId, String userId);
 

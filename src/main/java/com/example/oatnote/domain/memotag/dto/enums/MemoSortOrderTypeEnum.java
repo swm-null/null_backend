@@ -1,14 +1,13 @@
 package com.example.oatnote.domain.memotag.dto.enums;
 
-public enum SortOrderTypeEnum {
+public enum MemoSortOrderTypeEnum {
     LATEST("latest"),
     OLDEST("oldest"),
-    NAME("name"),
     ;
 
     private final String value;
 
-    SortOrderTypeEnum(String value) {
+    MemoSortOrderTypeEnum(String value) {
         this.value = value.toUpperCase();
     }
 
