@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
@@ -30,7 +31,7 @@ public class TagService {
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserId(tagIds, userId);
+        return tagRepository.findByIdInAndUserIdOrderByName(tagIds, userId);
     }
 
     public Page<Tag> getPagedTags(List<String> tagsIds, PageRequest pageRequest, String userId) {
@@ -82,5 +83,13 @@ public class TagService {
         tagEdgeService.deleteUserAllData(userId);
         tagsRelationService.deleteUserAllData(userId);
         tagRepository.deleteByUserId(userId);
+    }
+
+    public Integer countChildTags(String tagId, String userId) {
+        return getChildTagsIds(tagId).size();
+    }
+
+    public Page<Tag> getPagedChildTags(String tagId, PageRequest pageRequest, String userId) {
+        return getPagedTags(getChildTagsIds(tagId), pageRequest, userId);
     }
 }

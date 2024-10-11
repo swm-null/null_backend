@@ -15,20 +15,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.event.CreateStructureAsyncEvent;
 import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
-import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
-import com.example.oatnote.domain.memotag.dto.enums.SortOrderTypeEnum;
+import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
@@ -48,7 +47,7 @@ import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHist
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
-import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
+import com.example.oatnote.event.CreateStructureAsyncEvent;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -86,19 +85,15 @@ public class MemoTagService {
         String tagId,
         Integer memoPage,
         Integer memoLimit,
-        SortOrderTypeEnum sortOrder,
+        MemoSortOrderTypeEnum sortOrder,
         String userId
     ) {
-        if (Objects.equals(sortOrder, SortOrderTypeEnum.NAME)) {
-            throw OatIllegalArgumentException.withDetail("메모는 이름 순으로 정렬할 수 없습니다.");
-        }
-
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
         Integer total = memoTagRelationService.countMemos(tagId, userId);
         Criteria criteria = Criteria.of(memoPage, memoLimit, total);
-        PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), sortOrder);
+        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getMemoSort(sortOrder));
 
         Page<MemoResponse> pageMemos = memoService.getPagedMemos(
             memoTagRelationService.getMemoIds(tagId, userId),
@@ -124,10 +119,25 @@ public class MemoTagService {
         Integer tagLimit,
         Integer memoPage,
         Integer memoLimit,
-        SortOrderTypeEnum sortOrder,
+        MemoSortOrderTypeEnum sortOrder,
         String userId
     ) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
+        TagWithMemosResponse tagWithMemosResponse = getTagWithMemos(tagId, memoPage, memoLimit, sortOrder, userId);
 
+        Integer total = tagService.countChildTags(tagId, userId);
+        Criteria criteria = Criteria.of(tagPage, tagLimit, total);
+        PageRequest pageRequest = PageRequest.of(
+            criteria.getPage(),
+            criteria.getLimit(),
+            Sort.by(Sort.Direction.ASC, "name")
+        );
+
+        Page<TagWithMemosResponse> childTagsPage = tagService.getPagedChildTags(tagId, pageRequest, userId).map(
+            tag -> getTagWithMemos(tag.getId(), memoPage, memoLimit, sortOrder, userId)
+        );
+
+        return ChildTagsWithMemosResponse.from(tagWithMemosResponse, childTagsPage, criteria);
     }
 
     public SearchHistoriesResponse getSearchHistories(
@@ -138,7 +148,8 @@ public class MemoTagService {
     ) {
         Integer total = searchHistoryService.countSearchHistories(userId);
         Criteria criteria = Criteria.of(searchHistoryPage, searchHistoryLimit, total);
-        PageRequest pageRequest = createPageRequest(criteria.getPage(), criteria.getLimit(), SortOrderTypeEnum.LATEST);
+        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(),
+            Sort.by(Sort.Direction.DESC, "cTime"));
         Page<SearchHistory> result = searchHistoryService.getSearchHistories(query, pageRequest, userId);
         Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
@@ -261,13 +272,11 @@ public class MemoTagService {
         }
     }
 
-    PageRequest createPageRequest(Integer page, Integer limit, SortOrderTypeEnum sortOrder) {
-        Sort sort = switch (sortOrder) {
-            case NAME -> Sort.by(Sort.Direction.ASC, "name");
+    Sort getMemoSort(MemoSortOrderTypeEnum sortOrder) {
+        return switch (sortOrder) {
             case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
             case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
         };
-        return PageRequest.of(page, limit, sort);
     }
 
     List<Tag> getLinkedTags(String memoId, String userId) {

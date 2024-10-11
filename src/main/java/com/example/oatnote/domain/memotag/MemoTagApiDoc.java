@@ -19,11 +19,12 @@ import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
-import com.example.oatnote.domain.memotag.dto.enums.SortOrderTypeEnum;
+import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,11 +76,11 @@ public interface MemoTagApiDoc {
     )
     @Operation(summary = "특정 태그의 메모 리스트 조회")
     @GetMapping("/tag/memos")
-    ResponseEntity<MemosResponse> getMemosByTag(
+    ResponseEntity<TagWithMemosResponse> getTagWithMemos(
         @RequestParam("tagId") String tagId,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "5") Integer memoLimit,
-        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
+        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     );
 
@@ -114,7 +115,7 @@ public interface MemoTagApiDoc {
         @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
         @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
-        @RequestParam(name = "sortOrder") SortOrderTypeEnum sortOrder,
+        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
         @AuthenticationPrincipal String userId
     );
 
