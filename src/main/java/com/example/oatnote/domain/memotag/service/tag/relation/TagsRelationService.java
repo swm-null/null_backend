@@ -22,14 +22,14 @@ public class TagsRelationService {
         tagsRelationRepository.insert(tagsRelation);
     }
 
-    public List<String> getParentTagsIds(String childTagId) {
-        return tagsRelationRepository.findByChildTagId(childTagId).stream()
+    public List<String> getParentTagsIds(String childTagId, String userId) {
+        return tagsRelationRepository.findByChildTagIdAndUserId(childTagId, userId).stream()
             .map(TagsRelation::getParentTagId)
             .toList();
     }
 
-    public List<String> getChildTagsIds(String parentTagId) {
-        return tagsRelationRepository.findByParentTagId(parentTagId).stream()
+    public List<String> getChildTagsIds(String parentTagId, String userId) {
+        return tagsRelationRepository.findByParentTagIdAndUserId(parentTagId, userId).stream()
             .map(TagsRelation::getChildTagId)
             .toList();
     }
