@@ -16,7 +16,7 @@ public class CreateStructureAsyncEventListener {
 
     @EventListener
     public void handelCreateStructureAsyncEventEvent(CreateStructureAsyncEvent event) {
-        memoTagService.createStructureAsync(
+        memoTagService.createStructures(
             event.aiCreateTagsResponse(),
             event.rawMemo(),
             event.userId(),

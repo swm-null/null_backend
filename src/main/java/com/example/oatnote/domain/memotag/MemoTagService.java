@@ -4,11 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
@@ -27,6 +25,7 @@ import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
+import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRequest;
@@ -42,7 +41,6 @@ import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistorySer
 import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHistory;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
-import com.example.oatnote.event.CreateStructureAsyncEvent;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -56,7 +54,7 @@ public class MemoTagService {
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
     private final SearchHistoryService searchHistoryService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final MemoTagMessageProducer memoTagMessageProducer;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
 
@@ -67,7 +65,8 @@ public class MemoTagService {
         AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
         Memo rawMemo = createMemoRequest.toRawMemo(userId, now);
-        eventPublisher.publishEvent(new CreateStructureAsyncEvent(aiCreateTagsResponse, rawMemo, userId, now));
+
+        memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);
 
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
@@ -213,8 +212,8 @@ public class MemoTagService {
         tagService.deleteUserAllData(userId);
     }
 
-    @Async
-    public void createStructureAsync(
+    // rabbitmq 수신
+    public void createStructures(
         AICreateTagsResponse aiCreateTagsResponse,
         Memo rawMemo,
         String userId,
