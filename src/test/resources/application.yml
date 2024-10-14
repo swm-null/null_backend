@@ -12,6 +12,10 @@ spring:
     exchange: test
     queue: test
     routing-key: test
+    dlx:
+      exchange: test
+      queue: test
+      routing-key: test
   ai:
     url: test
 
