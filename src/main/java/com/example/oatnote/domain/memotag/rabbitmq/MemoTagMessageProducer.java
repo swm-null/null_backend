@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemoTagMessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
-    private final ObjectMapper objectMapper;  // ObjectMapper 주입
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.rabbitmq.exchange}")
     private String exchange;
