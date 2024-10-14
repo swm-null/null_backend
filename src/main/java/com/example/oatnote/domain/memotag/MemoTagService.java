@@ -143,8 +143,11 @@ public class MemoTagService {
     ) {
         Integer total = searchHistoryService.countSearchHistories(userId);
         Criteria criteria = Criteria.of(searchHistoryPage, searchHistoryLimit, total);
-        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(),
-            Sort.by(Sort.Direction.DESC, "cTime"));
+        PageRequest pageRequest = PageRequest.of(
+            criteria.getPage(),
+            criteria.getLimit(),
+            Sort.by(Sort.Direction.DESC, "sTime")
+        );
         Page<SearchHistory> result = searchHistoryService.getSearchHistories(query, pageRequest, userId);
         Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
