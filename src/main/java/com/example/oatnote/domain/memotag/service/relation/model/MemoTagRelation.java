@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service.relation.model;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -34,11 +35,15 @@ public class MemoTagRelation {
     @Field("uId")
     private String userId;
 
+    @Field("cTime")
+    private LocalDateTime createdAt;
+
     public MemoTagRelation(String memoId, String tagId, boolean isLinked, String userId) {
         this.id = UUID.randomUUID().toString();
         this.memoId = memoId;
         this.tagId = tagId;
         this.isLinked = isLinked;
         this.userId = userId;
+        this.createdAt = LocalDateTime.now();
     }
 }

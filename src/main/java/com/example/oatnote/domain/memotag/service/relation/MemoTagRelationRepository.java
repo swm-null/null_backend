@@ -10,6 +10,8 @@ public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelati
 
     List<MemoTagRelation> findByMemoIdAndIsLinkedTrueAndUserId(String memoId, String userId);
 
+    List<MemoTagRelation> findByTagIdAndIsLinkedTrueAndUserId(String tagId, String userId);
+
     List<MemoTagRelation> findByTagIdAndUserId(String tagId, String userId);
 
     void deleteByMemoIdAndUserId(String memoId, String userId);
@@ -17,6 +19,8 @@ public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelati
     void deleteByTagIdAndUserId(String tagId, String userId);
 
     void deleteByUserId(String userId);
+
+    Integer countByTagIdAndIsLinkedTrueAndUserId(String tagId, String userId);
 
     Integer countByTagIdAndUserId(String tagId, String userId);
 }

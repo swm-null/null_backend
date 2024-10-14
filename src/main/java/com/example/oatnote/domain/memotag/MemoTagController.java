@@ -68,7 +68,8 @@ public class MemoTagController implements MemoTagApiDoc {
             memoPage,
             memoLimit,
             sortOrder,
-            userId
+            userId,
+            false
         );
         return ResponseEntity.status(HttpStatus.OK).body(tagWithMemosResponse);
     }

@@ -6,7 +6,10 @@ import org.springframework.data.domain.Page;
 
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.web.model.Criteria;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+@JsonNaming(SnakeCaseStrategy.class)
 public record SearchHistoriesResponse(
     Long totalCount,
     Integer currentCount,

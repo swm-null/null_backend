@@ -34,6 +34,12 @@ public class MemoTagRelationService {
             .toList();
     }
 
+    public List<String> getLinkedMemoIds(String tagId, String userId) {
+        return memoTagRelationRepository.findByTagIdAndIsLinkedTrueAndUserId(tagId, userId).stream()
+            .map(MemoTagRelation::getMemoId)
+            .toList();
+    }
+
     public void deleteRelationsByMemoId(String memoId, String userId) {
         log.info("메모-태그 릴레이션 삭제 - 메모: {} / 유저: {}", memoId, userId);
         memoTagRelationRepository.deleteByMemoIdAndUserId(memoId, userId);
@@ -51,5 +57,9 @@ public class MemoTagRelationService {
 
     public Integer countMemos(String tagId, String userId) {
         return memoTagRelationRepository.countByTagIdAndUserId(tagId, userId);
+    }
+
+    public Integer countLinkedMemos(String tagId, String userId) {
+        return memoTagRelationRepository.countByTagIdAndIsLinkedTrueAndUserId(tagId, userId);
     }
 }
