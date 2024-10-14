@@ -86,10 +86,11 @@ public class MemoTagService {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
+        List<TagResponse> childTags = getChildTags(tagId, userId);
+
         Integer total = isLinked
             ? memoTagRelationService.countLinkedMemos(tagId, userId)
             : memoTagRelationService.countMemos(tagId, userId);
-
         List<String> memoIds = isLinked
             ? memoTagRelationService.getLinkedMemoIds(tagId, userId)
             : memoTagRelationService.getMemoIds(tagId, userId);
@@ -107,7 +108,7 @@ public class MemoTagService {
             userId
         ).map(memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId)));
 
-        return TagWithMemosResponse.from(tag, pageMemos, criteria);
+        return TagWithMemosResponse.from(tag, childTags, pageMemos, criteria);
     }
 
     public List<TagResponse> getChildTags(String parentTagId, String userId) {
