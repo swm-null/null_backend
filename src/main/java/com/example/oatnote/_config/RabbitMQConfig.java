@@ -20,6 +20,15 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.routing-key}")
     private String routingKey;
 
+    @Value("${spring.rabbitmq.dlx.exchange}")
+    private String dlxExchangeName;
+
+    @Value("${spring.rabbitmq.dlx.queue}")
+    private String dlxQueueName;
+
+    @Value("${spring.rabbitmq.dlx.routing-key}")
+    private String dlxRoutingKey;
+
     @Bean
     public Queue memoQueue() {
         return new Queue(queueName, true);
@@ -35,5 +44,22 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(memoQueue)
             .to(topicExchange)
             .with(routingKey);
+    }
+
+    @Bean
+    public Queue dlxQueue() {
+        return new Queue(dlxQueueName, true);
+    }
+
+    @Bean
+    public TopicExchange dlxExchange() {
+        return new TopicExchange(dlxExchangeName, true, false);
+    }
+
+    @Bean
+    public Binding dlxBinding(Queue dlxQueue, TopicExchange dlxExchange) {
+        return BindingBuilder.bind(dlxQueue)
+            .to(dlxExchange)
+            .with(dlxRoutingKey);
     }
 }

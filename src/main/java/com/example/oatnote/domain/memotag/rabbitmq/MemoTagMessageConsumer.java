@@ -27,18 +27,19 @@ public class MemoTagMessageConsumer {
             MemoTagMessage memoTagMessage = parseMessageBody(message.getBody());
             log.info("rabbitMQ structures request 수신. userId: {}", memoTagMessage.userId());
 
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); //todo refactor
-
             memoTagService.createStructures(
                 memoTagMessage.aiCreateTagsResponse(),
                 memoTagMessage.rawMemo(),
                 memoTagMessage.userId(),
                 memoTagMessage.time()
             );
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (OatExternalServiceException e) {
-            log.error("Error rabbitMQ consuming message: {}", e.getDetail());
+            log.error("외부 서비스 오류: {}", e.getDetail());
+            handleNack(channel, message);
         } catch (Exception e) {
-            log.error("Error rabbitMQ consuming message: {}", e.getMessage());
+            log.error("메시지 처리 중 오류 발생: {}", e.getMessage());
+            handleNack(channel, message);
         }
     }
 
@@ -48,6 +49,14 @@ public class MemoTagMessageConsumer {
         } catch (Exception e) {
             log.error("Error rabbitMQ parsing message body");
             throw new OatExternalServiceException("Error rabbitMQ parsing message body");
+        }
+    }
+
+    private void handleNack(Channel channel, Message message) {
+        try {
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+        } catch (Exception e) {
+            log.error("NACK 전송 중 오류 발생: {}", e.getMessage());
         }
     }
 }
