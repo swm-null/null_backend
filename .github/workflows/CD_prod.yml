@@ -2,16 +2,16 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: oatnote-be/stage
-  ECS_SERVICE: oatnote-be-stage-service
-  ECS_CLUSTER: oatnote-stage-cluster
-  ECS_TASK_DEFINITION: oatnote-be-stage-family-revision.json
-  CONTAINER_NAME: oatnote-be-stage-container
-  SECRET_NAME: stage/oatnote
+  ECR_REPOSITORY: oatnote-be/prod
+  ECS_SERVICE: oatnote-be-prod-service
+  ECS_CLUSTER: oatnote-prod-cluster
+  ECS_TASK_DEFINITION: oatnote-be-prod-family-revision.json
+  CONTAINER_NAME: oatnote-be-prod-container
+  SECRET_NAME: prod/oatnote
 
 permissions:
   contents: read
