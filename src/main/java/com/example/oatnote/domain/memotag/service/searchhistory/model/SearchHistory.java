@@ -29,14 +29,14 @@ public class SearchHistory {
     @Field("uId")
     private String userId;
 
-    @Field("sTime")
-    private LocalDateTime searchedAt;
+    @Field("cTime")
+    private LocalDateTime createdAt;
 
     public SearchHistory(String query, SearchMemosResponse searchMemosResponse, String userId) {
         this.id = UUID.randomUUID().toString();
         this.query = query;
         this.searchMemosResponse = searchMemosResponse;
         this.userId = userId;
-        this.searchedAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

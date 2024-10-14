@@ -14,7 +14,7 @@ public record SearchHistoryResponse(
     public static SearchHistoryResponse from(SearchHistory searchHistory) {
         return new SearchHistoryResponse(
             searchHistory.getQuery(),
-            searchHistory.getSearchedAt(),
+            searchHistory.getCreatedAt(),
             searchHistory.getSearchMemosResponse()
         );
     }
