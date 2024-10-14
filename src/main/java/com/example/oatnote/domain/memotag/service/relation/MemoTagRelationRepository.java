@@ -1,6 +1,5 @@
 package com.example.oatnote.domain.memotag.service.relation;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
