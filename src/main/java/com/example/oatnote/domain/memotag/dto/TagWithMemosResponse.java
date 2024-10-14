@@ -17,8 +17,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record TagWithMemosResponse(
-    @Schema(description = "태그")
+    @Schema(description = "자식 태그")
     TagResponse tag,
+
+    @Schema(description = "자식 태그의 자식 태그 리스트")
+    List<TagResponse> childTags,
 
     @Schema(description = "특정 태그와 연관된 총 메모의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
@@ -38,11 +41,13 @@ public record TagWithMemosResponse(
 
     public static TagWithMemosResponse from(
         Tag tag,
+        List<TagResponse> childTagsResponse,
         Page<MemoResponse> pageResult,
         Criteria criteria
     ) {
         return new TagWithMemosResponse(
             TagResponse.fromTag(tag),
+            childTagsResponse,
             pageResult.getTotalElements(),
             pageResult.getContent().size(),
             pageResult.getTotalPages(),
