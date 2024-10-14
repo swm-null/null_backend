@@ -161,7 +161,7 @@ public class MemoTagService {
         PageRequest pageRequest = PageRequest.of(
             criteria.getPage(),
             criteria.getLimit(),
-            Sort.by(Sort.Direction.DESC, "sTime")
+            Sort.by(Sort.Direction.DESC, "cTime")
         );
         Page<SearchHistory> result = searchHistoryService.getSearchHistories(query, pageRequest, userId);
         Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
