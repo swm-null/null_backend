@@ -4,6 +4,18 @@ spring:
     port: 123
     username: test
     password: test
+  rabbitmq:
+    host: test
+    port: 123
+    username: test
+    password: test
+    exchange: test
+    queue: test
+    routing-key: test
+    dlx:
+      exchange: test
+      queue: test
+      routing-key: test
   ai:
     url: test
 
