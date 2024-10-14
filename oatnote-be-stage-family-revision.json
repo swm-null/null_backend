@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "oatnote-be-stage-container",
-      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote-be/prod:${IMAGE_TAG}",
+      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote-be/stage:${IMAGE_TAG}",
       "cpu": 2048,
       "memory": 4096,
       "portMappings": [
