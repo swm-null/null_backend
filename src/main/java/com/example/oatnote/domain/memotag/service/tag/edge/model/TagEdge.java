@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service.tag.edge.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -27,10 +28,14 @@ public class TagEdge {
     @Field("edges")
     private Map<String, List<String>> tagEdges;
 
+    @Field("cTime")
+    private LocalDateTime createdAt;
+
     private TagEdge(String userId, Map<String, List<String>> tagEdges) {
         this.id = UUID.randomUUID().toString();
         this.userId = userId;
         this.tagEdges = tagEdges;
+        this.createdAt = LocalDateTime.now();
     }
 
     public static TagEdge of(String userId, Map<String, List<String>> tagEdges) {
