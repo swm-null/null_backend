@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TagService {
 
     private final TagEdgeService tagEdgeService;
-    private final TagsRelationService tagsRelationService;
     private final TagRepository tagRepository;
 
     public void createTag(Tag tag) {
@@ -43,12 +42,12 @@ public class TagService {
     }
 
     public List<Tag> getChildTags(String tagId, String userId) {
-        List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
+        List<String> childTagIds = tagEdgeService.getChildTagsIds(tagId, userId);
         return getTags(childTagIds, userId);
     }
 
     public Page<Tag> getPagedChildTags(String tagId, PageRequest pageRequest, String userId) {
-        List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
+        List<String> childTagIds = tagEdgeService.getChildTagsIds(tagId, userId);
         return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(childTagIds, pageRequest, userId);
     }
 
@@ -65,18 +64,17 @@ public class TagService {
     }
 
     public List<String> getParentTagsIds(String childTagId, String userId) {
-        return tagsRelationService.getParentTagsIds(childTagId, userId);
+        return tagEdgeService.getParentTagsIds(childTagId, userId);
     }
 
     public void deleteUserAllData(String userId) {
         log.info("태그 전체 삭제 - 유저: {}", userId);
         tagRepository.deleteByUserId(userId);
         tagEdgeService.deleteUserAllData(userId);
-        tagsRelationService.deleteUserAllData(userId);
     }
 
     public Integer countChildTags(String tagId, String userId) {
-        List<String> childTagIds = tagsRelationService.getChildTagsIds(tagId, userId);
+        List<String> childTagIds = tagEdgeService.getChildTagsIds(tagId, userId);
         return childTagIds.size();
     }
 
@@ -84,14 +82,6 @@ public class TagService {
         for (NewTag newTag : aiCreateStructureResponse.newTags()) {
             Tag tag = newTag.toTag(userId, time);
             createTag(tag);
-        }
-
-        for (TagsRelations.AddedRelation addedRelation : aiCreateStructureResponse.tagsRelations().added()) {
-            tagsRelationService.createRelation(addedRelation.parentId(), addedRelation.childId(), userId);
-        }
-
-        for (TagsRelations.DeletedRelation deletedRelation : aiCreateStructureResponse.tagsRelations().deleted()) {
-            tagsRelationService.deleteRelation(deletedRelation.parentId(), deletedRelation.childId(), userId);
         }
 
         tagEdgeService.createTagEdge(TagEdge.of(userId, aiCreateStructureResponse.newStructure()));
