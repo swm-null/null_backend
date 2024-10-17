@@ -29,6 +29,8 @@ import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
 import com.example.oatnote.web.exception.server.OatIllegalStateException;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -130,6 +132,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.joining(", "));
         log.warn("검증 과정에서 문제가 발생했습니다. uri: {}, {}, {}, ", request.getMethod(), request.getRequestURI(), detail);
+        requestLogging(request);
+        return buildErrorResponse(ErrorEnum.VALIDATION_ERROR, detail);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(
+        HttpServletRequest request,
+        ConstraintViolationException e
+    ) {
+        String detail = e.getConstraintViolations().stream()
+            .map(ConstraintViolation::getMessage)
+            .collect(Collectors.joining(", "));
+        log.warn("유효성 검사 실패. uri: {}, {}, {}", request.getMethod(), request.getRequestURI(), detail);
         requestLogging(request);
         return buildErrorResponse(ErrorEnum.VALIDATION_ERROR, detail);
     }

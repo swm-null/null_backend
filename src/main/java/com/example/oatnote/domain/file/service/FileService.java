@@ -64,7 +64,7 @@ public class FileService {
 
     String generateFilePath(String fileNameExt, String userId) {
         String[] parts = fileNameExt.split("\\.");
-        String fileExt = parts.length > 1 ? parts[parts.length - 1] : "";
+        String fileExt = parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
         return String.format("%s/%s.%s", userId, UUID.randomUUID(), fileExt);
     }
 }

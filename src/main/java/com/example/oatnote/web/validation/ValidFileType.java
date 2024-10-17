@@ -8,12 +8,12 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Target({ ElementType.PARAMETER, ElementType.FIELD })
+@Target({ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = FileTypeValidator.class)
 public @interface ValidFileType {
 
-    String message() default "Invalid file type";
+    String message() default "지원하지 않는 파일 형식입니다.";
 
     Class<?>[] groups() default {};
 

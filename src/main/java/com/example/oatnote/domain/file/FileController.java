@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,16 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
 import com.example.oatnote.domain.file.service.FileService;
+import com.example.oatnote.web.validation.ValidFileType;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 public class FileController implements FileApiDoc {
 
     private final FileService fileService;
@@ -35,7 +32,7 @@ public class FileController implements FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<UploadFileResponse> uploadFile(
-        @RequestPart MultipartFile file,
+        @RequestPart @ValidFileType MultipartFile file,
         @AuthenticationPrincipal String userId
     ) {
         UploadFileResponse uploadFileResponse = fileService.uploadFile(file, userId);
@@ -48,7 +45,7 @@ public class FileController implements FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<UploadFilesResponse> uploadFiles(
-        @RequestPart List<MultipartFile> files,
+        @RequestPart List<@ValidFileType MultipartFile> files,
         @AuthenticationPrincipal String userId
     ) {
         UploadFilesResponse uploadFilesResponse = fileService.uploadFiles(files, userId);
