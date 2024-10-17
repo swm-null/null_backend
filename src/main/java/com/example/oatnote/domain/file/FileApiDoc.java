@@ -1,5 +1,7 @@
 package com.example.oatnote.domain.file;
 
+import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.*;
+
 import java.util.List;
 
 import org.springframework.http.MediaType;
@@ -12,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
-import com.example.oatnote.web.validation.ValidFileType;
+import com.example.oatnote.web.validation.AllowedFileType;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +42,7 @@ public interface FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<UploadFileResponse> uploadFile(
-        @RequestPart @ValidFileType MultipartFile file,
+        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, SVG}) MultipartFile file,
         @AuthenticationPrincipal String userId
     );
 
@@ -59,7 +61,7 @@ public interface FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<UploadFilesResponse> uploadFiles(
-        @RequestPart List<@ValidFileType MultipartFile> files,
+        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, SVG}) List<MultipartFile> files,
         @AuthenticationPrincipal String userId
     );
 }
