@@ -36,6 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 .DS_STORE
+.DS_Store
 
 *adminsdk.json
 

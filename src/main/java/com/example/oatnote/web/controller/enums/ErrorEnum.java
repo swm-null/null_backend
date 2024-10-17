@@ -18,7 +18,7 @@ public enum ErrorEnum {
     // 클라이언트 에러
     INVALID_ARGUMENT("1001", "잘못된 인자입니다.", HttpStatus.BAD_REQUEST),
     DATA_NOT_FOUND("1002", "데이터를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    VALIDATION_ERROR("1003", "유효성 검사가 실패했습니다.", HttpStatus.BAD_REQUEST),
+    VALIDATION_ERROR("1003", "유효성 검사에 실패했습니다.", HttpStatus.BAD_REQUEST),
     ILLEGAL_ARGUMENT("1004", "잘못된 인자입니다.", HttpStatus.BAD_REQUEST),
 
     // 서버 에러
