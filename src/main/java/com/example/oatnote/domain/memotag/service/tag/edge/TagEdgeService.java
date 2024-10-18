@@ -1,8 +1,12 @@
 package com.example.oatnote.domain.memotag.service.tag.edge;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
+import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +26,18 @@ public class TagEdgeService {
         tagEdgeRepository.insert(tagEdge);
     }
 
+    public TagEdge getTagEdge(String userId) {
+        return tagEdgeRepository.findByUserId(userId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("태그 엣지를 찾지 못했습니다", userId));
+    }
+
     public void deleteUserAllData(String userId) {
         log.info("태그 엣지 전체 삭제 - 유저: {}", userId);
         tagEdgeRepository.deleteByUserId(userId);
+    }
+
+    public Integer countChildTags(String tagId, String userId) {
+        Map<String, List<String>> edges = getTagEdge(userId).getEdges();
+        return edges.get(tagId).size();
     }
 }

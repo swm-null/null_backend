@@ -13,7 +13,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRe
 import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
-import com.example.oatnote.domain.memotag.service.tag.relation.TagsRelationService;
 import com.example.oatnote.web.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -74,8 +73,7 @@ public class TagService {
     }
 
     public Integer countChildTags(String tagId, String userId) {
-        List<String> childTagIds = tagEdgeService.getChildTagsIds(tagId, userId);
-        return childTagIds.size();
+        return tagEdgeService.countChildTags(tagId, userId);
     }
 
     public void processTags(AICreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
@@ -84,6 +82,12 @@ public class TagService {
             createTag(tag);
         }
 
-        tagEdgeService.createTagEdge(TagEdge.of(userId, aiCreateStructureResponse.newStructure()));
+        tagEdgeService.createTagEdge(
+            TagEdge.of(
+                userId,
+                aiCreateStructureResponse.newStructure(),
+                aiCreateStructureResponse.newReversedStructure()
+            )
+        );
     }
 }

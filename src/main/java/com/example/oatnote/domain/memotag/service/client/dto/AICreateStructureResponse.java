@@ -13,7 +13,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public record AICreateStructureResponse(
     List<NewTag> newTags,
     List<ProcessedMemo> processedMemos,
-    Map<String, List<String>> newStructure
+    Map<String, List<String>> newStructure,
+    Map<String, List<String>> newReversedStructure
 ) {
 
     @JsonNaming(SnakeCaseStrategy.class)

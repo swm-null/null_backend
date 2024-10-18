@@ -21,24 +21,34 @@ public class TagEdge {
     @Id
     private String id;
 
+    private Map<String, List<String>> edges;
+
+    private Map<String, List<String>> reversedEdges;
+
     @Indexed(unique = true)
     @Field("uId")
     private String userId;
 
-    @Field("edges")
-    private Map<String, List<String>> tagEdges;
-
     @Field("cTime")
     private LocalDateTime createdAt;
 
-    private TagEdge(String userId, Map<String, List<String>> tagEdges) {
+    private TagEdge(
+        Map<String, List<String>> edges,
+        Map<String, List<String>> reversedEdges,
+        String userId
+    ) {
         this.id = UUID.randomUUID().toString();
+        this.edges = edges;
+        this.reversedEdges = reversedEdges;
         this.userId = userId;
-        this.tagEdges = tagEdges;
         this.createdAt = LocalDateTime.now();
     }
 
-    public static TagEdge of(String userId, Map<String, List<String>> tagEdges) {
-        return new TagEdge(userId, tagEdges);
+    public static TagEdge of(
+        String userId,
+        Map<String, List<String>> edges,
+        Map<String, List<String>> reversedEdges
+    ) {
+        return new TagEdge(edges, reversedEdges, userId);
     }
 }

@@ -14,9 +14,7 @@ public interface MemoRepository extends MongoRepository<Memo, String> {
 
     Optional<Memo> findByIdAndUserId(String memoId, String userId);
 
-    List<Memo> findByIdInAndUserId(List<String> memoIds, String userId);
-
-    Page<Memo> findByIdInAndUserId(List<String> memoIds, Pageable pageable, String userId);
+    Page<Memo> findByIdInAndUserId(List<String> memoIds, String userId, Pageable pageable);
 
     @Query("{ 'content' : { $regex: ?0, $options: 'i' }, 'userId' : ?1 }")
     List<Memo> findByContentRegexAndUserId(String regex, String userId);

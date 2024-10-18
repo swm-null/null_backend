@@ -1,9 +1,12 @@
 package com.example.oatnote.domain.memotag.service.memo;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
@@ -30,11 +33,11 @@ public class MemoService {
     }
 
     public List<Memo> getMemos(List<String> memoIds, String userId) {
-        return memoRepository.findByIdInAndUserId(memoIds, userId);
+
     }
 
-    public Page<Memo> getPagedMemos(List<String> memoIds, PageRequest pageRequest, String userId) {
-        return memoRepository.findByIdInAndUserId(memoIds, pageRequest, userId);
+    public Page<Memo> getMemos(List<String> memoIds, String userId, Pageable pageable) {
+        return memoRepository.findByIdInAndUserId(memoIds, userId, pageable);
     }
 
     public List<Memo> getMemosContainingRegex(String regex, String userId) {

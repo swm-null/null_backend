@@ -2,8 +2,11 @@ package com.example.oatnote.domain.memotag.service.relation;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +25,8 @@ public class MemoTagRelationService {
         memoTagRelationRepository.insert(memoTagRelation);
     }
 
-    public List<String> getMemoIds(String tagId, String userId) {
-        return memoTagRelationRepository.findByTagIdAndUserId(tagId, userId).stream()
+    public List<String> getMemoIds(String tagId, boolean isLinked, String userId, PageRequest pageRequest) {
+        return memoTagRelationRepository.findByTagIdAndIsLinkedAndUserId(tagId, isLinked, userId, pageRequest).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }
@@ -34,8 +37,9 @@ public class MemoTagRelationService {
             .toList();
     }
 
-    public List<String> getLinkedMemoIds(String tagId, String userId) {
-        return memoTagRelationRepository.findByTagIdAndIsLinkedTrueAndUserId(tagId, userId).stream()
+    public List<String> getLinkedMemoIds(String tagId, MemoSortOrderTypeEnum sortOrder, String userId) {
+        Sort sort = getSort(sortOrder);
+        return memoTagRelationRepository.findByTagIdAndIsLinkedTrueAndUserId(tagId, sort, userId).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }
