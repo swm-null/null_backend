@@ -12,7 +12,7 @@ public enum AllowedFileTypeEnum {
         "jpg", "image/jpeg",
         "jpeg", "image/jpeg",
         "png", "image/png",
-        "svg", "image/svg+xml"
+        "webp", "image/webp"
     )),
     AUDIO(Map.of(
         "mp3", "audio/mpeg",
