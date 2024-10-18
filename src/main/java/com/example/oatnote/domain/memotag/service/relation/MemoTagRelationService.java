@@ -25,6 +25,12 @@ public class MemoTagRelationService {
         memoTagRelationRepository.insert(memoTagRelation);
     }
 
+    public List<String> getMemoIds(String tagId, String userId, PageRequest pageRequest) {
+        return memoTagRelationRepository.findByTagIdAndUserId(tagId, userId, pageRequest).stream()
+            .map(MemoTagRelation::getMemoId)
+            .toList();
+    }
+
     public List<String> getMemoIds(String tagId, boolean isLinked, String userId, PageRequest pageRequest) {
         return memoTagRelationRepository.findByTagIdAndIsLinkedAndUserId(tagId, isLinked, userId, pageRequest).stream()
             .map(MemoTagRelation::getMemoId)
@@ -34,13 +40,6 @@ public class MemoTagRelationService {
     public List<String> getLinkedTagIds(String memoId, String userId) {
         return memoTagRelationRepository.findByMemoIdAndIsLinkedTrueAndUserId(memoId, userId).stream()
             .map(MemoTagRelation::getTagId)
-            .toList();
-    }
-
-    public List<String> getLinkedMemoIds(String tagId, MemoSortOrderTypeEnum sortOrder, String userId) {
-        Sort sort = getSort(sortOrder);
-        return memoTagRelationRepository.findByTagIdAndIsLinkedTrueAndUserId(tagId, sort, userId).stream()
-            .map(MemoTagRelation::getMemoId)
             .toList();
     }
 
@@ -61,9 +60,5 @@ public class MemoTagRelationService {
 
     public Integer countMemos(String tagId, String userId) {
         return memoTagRelationRepository.countByTagIdAndUserId(tagId, userId);
-    }
-
-    public Integer countLinkedMemos(String tagId, String userId) {
-        return memoTagRelationRepository.countByTagIdAndIsLinkedTrueAndUserId(tagId, userId);
     }
 }

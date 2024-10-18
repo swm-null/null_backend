@@ -4,6 +4,8 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.web.model.Criteria;
@@ -34,10 +36,12 @@ public record ChildTagsResponse(
 ) {
 
     public static ChildTagsResponse from(
-
+        Tag tag,
+        Page<ChildTag> pageResult,
         Criteria criteria
     ) {
         return new ChildTagsResponse(
+            TagResponse.fromTag(tag),
             pageResult.getTotalElements(),
             pageResult.getContent().size(),
             pageResult.getTotalPages(),
@@ -46,7 +50,7 @@ public record ChildTagsResponse(
         );
     }
 
-    private record ChildTag(
+    public record ChildTag(
         @Schema(description = "자식 태그")
         TagResponse tag,
 

@@ -1,12 +1,12 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
-import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.*;
+import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.NewTag;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
@@ -40,14 +40,8 @@ public class TagService {
         return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
     }
 
-    public List<Tag> getChildTags(String tagId, String userId) {
-        List<String> childTagIds = tagEdgeService.getChildTagsIds(tagId, userId);
-        return getTags(childTagIds, userId);
-    }
-
-    public Page<Tag> getPagedChildTags(String tagId, PageRequest pageRequest, String userId) {
-        List<String> childTagIds = tagEdgeService.getChildTagsIds(tagId, userId);
-        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(childTagIds, pageRequest, userId);
+    public Page<Tag> getTags(List<String> tagIds, String userId, Pageable pageable) {
+        return tagRepository.findByIdInAndUserId(tagIds, userId, pageable);
     }
 
     public Tag updateTag(Tag tag) {
@@ -89,5 +83,9 @@ public class TagService {
                 aiCreateStructureResponse.newReversedStructure()
             )
         );
+    }
+
+    public TagEdge getTagEdge(String userId) {
+        return tagEdgeService.getTagEdge(userId);
     }
 }

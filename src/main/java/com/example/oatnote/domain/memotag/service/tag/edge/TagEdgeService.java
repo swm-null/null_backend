@@ -26,6 +26,11 @@ public class TagEdgeService {
         tagEdgeRepository.insert(tagEdge);
     }
 
+    public List<String> getParentTagsIds(String tagId, String userId) {
+        Map<String, List<String>> reversedEdges = getTagEdge(userId).getReversedEdges();
+        return reversedEdges.get(tagId);
+    }
+
     public TagEdge getTagEdge(String userId) {
         return tagEdgeRepository.findByUserId(userId)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("태그 엣지를 찾지 못했습니다", userId));

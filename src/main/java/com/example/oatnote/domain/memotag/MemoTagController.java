@@ -58,7 +58,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
-        @RequestParam(name = "isLinked") boolean isLinked,
+        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     ) {
         MemosResponse memosResponse = memoTagService.getMemos(

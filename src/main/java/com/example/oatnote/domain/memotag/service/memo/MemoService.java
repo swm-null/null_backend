@@ -33,7 +33,7 @@ public class MemoService {
     }
 
     public List<Memo> getMemos(List<String> memoIds, String userId) {
-
+        return memoRepository.findByIdInAndUserId(memoIds, userId);
     }
 
     public Page<Memo> getMemos(List<String> memoIds, String userId, Pageable pageable) {

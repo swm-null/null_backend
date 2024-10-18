@@ -78,7 +78,7 @@ public interface MemoTagApiDoc {
         @RequestParam(name = "page", defaultValue = "1") Integer memoPage,
         @RequestParam(name = "limit", defaultValue = "10") Integer memoLimit,
         @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
-        @RequestParam(name = "isLinked") boolean isLinked,
+        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     );
 
