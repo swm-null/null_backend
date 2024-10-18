@@ -116,7 +116,6 @@ public class MemoTagService {
         TagEdge tagEdge = tagService.getTagEdge(userId);
         Map<String, List<String>> tagEdges = tagEdge.getEdges();
 
-
         Integer total = tagEdges.getOrDefault(tagId, List.of()).size();
         Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(
