@@ -25,14 +25,14 @@ public class MemoTagRelationService {
         memoTagRelationRepository.insert(memoTagRelation);
     }
 
-    public List<String> getMemoIds(String tagId, String userId, PageRequest pageRequest) {
-        return memoTagRelationRepository.findByTagIdAndUserId(tagId, userId, pageRequest).stream()
+    public List<String> getMemoIds(String tagId, String userId) {
+        return memoTagRelationRepository.findByTagIdAndUserId(tagId, userId).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }
 
-    public List<String> getMemoIds(String tagId, boolean isLinked, String userId, PageRequest pageRequest) {
-        return memoTagRelationRepository.findByTagIdAndIsLinkedAndUserId(tagId, isLinked, userId, pageRequest).stream()
+    public List<String> getMemoIds(String tagId, boolean isLinked, String userId) {
+        return memoTagRelationRepository.findByTagIdAndIsLinkedAndUserId(tagId, isLinked, userId).stream()
             .map(MemoTagRelation::getMemoId)
             .toList();
     }

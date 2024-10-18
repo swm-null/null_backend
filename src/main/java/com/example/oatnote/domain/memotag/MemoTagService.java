@@ -87,13 +87,13 @@ public class MemoTagService {
         Boolean isLinked,
         String userId
     ) {
-        Integer total = memoTagRelationService.countMemos(tagId, userId);
+        List<String> memoIds = Objects.isNull(isLinked)
+            ? memoTagRelationService.getMemoIds(tagId, userId)
+            : memoTagRelationService.getMemoIds(tagId, isLinked, userId);
+
+        Integer total = memoIds.size();
         Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getSort(sortOrder));
-
-        List<String> memoIds = Objects.isNull(isLinked)
-            ? memoTagRelationService.getMemoIds(tagId, userId, pageRequest)
-            : memoTagRelationService.getMemoIds(tagId, isLinked, userId, pageRequest);
 
         Page<MemoResponse> memos = memoService.getMemos(memoIds, userId, pageRequest)
             .map(memo ->
@@ -105,7 +105,7 @@ public class MemoTagService {
         return MemosResponse.from(memos, criteria);
     }
 
-    public ChildTagsResponse getChildTagsWithMemos(
+    public ChildTagsResponse getChildTags(
         String tagId,
         Integer page,
         Integer limit,
@@ -113,18 +113,19 @@ public class MemoTagService {
     ) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
-        Integer total = tagService.countChildTags(tagId, userId);
+        TagEdge tagEdge = tagService.getTagEdge(userId);
+        Map<String, List<String>> tagEdges = tagEdge.getEdges();
+
+
+        Integer total = tagEdges.getOrDefault(tagId, List.of()).size();
         Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(
             criteria.getPage(),
             criteria.getLimit(),
-            Sort.by(Sort.Direction.DESC, "uTime")
+            Sort.by(Sort.Direction.DESC, "name")
         );
 
-        TagEdge tagEdge = tagService.getTagEdge(userId);
-        Map<String, List<String>> tagEdges = tagEdge.getEdges();
         List<String> childTagIds = tagEdges.getOrDefault(tagId, List.of());
-
         Page<Tag> childTagsPage = tagService.getTags(childTagIds, userId, pageRequest);
 
         Page<ChildTag> childTags = childTagsPage.map(childTag -> {
@@ -265,8 +266,8 @@ public class MemoTagService {
 
     Sort getSort(MemoSortOrderTypeEnum sortOrder) {
         return switch (sortOrder) {
-            case LATEST -> Sort.by(Sort.Direction.DESC, "cTime");
-            case OLDEST -> Sort.by(Sort.Direction.ASC, "cTime");
+            case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
+            case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
         };
     }
 }

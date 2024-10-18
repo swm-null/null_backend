@@ -40,9 +40,4 @@ public class TagEdgeService {
         log.info("태그 엣지 전체 삭제 - 유저: {}", userId);
         tagEdgeRepository.deleteByUserId(userId);
     }
-
-    public Integer countChildTags(String tagId, String userId) {
-        Map<String, List<String>> edges = getTagEdge(userId).getEdges();
-        return edges.get(tagId).size();
-    }
 }

@@ -13,14 +13,9 @@ public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelati
 
     List<MemoTagRelation> findByMemoIdAndIsLinkedTrueAndUserId(String memoId, String userId);
 
-    List<MemoTagRelation> findByTagIdAndUserId(String tagId, String userId, Pageable pageable);
+    List<MemoTagRelation> findByTagIdAndUserId(String tagId, String userId);
 
-    List<MemoTagRelation> findByTagIdAndIsLinkedAndUserId(
-        String tagId,
-        boolean isLinked,
-        String userId,
-        Pageable pageable
-    );
+    List<MemoTagRelation> findByTagIdAndIsLinkedAndUserId(String tagId, boolean isLinked, String userId);
 
     void deleteByMemoIdAndUserId(String memoId, String userId);
 

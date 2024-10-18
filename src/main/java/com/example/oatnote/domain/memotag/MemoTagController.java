@@ -79,7 +79,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        ChildTagsResponse childTagsResponse = memoTagService.getChildTagsWithMemos(
+        ChildTagsResponse childTagsResponse = memoTagService.getChildTags(
             parentTagId,
             page,
             limit,

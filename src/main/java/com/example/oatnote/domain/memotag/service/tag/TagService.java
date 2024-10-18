@@ -66,10 +66,6 @@ public class TagService {
         tagEdgeService.deleteUserAllData(userId);
     }
 
-    public Integer countChildTags(String tagId, String userId) {
-        return tagEdgeService.countChildTags(tagId, userId);
-    }
-
     public void processTags(AICreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
         for (NewTag newTag : aiCreateStructureResponse.newTags()) {
             Tag tag = newTag.toTag(userId, time);
