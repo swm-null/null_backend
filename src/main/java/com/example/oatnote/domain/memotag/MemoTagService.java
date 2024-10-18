@@ -4,9 +4,12 @@ import static com.example.oatnote.domain.memotag.dto.ChildTagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.ChildTagsResponse.from;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +43,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosRespon
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
+import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
 import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHistory;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
@@ -95,14 +99,40 @@ public class MemoTagService {
         Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getSort(sortOrder));
 
-        Page<MemoResponse> memos = memoService.getMemos(memoIds, userId, pageRequest)
-            .map(memo ->
-                MemoResponse.fromTag(
-                    memo,
-                    getLinkedTags(memo.getId(), userId)
-                )
-            );
-        return MemosResponse.from(memos, criteria);
+        Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
+
+        List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
+
+        Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
+            .collect(Collectors.groupingBy(
+                MemoTagRelation::getMemoId,
+                Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
+            ));
+
+        Set<String> allTagIds = memoToTagIdsMap.values().stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+        List<Tag> linkedTags = tagService.getTags(allTagIds, userId);
+
+        Map<String, Tag> tagMap = linkedTags.stream()
+            .collect(Collectors.toMap(Tag::getId, tag -> tag));
+
+        Map<String, List<Tag>> linkedTagsMap = memoToTagIdsMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().stream()
+                    .map(tagMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())
+            ));
+
+        Page<MemoResponse> memoResponses = memos.map(memo -> {
+            List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
+            return MemoResponse.fromTag(memo, linkedTagsForMemo);
+        });
+
+        return MemosResponse.from(memoResponses, criteria);
     }
 
     public ChildTagsResponse getChildTags(
@@ -113,26 +143,44 @@ public class MemoTagService {
     ) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
+
         TagEdge tagEdge = tagService.getTagEdge(userId);
         Map<String, List<String>> tagEdges = tagEdge.getEdges();
+        List<String> childTagIds = tagEdges.getOrDefault(tagId, List.of());
 
-        Integer total = tagEdges.getOrDefault(tagId, List.of()).size();
+        Integer total = childTagIds.size();
         Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(
             criteria.getPage(),
             criteria.getLimit(),
             Sort.by(Sort.Direction.DESC, "name")
         );
-
-        List<String> childTagIds = tagEdges.getOrDefault(tagId, List.of());
         Page<Tag> childTagsPage = tagService.getTags(childTagIds, userId, pageRequest);
 
-        Page<ChildTag> childTags = childTagsPage.map(childTag -> {
-            List<String> childChildTagIds = tagEdges.getOrDefault(childTag.getId(), List.of());
-            List<Tag> childChildTags = tagService.getTags(childChildTagIds, userId);
-            return ChildTag.from(childTag, childChildTags);
-        });
+        // 자식의 자식태그들을 배치로 불러옴
+        Map<String, List<String>> childToGrandChildTagIdsMap = childTagsPage.stream()
+            .collect(Collectors.toMap(
+                Tag::getId,
+                childTag -> tagEdges.getOrDefault(childTag.getId(), List.of())
+            ));
 
+        Set<String> grandChildTagIds = childToGrandChildTagIdsMap.values().stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toSet());
+
+        Map<String, List<Tag>> grandChildTagsMap = tagService.getTags(grandChildTagIds, userId).stream()
+            .collect(Collectors.groupingBy(Tag::getId));
+
+        Page<ChildTag> childTags = childTagsPage.map(childTag -> {
+            List<String> grandChildIds = childToGrandChildTagIdsMap.getOrDefault(childTag.getId(), List.of());
+
+            List<Tag> grandChildTags = grandChildIds.stream()
+                .map(grandChildTagsMap::get)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+            return ChildTag.from(childTag, grandChildTags);
+        });
         return from(tag, childTags, criteria);
     }
 

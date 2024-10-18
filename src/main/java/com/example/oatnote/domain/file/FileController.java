@@ -34,7 +34,7 @@ public class FileController implements FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<UploadFileResponse> uploadFile(
-        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, SVG}) MultipartFile file,
+        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, CSV}) MultipartFile file,
         @AuthenticationPrincipal String userId
     ) {
         UploadFileResponse uploadFileResponse = fileService.uploadFile(file, userId);
@@ -47,7 +47,7 @@ public class FileController implements FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<UploadFilesResponse> uploadFiles(
-        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, SVG}) List<MultipartFile> files,
+        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, CSV}) List<MultipartFile> files,
         @AuthenticationPrincipal String userId
     ) {
         UploadFilesResponse uploadFilesResponse = fileService.uploadFiles(files, userId);

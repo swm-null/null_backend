@@ -17,11 +17,11 @@ public interface MemoTagRelationRepository extends MongoRepository<MemoTagRelati
 
     List<MemoTagRelation> findByTagIdAndIsLinkedAndUserId(String tagId, boolean isLinked, String userId);
 
+    List<MemoTagRelation> findByMemoIdInAndIsLinkedTrueAndUserId(List<String> memoIds, String userId);
+
     void deleteByMemoIdAndUserId(String memoId, String userId);
 
     void deleteByTagIdAndUserId(String tagId, String userId);
 
     void deleteByUserId(String userId);
-
-    Integer countByTagIdAndUserId(String tagId, String userId);
 }

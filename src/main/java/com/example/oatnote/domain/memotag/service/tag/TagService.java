@@ -4,6 +4,7 @@ import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStru
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,10 @@ public class TagService {
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
+        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
+    }
+
+    public List<Tag> getTags(Set<String> tagIds, String userId) {
         return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
     }
 

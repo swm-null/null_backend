@@ -42,7 +42,7 @@ public interface FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<UploadFileResponse> uploadFile(
-        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, SVG}) MultipartFile file,
+        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, CSV}) MultipartFile file,
         @AuthenticationPrincipal String userId
     );
 
@@ -61,7 +61,7 @@ public interface FileApiDoc {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<UploadFilesResponse> uploadFiles(
-        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, SVG}) List<MultipartFile> files,
+        @RequestPart @AllowedFileType({IMAGE, AUDIO, TXT, CSV}) List<MultipartFile> files,
         @AuthenticationPrincipal String userId
     );
 }

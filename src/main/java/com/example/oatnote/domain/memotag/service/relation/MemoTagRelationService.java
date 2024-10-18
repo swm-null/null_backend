@@ -2,11 +2,8 @@ package com.example.oatnote.domain.memotag.service.relation;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 
 import lombok.RequiredArgsConstructor;
@@ -43,6 +40,10 @@ public class MemoTagRelationService {
             .toList();
     }
 
+    public List<MemoTagRelation> getLinkedMemoTagRelations(List<String> memoIds, String userId) {
+        return memoTagRelationRepository.findByMemoIdInAndIsLinkedTrueAndUserId(memoIds, userId);
+    }
+
     public void deleteRelationsByMemoId(String memoId, String userId) {
         log.info("메모-태그 릴레이션 삭제 - 메모: {} / 유저: {}", memoId, userId);
         memoTagRelationRepository.deleteByMemoIdAndUserId(memoId, userId);
@@ -56,9 +57,5 @@ public class MemoTagRelationService {
     public void deleteUserAllData(String userId) {
         log.info("메모-태그 릴레이션 전체 삭제 - 유저: {}", userId);
         memoTagRelationRepository.deleteByUserId(userId);
-    }
-
-    public Integer countMemos(String tagId, String userId) {
-        return memoTagRelationRepository.countByTagIdAndUserId(tagId, userId);
     }
 }
