@@ -101,6 +101,7 @@ public class MemoTagService {
 
         Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
 
+        // 메모와 링크태그 배치 처리
         List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
 
         Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
@@ -109,11 +110,11 @@ public class MemoTagService {
                 Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
             ));
 
-        Set<String> allTagIds = memoToTagIdsMap.values().stream()
+        Set<String> tagIds = memoToTagIdsMap.values().stream()
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
 
-        List<Tag> linkedTags = tagService.getTags(allTagIds, userId);
+        List<Tag> linkedTags = tagService.getTags(tagIds, userId);
 
         Map<String, Tag> tagMap = linkedTags.stream()
             .collect(Collectors.toMap(Tag::getId, tag -> tag));
