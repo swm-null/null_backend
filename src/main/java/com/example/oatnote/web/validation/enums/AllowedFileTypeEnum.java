@@ -21,7 +21,7 @@ public enum AllowedFileTypeEnum {
     TXT(Map.of(
         "txt", "text/plain"
     )),
-    SVG(Map.of(
+    CSV(Map.of(
         "csv", "text/csv"
     )),
     ;

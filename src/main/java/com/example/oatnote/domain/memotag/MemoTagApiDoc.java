@@ -1,7 +1,5 @@
 package com.example.oatnote.domain.memotag;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,20 +10,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
+import com.example.oatnote.domain.memotag.dto.ChildTagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
-import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
+import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
-import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -75,12 +72,13 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "특정 태그의 메모 리스트 조회")
-    @GetMapping("/tag/memos")
-    ResponseEntity<TagWithMemosResponse> getTagWithMemos(
-        @RequestParam("tagId") String tagId,
-        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "5") Integer memoLimit,
+    @GetMapping("/tag/{tagId}/memos")
+    ResponseEntity<MemosResponse> getMemos(
+        @PathVariable("tagId") String tagId,
+        @RequestParam(name = "page", defaultValue = "1") Integer memoPage,
+        @RequestParam(name = "limit", defaultValue = "10") Integer memoLimit,
         @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
+        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     );
 
@@ -92,30 +90,12 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "전체 자식 태그 리스트 조회")
+    @Operation(summary = "자식 태그 리스트 조회")
     @GetMapping("/childTags")
-    ResponseEntity<List<TagResponse>> getChildTags(
-        @RequestParam(value = "parentTagId", required = false) String parentTagId,
-        @AuthenticationPrincipal String userId
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "자식 태그 리스트와 관련된 메모 리스트 조회")
-    @GetMapping("/childTags/memos")
-    ResponseEntity<ChildTagsWithMemosResponse> getChildTagsWithMemos(
-        @RequestParam(value = "parentTagId", required = false) String parentTagId,
-        @RequestParam(name = "tagPage", defaultValue = "1") Integer tagPage,
-        @RequestParam(name = "tagLimit", defaultValue = "10") Integer tagLimit,
-        @RequestParam(name = "memoPage", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "memoLimit", defaultValue = "10") Integer memoLimit,
-        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
+    ResponseEntity<ChildTagsResponse> getChildTags(
+        @RequestParam(value = "tagId", required = false) String parentTagId,
+        @RequestParam(name = "page", defaultValue = "1") Integer tagPage,
+        @RequestParam(name = "limit", defaultValue = "10") Integer tagLimit,
         @AuthenticationPrincipal String userId
     );
 

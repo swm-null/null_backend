@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
+import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.web.model.Criteria;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -13,9 +15,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record ChildTagsWithMemosResponse(
-    @Schema(description = "태그별 메모 리스트")
-    TagWithMemosResponse tagWithMemos,
+public record ChildTagsResponse(
+    @Schema(description = "현재 태그")
+    TagResponse tag,
 
     @Schema(description = "특정 태그의 총 자식 태그의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
@@ -29,22 +31,43 @@ public record ChildTagsWithMemosResponse(
     @Schema(description = "현재 페이지", example = "2", requiredMode = REQUIRED)
     Integer currentPage,
 
-    @Schema(description = "현재 페이지의 자식 태그별 메모 리스트", requiredMode = REQUIRED)
-    List<TagWithMemosResponse> childTagsWithMemos
+    @Schema(description = "현재 페이지의 자식 태그 리스트", requiredMode = REQUIRED)
+    List<ChildTag> childTags
 ) {
 
-    public static ChildTagsWithMemosResponse from(
-        TagWithMemosResponse tagWithMemosResponse,
-        Page<TagWithMemosResponse> pageResult,
+    public static ChildTagsResponse from(
+        Tag tag,
+        Page<ChildTag> pageResult,
         Criteria criteria
     ) {
-        return new ChildTagsWithMemosResponse(
-            tagWithMemosResponse,
+        return new ChildTagsResponse(
+            TagResponse.fromTag(tag),
             pageResult.getTotalElements(),
             pageResult.getContent().size(),
             pageResult.getTotalPages(),
             criteria.getCurrentPage(),
             pageResult.getContent()
         );
+    }
+
+    public record ChildTag(
+        @Schema(description = "자식 태그")
+        TagResponse tag,
+
+        @Schema(description = "자식 태그의 자식 태그")
+        List<TagResponse> childTags
+    ) {
+
+        public static ChildTag from(
+            Tag tag,
+            List<Tag> childTags
+        ) {
+            return new ChildTag(
+                TagResponse.fromTag(tag),
+                childTags.stream()
+                    .map(TagResponse::fromTag)
+                    .toList()
+            );
+        }
     }
 }

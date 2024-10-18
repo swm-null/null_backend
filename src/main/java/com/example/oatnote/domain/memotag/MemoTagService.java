@@ -1,22 +1,29 @@
 package com.example.oatnote.domain.memotag;
 
+import static com.example.oatnote.domain.memotag.dto.ChildTagsResponse.ChildTag;
+import static com.example.oatnote.domain.memotag.dto.ChildTagsResponse.from;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.dto.ChildTagsWithMemosResponse;
+import com.example.oatnote.domain.memotag.dto.ChildTagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
-import com.example.oatnote.domain.memotag.dto.TagWithMemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
@@ -24,7 +31,6 @@ import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
-import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
@@ -37,9 +43,11 @@ import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosRespon
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
+import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
 import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHistory;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
+import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.web.model.Criteria;
 
@@ -75,79 +83,106 @@ public class MemoTagService {
         //todo refactor
     }
 
-    public TagWithMemosResponse getTagWithMemos(
+    public MemosResponse getMemos(
         String tagId,
-        Integer memoPage,
-        Integer memoLimit,
+        Integer page,
+        Integer limit,
         MemoSortOrderTypeEnum sortOrder,
-        String userId,
-        boolean isLinked
+        Boolean isLinked,
+        String userId
+    ) {
+        List<String> memoIds = Objects.isNull(isLinked)
+            ? memoTagRelationService.getMemoIds(tagId, userId)
+            : memoTagRelationService.getMemoIds(tagId, isLinked, userId);
+
+        Integer total = memoIds.size();
+        Criteria criteria = Criteria.of(page, limit, total);
+        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getSort(sortOrder));
+
+        Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
+
+        // 메모와 링크태그 배치 처리
+        List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
+
+        Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
+            .collect(Collectors.groupingBy(
+                MemoTagRelation::getMemoId,
+                Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
+            ));
+
+        Set<String> tagIds = memoToTagIdsMap.values().stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+        List<Tag> linkedTags = tagService.getTags(tagIds, userId);
+
+        Map<String, Tag> tagMap = linkedTags.stream()
+            .collect(Collectors.toMap(Tag::getId, tag -> tag));
+
+        Map<String, List<Tag>> linkedTagsMap = memoToTagIdsMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().stream()
+                    .map(tagMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())
+            ));
+
+        Page<MemoResponse> memoResponses = memos.map(memo -> {
+            List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
+            return MemoResponse.fromTag(memo, linkedTagsForMemo);
+        });
+
+        return MemosResponse.from(memoResponses, criteria);
+    }
+
+    public ChildTagsResponse getChildTags(
+        String tagId,
+        Integer page,
+        Integer limit,
+        String userId
     ) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
-        List<TagResponse> childTags = getChildTags(tagId, userId);
+        TagEdge tagEdge = tagService.getTagEdge(userId);
+        Map<String, List<String>> tagEdges = tagEdge.getEdges();
+        List<String> childTagIds = tagEdges.getOrDefault(tagId, List.of());
 
-        Integer total = isLinked
-            ? memoTagRelationService.countLinkedMemos(tagId, userId)
-            : memoTagRelationService.countMemos(tagId, userId);
-        List<String> memoIds = isLinked
-            ? memoTagRelationService.getLinkedMemoIds(tagId, userId)
-            : memoTagRelationService.getMemoIds(tagId, userId);
-
-        Criteria criteria = Criteria.of(memoPage, memoLimit, total);
-        Sort sort = switch (sortOrder) {
-            case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
-            case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
-        };
-        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), sort);
-
-        Page<MemoResponse> pageMemos = memoService.getPagedMemos(
-            memoIds,
-            pageRequest,
-            userId
-        ).map(memo -> MemoResponse.fromTag(memo, getLinkedTags(memo.getId(), userId)));
-
-        return TagWithMemosResponse.from(tag, childTags, pageMemos, criteria);
-    }
-
-    public List<TagResponse> getChildTags(String parentTagId, String userId) {
-        parentTagId = Objects.requireNonNullElse(parentTagId, userId);
-
-        List<Tag> childTags = tagService.getChildTags(parentTagId, userId);
-        return childTags.stream()
-            .map(TagResponse::fromTag)
-            .toList();
-    }
-
-    public ChildTagsWithMemosResponse getChildTagsWithMemos(
-        String tagId,
-        Integer tagPage,
-        Integer tagLimit,
-        Integer memoPage,
-        Integer memoLimit,
-        MemoSortOrderTypeEnum sortOrder,
-        String userId
-    ) {
-        tagId = Objects.requireNonNullElse(tagId, userId);
-        TagWithMemosResponse tagWithMemosResponse = getTagWithMemos(
-            tagId,
-            memoPage,
-            memoLimit,
-            sortOrder,
-            userId,
-            IS_LINKED_MEMO_TAG
+        Integer total = childTagIds.size();
+        Criteria criteria = Criteria.of(page, limit, total);
+        PageRequest pageRequest = PageRequest.of(
+            criteria.getPage(),
+            criteria.getLimit(),
+            Sort.by(Sort.Direction.DESC, "name")
         );
+        Page<Tag> childTagsPage = tagService.getTags(childTagIds, userId, pageRequest);
 
-        Integer total = tagService.countChildTags(tagId, userId);
-        Criteria criteria = Criteria.of(tagPage, tagLimit, total);
-        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit());
+        // 자식의 자식태그들을 배치로 불러옴
+        Map<String, List<String>> childToGrandChildTagIdsMap = childTagsPage.stream()
+            .collect(Collectors.toMap(
+                Tag::getId,
+                childTag -> tagEdges.getOrDefault(childTag.getId(), List.of())
+            ));
 
-        Page<TagWithMemosResponse> childTagsPage = tagService.getPagedChildTags(tagId, pageRequest, userId).map(
-            tag -> getTagWithMemos(tag.getId(), memoPage, memoLimit, sortOrder, userId, !IS_LINKED_MEMO_TAG)
-        );
+        Set<String> grandChildTagIds = childToGrandChildTagIdsMap.values().stream()
+            .flatMap(List::stream)
+            .collect(Collectors.toSet());
 
-        return ChildTagsWithMemosResponse.from(tagWithMemosResponse, childTagsPage, criteria);
+        Map<String, List<Tag>> grandChildTagsMap = tagService.getTags(grandChildTagIds, userId).stream()
+            .collect(Collectors.groupingBy(Tag::getId));
+
+        Page<ChildTag> childTags = childTagsPage.map(childTag -> {
+            List<String> grandChildIds = childToGrandChildTagIdsMap.getOrDefault(childTag.getId(), List.of());
+
+            List<Tag> grandChildTags = grandChildIds.stream()
+                .map(grandChildTagsMap::get)
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+            return ChildTag.from(childTag, grandChildTags);
+        });
+        return from(tag, childTags, criteria);
     }
 
     public SearchHistoriesResponse getSearchHistories(
@@ -275,5 +310,12 @@ public class MemoTagService {
     List<Tag> getLinkedTags(String memoId, String userId) {
         List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId, userId);
         return tagService.getTags(tagIds, userId);
+    }
+
+    Sort getSort(MemoSortOrderTypeEnum sortOrder) {
+        return switch (sortOrder) {
+            case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
+            case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
+        };
     }
 }

@@ -16,13 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record TagWithMemosResponse(
-    @Schema(description = "자식 태그")
-    TagResponse tag,
-
-    @Schema(description = "자식 태그의 자식 태그 리스트")
-    List<TagResponse> childTags,
-
+public record MemosResponse(
     @Schema(description = "특정 태그와 연관된 총 메모의 수", example = "57", requiredMode = REQUIRED)
     Long totalCount,
 
@@ -39,15 +33,11 @@ public record TagWithMemosResponse(
     List<MemoResponse> memos
 ) {
 
-    public static TagWithMemosResponse from(
-        Tag tag,
-        List<TagResponse> childTagsResponse,
+    public static MemosResponse from(
         Page<MemoResponse> pageResult,
         Criteria criteria
     ) {
-        return new TagWithMemosResponse(
-            TagResponse.fromTag(tag),
-            childTagsResponse,
+        return new MemosResponse(
             pageResult.getTotalElements(),
             pageResult.getContent().size(),
             pageResult.getTotalPages(),

@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public record AICreateStructureResponse(
     List<NewTag> newTags,
     List<ProcessedMemo> processedMemos,
-    TagsRelations tagsRelations,
-    Map<String, List<String>> newStructure
+    Map<String, List<String>> newStructure,
+    Map<String, List<String>> newReversedStructure
 ) {
 
     @JsonNaming(SnakeCaseStrategy.class)
@@ -49,29 +49,6 @@ public record AICreateStructureResponse(
                 embedding,
                 time
             );
-        }
-    }
-
-    @JsonNaming(SnakeCaseStrategy.class)
-    public record TagsRelations(
-        List<AddedRelation> added,
-        List<DeletedRelation> deleted
-    ) {
-
-        @JsonNaming(SnakeCaseStrategy.class) //todo toRelation
-        public record AddedRelation(
-            String parentId,
-            String childId
-        ) {
-
-        }
-
-        @JsonNaming(SnakeCaseStrategy.class)
-        public record DeletedRelation(
-            String parentId,
-            String childId
-        ) {
-
         }
     }
 }

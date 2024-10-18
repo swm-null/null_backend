@@ -1,7 +1,6 @@
 package com.example.oatnote.domain.memotag.dto;
 
-import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.*;
-import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.SVG;
+import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.IMAGE;
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
