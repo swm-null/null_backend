@@ -254,8 +254,7 @@ public class MemoTagService {
 
     public void deleteMemo(String memoId, String userId) {
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
-        Memo memo = memoService.getMemo(memoId, userId);
-        memoService.deleteMemo(memo);
+        memoService.deleteMemo(memoId, userId);
     }
 
     public void deleteTag(String tagId, String userId) {
