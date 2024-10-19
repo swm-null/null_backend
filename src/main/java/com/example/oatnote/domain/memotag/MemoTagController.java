@@ -40,7 +40,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestBody @Valid CreateMemoRequest createMemoRequest,
         @AuthenticationPrincipal String userId
     ) {
-        CreateMemoResponse createMemoResponse = memoTagService.createMemoTags(createMemoRequest, userId);
+        CreateMemoResponse createMemoResponse = memoTagService.createMemo(createMemoRequest, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
@@ -48,7 +48,7 @@ public class MemoTagController implements MemoTagApiDoc {
     public ResponseEntity<Void> createMemosByEmail(
         @RequestBody @Valid CreateMemosRequest createMemosRequest
     ) {
-        memoTagService.createMemosTags(createMemosRequest);
+        memoTagService.createMemos(createMemosRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
