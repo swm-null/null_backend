@@ -48,7 +48,7 @@ public class AllowedFileTypeValidator implements ConstraintValidator<AllowedFile
 
     private boolean isValidList(List<?> list) {
         if (list.isEmpty()) {
-            return false;
+            return true;
         }
 
         return list.stream().allMatch(item ->

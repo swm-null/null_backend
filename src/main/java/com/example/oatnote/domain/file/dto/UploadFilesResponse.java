@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record UploadFilesResponse(
-    @Schema(description = "파일 URLs", example = "₩[https://example.com/file1.jpg, https://example.com/file2.jpg₩]")
+    @Schema(description = "파일 URLs", example = "\"https://example.com/file1.jpg\", \"https://example.com/file2.jpg\"]")
     List<String> fileUrls
 ) {
 
