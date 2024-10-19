@@ -52,9 +52,9 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/tag/{tagId}/memos")
+    @GetMapping("/tag/memos")
     public ResponseEntity<MemosResponse> getMemos(
-        @PathVariable("tagId") String tagId,
+        @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
@@ -74,13 +74,13 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/childTags")
     public ResponseEntity<ChildTagsResponse> getChildTags(
-        @RequestParam(value = "tagId", required = false) String parentTagId,
+        @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
         ChildTagsResponse childTagsResponse = memoTagService.getChildTags(
-            parentTagId,
+            tagId,
             page,
             limit,
             userId
@@ -91,14 +91,14 @@ public class MemoTagController implements MemoTagApiDoc {
     @GetMapping("/memos/search/histories")
     public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
         @RequestParam(name = "query", defaultValue = "") String query,
-        @RequestParam(name = "searchHistoryPage", defaultValue = "1") Integer searchHistoryPage,
-        @RequestParam(name = "searchHistoryLimit", defaultValue = "15") Integer searchHistoryLimit,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
         SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(
             query,
-            searchHistoryPage,
-            searchHistoryLimit,
+            page,
+            limit,
             userId
         );
         return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);

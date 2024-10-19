@@ -72,11 +72,11 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "특정 태그의 메모 리스트 조회")
-    @GetMapping("/tag/{tagId}/memos")
+    @GetMapping("/tag/memos")
     ResponseEntity<MemosResponse> getMemos(
-        @PathVariable("tagId") String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer memoPage,
-        @RequestParam(name = "limit", defaultValue = "10") Integer memoLimit,
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
         @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
@@ -93,9 +93,9 @@ public interface MemoTagApiDoc {
     @Operation(summary = "자식 태그 리스트 조회")
     @GetMapping("/childTags")
     ResponseEntity<ChildTagsResponse> getChildTags(
-        @RequestParam(value = "tagId", required = false) String parentTagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer tagPage,
-        @RequestParam(name = "limit", defaultValue = "10") Integer tagLimit,
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     );
 
@@ -111,8 +111,8 @@ public interface MemoTagApiDoc {
     @GetMapping("memos/search/histories")
     ResponseEntity<SearchHistoriesResponse> getSearchHistories(
         @RequestParam(name = "query", defaultValue = "") String query,
-        @RequestParam(name = "searchHistoryPage", defaultValue = "1") Integer historyPage,
-        @RequestParam(name = "searchHistoryLimit", defaultValue = "15") Integer historyLimit,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     );
 

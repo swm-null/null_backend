@@ -50,6 +50,7 @@ public record ChildTagsResponse(
         );
     }
 
+    @JsonNaming(SnakeCaseStrategy.class)
     public record ChildTag(
         @Schema(description = "자식 태그")
         TagResponse tag,
