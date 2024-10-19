@@ -61,14 +61,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     ) {
-        MemosResponse memosResponse = memoTagService.getMemos(
-            tagId,
-            page,
-            limit,
-            sortOrder,
-            isLinked,
-            userId
-        );
+        MemosResponse memosResponse = memoTagService.getMemos(tagId, page, limit, sortOrder, isLinked, userId);
         return ResponseEntity.status(HttpStatus.OK).body(memosResponse);
     }
 
@@ -79,12 +72,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        ChildTagsResponse childTagsResponse = memoTagService.getChildTags(
-            tagId,
-            page,
-            limit,
-            userId
-        );
+        ChildTagsResponse childTagsResponse = memoTagService.getChildTags(tagId, page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(childTagsResponse);
     }
 
@@ -95,12 +83,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(name = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(
-            query,
-            page,
-            limit,
-            userId
-        );
+        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(query, page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);
     }
 

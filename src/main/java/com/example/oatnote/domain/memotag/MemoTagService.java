@@ -141,12 +141,7 @@ public class MemoTagService {
         return MemosResponse.from(memoResponses, criteria);
     }
 
-    public ChildTagsResponse getChildTags(
-        String tagId,
-        Integer page,
-        Integer limit,
-        String userId
-    ) {
+    public ChildTagsResponse getChildTags(String tagId, Integer page, Integer limit, String userId) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
@@ -174,7 +169,11 @@ public class MemoTagService {
             .flatMap(List::stream)
             .collect(Collectors.toSet());
 
-        Map<String, List<Tag>> grandChildTagsMap = tagService.getTags(new ArrayList<>(grandChildTagIds), userId).stream()
+        Map<String, List<Tag>> grandChildTagsMap = tagService.getTags(
+                new ArrayList<>(grandChildTagIds),
+                userId
+            )
+            .stream()
             .collect(Collectors.groupingBy(Tag::getId));
 
         Page<ChildTag> childTags = childTagsPage.map(childTag -> {
