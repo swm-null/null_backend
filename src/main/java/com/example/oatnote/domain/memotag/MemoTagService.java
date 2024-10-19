@@ -91,6 +91,8 @@ public class MemoTagService {
         Boolean isLinked,
         String userId
     ) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
+
         List<String> memoIds = Objects.isNull(isLinked)
             ? memoTagRelationService.getMemoIds(tagId, userId)
             : memoTagRelationService.getMemoIds(tagId, isLinked, userId);
