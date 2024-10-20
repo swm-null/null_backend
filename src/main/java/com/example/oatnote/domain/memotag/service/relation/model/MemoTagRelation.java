@@ -38,12 +38,31 @@ public class MemoTagRelation {
     @Field("cTime")
     private LocalDateTime createdAt;
 
-    public MemoTagRelation(String memoId, String tagId, boolean isLinked, String userId) {
+    private MemoTagRelation(
+        String memoId,
+        String tagId,
+        boolean isLinked,
+        String userId
+    ) {
         this.id = UUID.randomUUID().toString();
         this.memoId = memoId;
         this.tagId = tagId;
         this.isLinked = isLinked;
         this.userId = userId;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public static MemoTagRelation of(
+        String memoId,
+        String tagId,
+        boolean isLinked,
+        String userId
+    ) {
+        return new MemoTagRelation(
+            memoId,
+            tagId,
+            isLinked,
+            userId
+        );
     }
 }

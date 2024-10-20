@@ -28,7 +28,7 @@ public record AICreateStructureResponse(
         List<String> parentTagIds
     ) {
 
-        public Memo toProcessedMemo(Memo memo) {
+        public Memo toMemo(Memo memo) {
             return memo.process(metadata, embedding, embeddingMetadata);
         }
     }
