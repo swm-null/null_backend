@@ -55,13 +55,18 @@ public class MemoService {
         return memoRepository.save(memo);
     }
 
-    public void deleteMemo(Memo memo) {
-        log.info("메모 삭제 - 메모: {} / 유저: {}", memo.getId(), memo.getUserId());
-        memoRepository.delete(memo);
+    public void deleteMemo(String memoId, String userId) {
+        log.info("메모 삭제 - 메모: {} / 유저: {}", memoId, userId);
+        memoRepository.deleteByIdAndUserId(memoId, userId);
     }
 
     public void deleteUserAllData(String userId) {
         log.info("메모 전체 삭제 - 유저: {}", userId);
         memoRepository.deleteByUserId(userId);
+    }
+
+    public void deleteMemos(List<String> memoIds, String userId) {
+        log.info("메모 리스트 삭제 - 메모: {} / 유저: {}", memoIds, userId);
+        memoRepository.deleteByIdInAndUserId(memoIds, userId);
     }
 }

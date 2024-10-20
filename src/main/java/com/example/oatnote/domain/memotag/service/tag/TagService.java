@@ -41,10 +41,6 @@ public class TagService {
         return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
     }
 
-    public List<Tag> getTags(Set<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
-    }
-
     public Page<Tag> getTags(List<String> tagIds, String userId, Pageable pageable) {
         return tagRepository.findByIdInAndUserId(tagIds, userId, pageable);
     }
@@ -56,9 +52,9 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-    public void deleteTag(Tag tag) {
-        log.info("태그 삭제 - 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
-        tagRepository.delete(tag);
+    public void deleteTags(Set<String> tagIds, String userId) {
+        log.info("태그 리스트 삭제 - 태그: {} / 유저: {}", tagIds, userId);
+        tagRepository.deleteByIdInAndUserId(tagIds, userId);
     }
 
     public List<String> getParentTagsIds(String childTagId, String userId) {
