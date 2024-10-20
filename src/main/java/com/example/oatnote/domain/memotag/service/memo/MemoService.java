@@ -23,7 +23,7 @@ public class MemoService {
     private final MemoRepository memoRepository;
 
     public void createMemos(List<Memo> memosToCreate, String userId) {
-        log.info("메모 리스트 생성 - 개수: {} - 유저: {}", memosToCreate.size());
+        log.info("메모 리스트 생성 - 개수: {} - 유저: {}", memosToCreate.size(), userId);
         memoRepository.insert(memosToCreate);
     }
 
