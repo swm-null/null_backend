@@ -341,7 +341,6 @@ public class MemoTagService {
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
-
     List<Tag> getLinkedTags(String memoId, String userId) {
         List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId, userId);
         return tagService.getTags(tagIds, userId);
