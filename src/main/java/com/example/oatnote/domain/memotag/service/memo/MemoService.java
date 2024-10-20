@@ -22,9 +22,9 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
 
-    public Memo createMemo(Memo memo) {
-        log.info("메모 생성 - 메모: {} / 유저: {}", memo.getId(), memo.getUserId());
-        return memoRepository.insert(memo);
+    public void createMemos(List<Memo> memosToCreate, String userId) {
+        log.info("메모 리스트 생성 - 개수: {} - 유저: {}", memosToCreate.size(), userId);
+        memoRepository.insert(memosToCreate);
     }
 
     public Memo getMemo(String memoId, String userId) {

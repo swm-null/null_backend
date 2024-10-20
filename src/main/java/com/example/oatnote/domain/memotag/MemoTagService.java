@@ -7,11 +7,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -262,18 +263,17 @@ public class MemoTagService {
         memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
-        // BFS를 통한 태그 수집 후 삭제
         Set<String> visitedTags = new HashSet<>();
         Map<String, List<String>> tagEdges = tagService.getTagEdge(userId).getEdges();
-        Stack<String> stack = new Stack<>();
-        stack.push(tagId);
+        Queue<String> queue = new LinkedList<>();
+        queue.add(tagId);
 
-        while (!stack.isEmpty()) {
-            String currentTagId = stack.pop();
+        while (!queue.isEmpty()) {
+            String currentTagId = queue.poll();
             if (visitedTags.add(currentTagId)) {
                 List<String> children = tagEdges.get(currentTagId);
                 if (children != null) {
-                    stack.addAll(children);
+                    queue.addAll(children);
                 }
             }
         }
@@ -307,24 +307,46 @@ public class MemoTagService {
         String userId,
         LocalDateTime now
     ) {
+
         tagService.processTags(aiCreateStructureResponse, userId, now);
+        Map<String, List<String>> reversedTagEdge = tagService.getTagEdge(userId).getReversedEdges();
+        List<Memo> memos = new ArrayList<>();
+        List<MemoTagRelation> memoTagRelations = new ArrayList<>();
+        Set<String> visitedTagIds = new HashSet<>();
 
-        Memo processedMemo = aiCreateStructureResponse.processedMemos().get(0).toProcessedMemo(rawMemo);
-        memoService.createMemo(processedMemo);
-        for (String parentTagId : aiCreateStructureResponse.processedMemos().get(0).parentTagIds()) {
-            memoTagRelationService.createRelation(processedMemo.getId(), parentTagId, IS_LINKED_MEMO_TAG, userId);
-            List<String> parentTagIds = tagService.getParentTagsIds(parentTagId, userId);
-            createParentTagsRelations(processedMemo.getId(), parentTagIds, userId);
-        }
-    }
+        for (AICreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
+            Memo memo = processedMemo.toMemo(rawMemo);
+            memos.add(memo);
 
-    void createParentTagsRelations(String memoId, List<String> parentTagIds, String userId) {
-        if (Objects.nonNull(parentTagIds) && !parentTagIds.isEmpty()) {
-            for (var tagId : parentTagIds) {
-                memoTagRelationService.createRelation(memoId, tagId, !IS_LINKED_MEMO_TAG, userId);
-                createParentTagsRelations(memoId, tagService.getParentTagsIds(tagId, userId), userId);
+            for (String parentTagId : processedMemo.parentTagIds()) {
+                if (visitedTagIds.add(parentTagId)) {
+                    MemoTagRelation memoTagRelation = MemoTagRelation.of(
+                        memo.getId(),
+                        parentTagId,
+                        IS_LINKED_MEMO_TAG,
+                        userId
+                    );
+                    memoTagRelations.add(memoTagRelation);
+                }
+            }
+
+            Queue<String> queue = new LinkedList<>(processedMemo.parentTagIds());
+            while (!queue.isEmpty()) {
+                String tagId = queue.poll();
+                if (visitedTagIds.add(tagId)) {
+                    MemoTagRelation memoTagRelation = MemoTagRelation.of(
+                        memo.getId(),
+                        tagId,
+                        !IS_LINKED_MEMO_TAG,
+                        userId
+                    );
+                    memoTagRelations.add(memoTagRelation);
+                    queue.addAll(reversedTagEdge.getOrDefault(tagId, List.of()));
+                }
             }
         }
+        memoService.createMemos(memos, userId);
+        memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
     List<Tag> getLinkedTags(String memoId, String userId) {

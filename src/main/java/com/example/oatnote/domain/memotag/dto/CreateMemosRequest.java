@@ -15,7 +15,7 @@ public record CreateMemosRequest(
     @Schema(description = "파일 url", example = "https://example.com/kakao.csv")
     @NotBlank(message = "파일 url은 비워둘 수 없습니다.")
     @AllowedFileType({TXT, CSV})
-    String content
+    String url
 ) {
 
 }

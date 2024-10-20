@@ -16,10 +16,9 @@ public class MemoTagRelationService {
 
     private final MemoTagRelationRepository memoTagRelationRepository;
 
-    public void createRelation(String memoId, String tagId, boolean isLinked, String userId) {
-        log.info("메모-태그 릴레이션 생성 - 메모: {} / 태그: {} / 유저: {}", memoId, tagId, userId);
-        MemoTagRelation memoTagRelation = new MemoTagRelation(memoId, tagId, isLinked, userId);
-        memoTagRelationRepository.insert(memoTagRelation);
+    public void createRelations(List<MemoTagRelation> memoTagRelations, String userId) {
+        log.info("메모-태그 릴레이션 리스트 생성 - 개수: {} - 유저: {}", memoTagRelations.size(), userId);
+        memoTagRelationRepository.insert(memoTagRelations);
     }
 
     public List<String> getMemoIds(String tagId, String userId) {

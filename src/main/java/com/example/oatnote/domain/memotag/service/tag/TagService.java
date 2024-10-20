@@ -57,10 +57,6 @@ public class TagService {
         tagRepository.deleteByIdInAndUserId(tagIds, userId);
     }
 
-    public List<String> getParentTagsIds(String childTagId, String userId) {
-        return tagEdgeService.getParentTagsIds(childTagId, userId);
-    }
-
     public void deleteUserAllData(String userId) {
         log.info("태그 전체 삭제 - 유저: {}", userId);
         tagRepository.deleteByUserId(userId);
