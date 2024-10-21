@@ -324,14 +324,14 @@ public class MemoTagService {
                     userId
                 );
                 memoTagRelations.add(memoTagRelation);
-                System.out.println(tagService.getTag(linkedTagId, userId).getName());
             }
 
             Queue<String> queue = new LinkedList<>(processedMemo.parentTagIds());
             while (!queue.isEmpty()) {
-                String tagId = queue.poll();
-                if (visitedTagIds.add(tagId)) {
-                    List<String> parentTagIds = reversedTagEdge.getOrDefault(tagId, List.of());
+                String currentTagId = queue.poll();
+                if (visitedTagIds.add(currentTagId)) {
+                    List<String> parentTagIds = reversedTagEdge.getOrDefault(currentTagId, List.of());
+                    queue.addAll(parentTagIds);
                     for (String parentTagId : parentTagIds) {
                         MemoTagRelation memoTagRelation = MemoTagRelation.of(
                             memo.getId(),
@@ -340,8 +340,6 @@ public class MemoTagService {
                             userId
                         );
                         memoTagRelations.add(memoTagRelation);
-                        queue.add(parentTagId);
-                        System.out.println(tagService.getTag(parentTagId, userId).getName());
                     }
                 }
             }
