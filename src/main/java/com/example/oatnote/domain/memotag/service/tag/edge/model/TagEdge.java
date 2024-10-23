@@ -32,6 +32,9 @@ public class TagEdge {
     @Field("cTime")
     private LocalDateTime createdAt;
 
+    @Field("uTime")
+    private LocalDateTime updatedAt;
+
     private TagEdge(
         Map<String, List<String>> edges,
         Map<String, List<String>> reversedEdges,
@@ -42,6 +45,7 @@ public class TagEdge {
         this.reversedEdges = reversedEdges;
         this.userId = userId;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public static TagEdge of(
@@ -50,5 +54,14 @@ public class TagEdge {
         Map<String, List<String>> reversedEdges
     ) {
         return new TagEdge(edges, reversedEdges, userId);
+    }
+
+    public void updateEdges(
+        Map<String, List<String>> tagEdges,
+        Map<String, List<String>> reversedEdges
+    ) {
+        this.edges = tagEdges;
+        this.reversedEdges = reversedEdges;
+        this.updatedAt = LocalDateTime.now();
     }
 }
