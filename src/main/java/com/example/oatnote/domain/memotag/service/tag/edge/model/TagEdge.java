@@ -51,4 +51,8 @@ public class TagEdge {
     ) {
         return new TagEdge(edges, reversedEdges, userId);
     }
+
+    public void updateEdges(Map<String, List<String>> tagEdges) {
+        this.edges = tagEdges;
+    }
 }

@@ -263,6 +263,7 @@ public class MemoTagService {
         memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
+        //todo refactor
         Set<String> visitedTagIds = new HashSet<>();
         Map<String, List<String>> tagEdges = tagService.getTagEdge(userId).getEdges();
         Queue<String> queue = new LinkedList<>();
@@ -270,11 +271,13 @@ public class MemoTagService {
 
         while (!queue.isEmpty()) {
             String currentTagId = queue.poll();
+            tagEdges.remove(currentTagId);
             if (visitedTagIds.add(currentTagId)) {
                 List<String> childTagIds = tagEdges.getOrDefault(currentTagId, List.of());
                 queue.addAll(childTagIds);
             }
         }
+        tagService.updateTagEdge(tagEdges, userId);
         tagService.deleteTags(visitedTagIds, userId);
     }
 

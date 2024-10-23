@@ -4,6 +4,7 @@ import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStru
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.data.domain.Page;
@@ -80,5 +81,9 @@ public class TagService {
 
     public TagEdge getTagEdge(String userId) {
         return tagEdgeService.getTagEdge(userId);
+    }
+
+    public void updateTagEdge(Map<String, List<String>> tagEdges, String userId) {
+        tagEdgeService.updateTagEdge(tagEdges, userId);
     }
 }

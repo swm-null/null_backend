@@ -40,4 +40,11 @@ public class TagEdgeService {
         log.info("태그 엣지 전체 삭제 - 유저: {}", userId);
         tagEdgeRepository.deleteByUserId(userId);
     }
+
+    public void updateTagEdge(Map<String, List<String>> tagEdges, String userId) {
+        TagEdge tagEdge = getTagEdge(userId);
+        log.info("태그 엣지 업데이트 - id : {} / 유저: {}", tagEdge.getId(), userId);
+        tagEdge.updateEdges(tagEdges);
+        tagEdgeRepository.save(tagEdge);
+    }
 }
