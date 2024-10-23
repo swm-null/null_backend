@@ -83,7 +83,7 @@ public class TagService {
         return tagEdgeService.getTagEdge(userId);
     }
 
-    public void updateTagEdge(Map<String, List<String>> tagEdges, String userId) {
-        tagEdgeService.updateTagEdge(tagEdges, userId);
+    public void updateTagEdge(TagEdge tagEdge, String userId) {
+        tagEdgeService.updateTagEdge(tagEdge, userId);
     }
 }

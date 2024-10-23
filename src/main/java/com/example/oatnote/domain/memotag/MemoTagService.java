@@ -264,20 +264,29 @@ public class MemoTagService {
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
         //todo refactor
-        Set<String> visitedTagIds = new HashSet<>();
-        Map<String, List<String>> tagEdges = tagService.getTagEdge(userId).getEdges();
+        TagEdge tagEdge = tagService.getTagEdge(userId);
+        Map<String, List<String>> tagEdges = tagEdge.getEdges();
+        Map<String, List<String>> reverseTagEdges = tagEdge.getReversedEdges();
+
         Queue<String> queue = new LinkedList<>();
         queue.add(tagId);
+        Set<String> visitedTagIds = new HashSet<>();
 
         while (!queue.isEmpty()) {
             String currentTagId = queue.poll();
             tagEdges.remove(currentTagId);
+
             if (visitedTagIds.add(currentTagId)) {
                 List<String> childTagIds = tagEdges.getOrDefault(currentTagId, List.of());
                 queue.addAll(childTagIds);
+
+                for (String childTagId : childTagIds) {
+                    reverseTagEdges.getOrDefault(childTagId, new ArrayList<>()).remove(currentTagId);
+                }
             }
         }
-        tagService.updateTagEdge(tagEdges, userId);
+        tagEdge.updateEdges(tagEdges, reverseTagEdges);
+        tagService.updateTagEdge(tagEdge, userId);
         tagService.deleteTags(visitedTagIds, userId);
     }
 

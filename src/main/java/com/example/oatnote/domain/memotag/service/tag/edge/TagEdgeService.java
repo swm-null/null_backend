@@ -41,10 +41,8 @@ public class TagEdgeService {
         tagEdgeRepository.deleteByUserId(userId);
     }
 
-    public void updateTagEdge(Map<String, List<String>> tagEdges, String userId) {
-        TagEdge tagEdge = getTagEdge(userId);
+    public void updateTagEdge(TagEdge tagEdge, String userId) {
         log.info("태그 엣지 업데이트 - id : {} / 유저: {}", tagEdge.getId(), userId);
-        tagEdge.updateEdges(tagEdges);
         tagEdgeRepository.save(tagEdge);
     }
 }
