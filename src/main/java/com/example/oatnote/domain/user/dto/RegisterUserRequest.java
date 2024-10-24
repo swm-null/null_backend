@@ -23,9 +23,11 @@ public record RegisterUserRequest(
     @NotBlank(message = "비밀번호는 비어 있을 수 없습니다.")
     @Size(min = 8, message = "비밀번호는 최소 8자 이상이어야 합니다.")
     @Pattern(
-        regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+        regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",
         message = "비밀번호는 8자 이상의 영어, 숫자, 특수기호의 조합이어야 합니다."
     )
+
+
     String password,
 
     @Schema(description = "비밀번호 확인", example = "password123!", requiredMode = REQUIRED)
