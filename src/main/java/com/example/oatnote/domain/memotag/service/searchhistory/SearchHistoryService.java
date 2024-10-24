@@ -28,4 +28,9 @@ public class SearchHistoryService {
     public Integer countSearchHistories(String userId) {
         return searchHistoryRepository.countByUserId(userId);
     }
+
+    public void deleteUserAllData(String userId) {
+        log.info("검색 히스토리 전체 삭제 - 유저: {}", userId);
+        searchHistoryRepository.deleteByUserId(userId);
+    }
 }

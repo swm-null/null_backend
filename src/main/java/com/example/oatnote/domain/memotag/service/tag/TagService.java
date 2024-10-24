@@ -3,6 +3,7 @@ package com.example.oatnote.domain.memotag.service.tag;
 import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.NewTag;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,5 +86,21 @@ public class TagService {
 
     public void updateTagEdge(TagEdge tagEdge, String userId) {
         tagEdgeService.updateTagEdge(tagEdge, userId);
+    }
+
+    public void createDefaultTagStructureForNewUser(String rootTagName, String userId, List<Double> embedding) {
+        Tag tag = Tag.of(
+            rootTagName,
+            userId,
+            embedding
+        );
+        createTag(tag);
+
+        TagEdge tagEdge = TagEdge.of(
+            userId,
+            Map.of(tag.getId(), List.of()),
+            Map.of(tag.getId(), List.of())
+        );
+        tagEdgeService.createTagEdge(tagEdge);
     }
 }
