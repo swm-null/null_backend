@@ -87,6 +87,12 @@ public class MemoTagService {
         //todo refactor
     }
 
+    public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
+        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(rootTagName);
+        List<Double> embedding = aiCreateEmbeddingResponse.embedding();
+        tagService.createDefaultTagStructureForNewUser(rootTagName, userId, embedding);
+    }
+
     public MemosResponse getMemos(
         String tagId,
         Integer page,
@@ -294,6 +300,7 @@ public class MemoTagService {
         memoTagRelationService.deleteUserAllData(userId);
         memoService.deleteUserAllData(userId);
         tagService.deleteUserAllData(userId);
+        searchHistoryService.deleteUserAllData(userId);
     }
 
     // rabbitmq 수신

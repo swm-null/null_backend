@@ -13,4 +13,6 @@ public interface SearchHistoryRepository extends MongoRepository<SearchHistory, 
     Page<SearchHistory> findBySearchTermContainingAndUserId(String query, Pageable pageable, String userId);
 
     Integer countByUserId(String userId);
+
+    void deleteByUserId(String userId);
 }
