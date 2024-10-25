@@ -36,11 +36,10 @@ public class Tag {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private Tag(String id, String name, String userId, List<Double> embedding) {
+    private Tag(String id, String name, String userId) {
         this.id = id;
         this.name = name;
         this.userId = userId;
-        this.embedding = embedding;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -54,8 +53,8 @@ public class Tag {
         this.updatedAt = time;
     }
 
-    public static Tag of(String name, String userId, List<Double> embedding) {
-        return new Tag(userId, name, userId, embedding);
+    public static Tag of(String name, String userId) {
+        return new Tag(userId, name, userId);
     }
 
     public void update(String name, List<Double> embedding) {

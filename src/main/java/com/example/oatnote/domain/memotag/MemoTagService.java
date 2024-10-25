@@ -89,9 +89,7 @@ public class MemoTagService {
     }
 
     public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(rootTagName);
-        List<Double> embedding = aiCreateEmbeddingResponse.embedding();
-        tagService.createDefaultTagStructureForNewUser(rootTagName, userId, embedding);
+        tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
     }
 
     public MemosResponse getMemos(
@@ -239,18 +237,36 @@ public class MemoTagService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
-        String content = updateMemoRequest.content();
-        List<String> imageUrls = updateMemoRequest.imageUrls();
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(content);
-        AICreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(content, imageUrls);
+        String newContent = updateMemoRequest.content();
+        List<String> newImageUrls = updateMemoRequest.imageUrls();
+
         Memo memo = memoService.getMemo(memoId, userId);
+        List<String> existingImageUrls = memo.getImageUrls();
+
+        AICreateEmbeddingResponse aiCreateEmbeddingResponse = null;
+        AICreateMetadataResponse aiCreateMetadataResponse = null;
+
+        boolean isContentChanged = !newContent.equals(memo.getContent());
+        if (isContentChanged) {
+            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(newContent);
+        }
+        aiCreateMetadataResponse = aiMemoTagClient.createMetadata(newContent, newImageUrls);
+
+        List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
+            ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
+        String metadata = Objects.nonNull(aiCreateMetadataResponse)
+            ? aiCreateMetadataResponse.metadata() : memo.getMetadata();
+        List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
+            ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
+
         memo.update(
-            updateMemoRequest.content(),
-            updateMemoRequest.imageUrls(),
-            aiCreateEmbeddingResponse.embedding(),
-            aiCreateMetadataResponse.metadata(),
-            aiCreateMetadataResponse.embeddingMetadata()
+            newContent,
+            newImageUrls,
+            embedding,
+            metadata,
+            embeddingMetadata
         );
+
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
@@ -328,11 +344,10 @@ public class MemoTagService {
         String userId,
         LocalDateTime now
     ) {
-
-        tagService.processTags(aiCreateStructureResponse, userId, now);
-        Map<String, List<String>> reversedTagEdge = aiCreateStructureResponse.newReversedStructure();
         List<Memo> memos = new ArrayList<>();
         List<MemoTagRelation> memoTagRelations = new ArrayList<>();
+
+        Map<String, List<String>> reversedTagEdge = aiCreateStructureResponse.newReversedStructure();
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AICreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
@@ -367,6 +382,7 @@ public class MemoTagService {
                 }
             }
         }
+        tagService.processTags(aiCreateStructureResponse, userId, now);
         memoService.createMemos(memos, userId);
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }

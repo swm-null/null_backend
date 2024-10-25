@@ -49,9 +49,9 @@ public class TagEdge {
     }
 
     public static TagEdge of(
-        String userId,
         Map<String, List<String>> edges,
-        Map<String, List<String>> reversedEdges
+        Map<String, List<String>> reversedEdges,
+        String userId
     ) {
         return new TagEdge(edges, reversedEdges, userId);
     }
