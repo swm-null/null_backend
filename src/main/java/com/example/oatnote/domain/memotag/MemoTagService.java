@@ -1,7 +1,7 @@
 package com.example.oatnote.domain.memotag;
 
-import static com.example.oatnote.domain.memotag.dto.ChildTagsResponse.ChildTag;
-import static com.example.oatnote.domain.memotag.dto.ChildTagsResponse.from;
+import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
+import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.dto.ChildTagsResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -147,7 +147,7 @@ public class MemoTagService {
         return MemosResponse.from(memoResponses, criteria);
     }
 
-    public ChildTagsResponse getChildTags(String tagId, Integer page, Integer limit, String userId) {
+    public TagsResponse getTags(String tagId, Integer page, Integer limit, String userId) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 

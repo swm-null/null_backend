@@ -1,5 +1,7 @@
 package com.example.oatnote.domain.memotag;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.oatnote.domain.memotag.dto.ChildTagsResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -23,6 +25,7 @@ import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
+import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,14 +74,10 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "특정 태그의 메모 리스트 조회")
-    @GetMapping("/tag/memos")
-    ResponseEntity<MemosResponse> getMemos(
+    @Operation(summary = "특정 태그의 전체 자식 태그 리스트 조회")
+    @GetMapping("/childTags")
+    ResponseEntity<List<TagResponse>> getChildTags(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
-        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
-        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     );
 
@@ -90,12 +89,31 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "자식 태그 리스트 조회")
-    @GetMapping("/childTags")
-    ResponseEntity<ChildTagsResponse> getChildTags(
+    @Operation(summary = "특정 태그와 그 자식, 손자 태그 리스트 조회")
+    @GetMapping("/tags")
+    ResponseEntity<TagsResponse> getTags(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(name = "page", defaultValue = "1") Integer page,
         @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "특정 태그의 메모 리스트 조회")
+    @GetMapping("/tag/memos")
+    ResponseEntity<MemosResponse> getMemos(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
+        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     );
 

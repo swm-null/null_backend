@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record ChildTagsResponse(
+public record TagsResponse(
     @Schema(description = "현재 태그")
     TagResponse tag,
 
@@ -35,12 +35,12 @@ public record ChildTagsResponse(
     List<ChildTag> childTags
 ) {
 
-    public static ChildTagsResponse from(
+    public static TagsResponse from(
         Tag tag,
         Page<ChildTag> pageResult,
         Criteria criteria
     ) {
-        return new ChildTagsResponse(
+        return new TagsResponse(
             TagResponse.fromTag(tag),
             pageResult.getTotalElements(),
             pageResult.getContent().size(),

@@ -1,5 +1,7 @@
 package com.example.oatnote.domain.memotag;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.domain.memotag.dto.ChildTagsResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -25,6 +27,7 @@ import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
+import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,26 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping("/childTags")
+    public ResponseEntity<List<TagResponse>> getChildTags(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @AuthenticationPrincipal String userId
+    ) {
+        List<TagResponse> childTags = memoTagService.getChildTags(tagId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(childTags);
+    }
+
+    @GetMapping("/tags")
+    public ResponseEntity<TagsResponse> getTags(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+        @AuthenticationPrincipal String userId
+    ) {
+        TagsResponse tagsResponse = memoTagService.getTags(tagId, page, limit, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(tagsResponse);
+    }
+
     @GetMapping("/tag/memos")
     public ResponseEntity<MemosResponse> getMemos(
         @RequestParam(value = "tagId", required = false) String tagId,
@@ -63,17 +86,6 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         MemosResponse memosResponse = memoTagService.getMemos(tagId, page, limit, sortOrder, isLinked, userId);
         return ResponseEntity.status(HttpStatus.OK).body(memosResponse);
-    }
-
-    @GetMapping("/childTags")
-    public ResponseEntity<ChildTagsResponse> getChildTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
-        @AuthenticationPrincipal String userId
-    ) {
-        ChildTagsResponse childTagsResponse = memoTagService.getChildTags(tagId, page, limit, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(childTagsResponse);
     }
 
     @GetMapping("/memos/search/histories")
