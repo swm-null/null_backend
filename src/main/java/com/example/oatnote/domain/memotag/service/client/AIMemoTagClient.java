@@ -90,7 +90,7 @@ public class AIMemoTagClient {
     }
 
     public AICreateMetadataResponse createMetadata(String content, List<String> imageUrls) {
-        final URI uri = buildUri("/get-embedding");
+        final URI uri = buildUri("/get-metadata-with-embedding");
         AICreateMetadataRequest aiCreateMetadataRequest = AICreateMetadataRequest.from(content, imageUrls);
         ResponseEntity<AICreateMetadataResponse> aiCreateMetadataResponse = restTemplate.postForEntity(
             uri,
