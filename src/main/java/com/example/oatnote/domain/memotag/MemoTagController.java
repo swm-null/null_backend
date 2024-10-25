@@ -60,8 +60,8 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(value = "tagId", required = false) String tagId,
         @AuthenticationPrincipal String userId
     ) {
-        List<TagResponse> childTags = memoTagService.getChildTags(tagId, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(childTags);
+        List<TagResponse> childTagsResponse = memoTagService.getChildTags(tagId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(childTagsResponse);
     }
 
     @GetMapping("/tags")
