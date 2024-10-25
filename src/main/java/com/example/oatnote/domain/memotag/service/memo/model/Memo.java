@@ -29,9 +29,9 @@ public class Memo {
     @Field("uId")
     private String userId;
 
-    private List<Double> embedding;
-
     private String metadata;
+
+    private List<Double> embedding;
 
     private List<Double> embeddingMetadata;
 
@@ -53,21 +53,17 @@ public class Memo {
     public void update(
         String content,
         List<String> imageUrls,
-        List<Double> embedding,
-        String metadata,
-        List<Double> embeddingMetadata
+        List<Double> embedding
     ) {
         this.content = content;
         this.imageUrls = imageUrls;
-        this.metadata = metadata;
         this.embedding = embedding;
-        this.embeddingMetadata = embeddingMetadata;
         this.updatedAt = LocalDateTime.now();
     }
 
     public Memo process(String metadata, List<Double> embedding, List<Double> embeddingMetadata) {
-        this.embedding = embedding;
         this.metadata = metadata;
+        this.embedding = embedding;
         this.embeddingMetadata = embeddingMetadata;
         return this;
     }

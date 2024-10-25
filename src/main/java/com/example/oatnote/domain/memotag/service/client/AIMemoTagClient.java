@@ -1,7 +1,6 @@
 package com.example.oatnote.domain.memotag.service.client;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +10,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateMetadataRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateMetadataResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest;
@@ -78,26 +75,15 @@ public class AIMemoTagClient {
         return aiSearchMemosResponse.getBody();
     }
 
-    public AICreateEmbeddingResponse createEmbedding(String content) {
+    public AICreateEmbeddingResponse createEmbedding(String name) {
         final URI uri = buildUri("/get-embedding");
-        AICreateEmbeddingRequest aiCreateEmbeddingRequest = AICreateEmbeddingRequest.from(content);
+        AICreateEmbeddingRequest aiCreateEmbeddingRequest = AICreateEmbeddingRequest.from(name);
         ResponseEntity<AICreateEmbeddingResponse> aiCreateEmbeddingResponse = restTemplate.postForEntity(
             uri,
             aiCreateEmbeddingRequest,
             AICreateEmbeddingResponse.class
         );
         return aiCreateEmbeddingResponse.getBody();
-    }
-
-    public AICreateMetadataResponse createMetadata(String content, List<String> imageUrls) {
-        final URI uri = buildUri("/get-embedding");
-        AICreateMetadataRequest aiCreateMetadataRequest = AICreateMetadataRequest.from(content, imageUrls);
-        ResponseEntity<AICreateMetadataResponse> aiCreateMetadataResponse = restTemplate.postForEntity(
-            uri,
-            aiCreateMetadataRequest,
-            AICreateMetadataResponse.class
-        );
-        return aiCreateMetadataResponse.getBody();
     }
 
     private URI buildUri(String path) {

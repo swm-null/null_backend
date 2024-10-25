@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AICreateEmbeddingResponse(
+    @NotEmpty(message = "임베딩값은 비워둘 수 없습니다.")
     List<Double> embedding
 ) {
 

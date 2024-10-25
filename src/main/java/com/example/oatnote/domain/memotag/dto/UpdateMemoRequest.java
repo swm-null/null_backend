@@ -17,7 +17,6 @@ import jakarta.validation.constraints.Size;
 public record UpdateMemoRequest(
     @Schema(description = "내용", example = "내일 5시로 멘토링이 변경되었다.", requiredMode = REQUIRED)
     @NotNull(message = "내용은 null일 수 없습니다.")
-    @Size(max = 2000, message = "내용은 최대 2000자까지 입력 가능합니다.")
     String content,
 
     @Schema(
