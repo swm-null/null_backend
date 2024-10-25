@@ -346,11 +346,10 @@ public class MemoTagService {
         String userId,
         LocalDateTime now
     ) {
-
-        tagService.processTags(aiCreateStructureResponse, userId, now);
-        Map<String, List<String>> reversedTagEdge = aiCreateStructureResponse.newReversedStructure();
         List<Memo> memos = new ArrayList<>();
         List<MemoTagRelation> memoTagRelations = new ArrayList<>();
+
+        Map<String, List<String>> reversedTagEdge = aiCreateStructureResponse.newReversedStructure();
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AICreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
@@ -385,6 +384,7 @@ public class MemoTagService {
                 }
             }
         }
+        tagService.processTags(aiCreateStructureResponse, userId, now);
         memoService.createMemos(memos, userId);
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }

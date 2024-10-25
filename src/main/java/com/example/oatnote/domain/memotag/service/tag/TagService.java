@@ -34,6 +34,11 @@ public class TagService {
         tagRepository.insert(tag);
     }
 
+    public void createTags(List<Tag> tags, String userId) {
+        log.info("태그 리스트 생성 - 태그: {} / 유저: {}", tags, userId);
+        tagRepository.insert(tags);
+    }
+
     public Tag getTag(String tagId, String userId) {
         return tagRepository.findByIdAndUserId(tagId, userId)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("태그를 찾지 못했습니다.", tagId));
@@ -66,18 +71,17 @@ public class TagService {
     }
 
     public void processTags(AICreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
-        for (NewTag newTag : aiCreateStructureResponse.newTags()) {
-            Tag tag = newTag.toTag(userId, time);
-            createTag(tag);
-        }
+        List<Tag> tags = aiCreateStructureResponse.newTags().stream()
+            .map(newTag -> newTag.toTag(userId, time))
+            .toList();
+        createTags(tags, userId);
 
-        tagEdgeService.createTagEdge(
-            TagEdge.of(
-                userId,
-                aiCreateStructureResponse.newStructure(),
-                aiCreateStructureResponse.newReversedStructure()
-            )
+        TagEdge tagEdge = TagEdge.of(
+            aiCreateStructureResponse.newStructure(),
+            aiCreateStructureResponse.newReversedStructure(),
+            userId
         );
+        tagEdgeService.createTagEdge(tagEdge);
     }
 
     public TagEdge getTagEdge(String userId) {
@@ -97,9 +101,9 @@ public class TagService {
         createTag(tag);
 
         TagEdge tagEdge = TagEdge.of(
-            userId,
             Map.of(tag.getId(), List.of()),
-            Map.of(tag.getId(), List.of())
+            Map.of(tag.getId(), List.of()),
+            userId
         );
         tagEdgeService.createTagEdge(tagEdge);
     }
