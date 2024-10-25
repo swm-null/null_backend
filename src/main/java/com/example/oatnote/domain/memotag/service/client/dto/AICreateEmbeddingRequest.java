@@ -10,7 +10,7 @@ public record AICreateEmbeddingRequest(
     String content
 ) {
 
-    public static AICreateEmbeddingRequest from(String name) {
-        return new AICreateEmbeddingRequest(name);
+    public static AICreateEmbeddingRequest from(String content) {
+        return new AICreateEmbeddingRequest(content);
     }
 }

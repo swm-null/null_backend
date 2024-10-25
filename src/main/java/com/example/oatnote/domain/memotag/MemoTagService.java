@@ -38,6 +38,7 @@ import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AICreateMetadataResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest;
@@ -238,14 +239,17 @@ public class MemoTagService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(
-            updateMemoRequest.content()
-        );
+        String content = updateMemoRequest.content();
+        List<String> imageUrls = updateMemoRequest.imageUrls();
+        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(content);
+        AICreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(content, imageUrls);
         Memo memo = memoService.getMemo(memoId, userId);
-        memo.update( //todo metadata
+        memo.update(
             updateMemoRequest.content(),
             updateMemoRequest.imageUrls(),
-            aiCreateEmbeddingResponse.embedding()
+            aiCreateEmbeddingResponse.embedding(),
+            aiCreateMetadataResponse.metadata(),
+            aiCreateMetadataResponse.embeddingMetadata()
         );
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
