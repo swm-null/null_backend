@@ -249,13 +249,10 @@ public class MemoTagService {
         AICreateMetadataResponse aiCreateMetadataResponse = null;
 
         boolean isContentChanged = !newContent.equals(memo.getContent());
-        boolean isImagesChanged = !Objects.equals(newImageUrls, existingImageUrls);
         if (isContentChanged) {
             aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(newContent);
         }
-        if (isImagesChanged) {
-            aiCreateMetadataResponse = aiMemoTagClient.createMetadata(newContent, newImageUrls);
-        }
+        aiCreateMetadataResponse = aiMemoTagClient.createMetadata(newContent, newImageUrls);
 
         List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
             ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
@@ -275,7 +272,6 @@ public class MemoTagService {
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
-
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
