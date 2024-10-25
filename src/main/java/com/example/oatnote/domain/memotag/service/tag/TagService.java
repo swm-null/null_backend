@@ -92,11 +92,10 @@ public class TagService {
         tagEdgeService.updateTagEdge(tagEdge, userId);
     }
 
-    public void createDefaultTagStructureForNewUser(String rootTagName, String userId, List<Double> embedding) {
+    public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
         Tag tag = Tag.of(
             rootTagName,
-            userId,
-            embedding
+            userId
         );
         createTag(tag);
 

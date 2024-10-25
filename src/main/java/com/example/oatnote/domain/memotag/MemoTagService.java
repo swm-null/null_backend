@@ -89,9 +89,7 @@ public class MemoTagService {
     }
 
     public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(rootTagName);
-        List<Double> embedding = aiCreateEmbeddingResponse.embedding();
-        tagService.createDefaultTagStructureForNewUser(rootTagName, userId, embedding);
+        tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
     }
 
     public MemosResponse getMemos(
