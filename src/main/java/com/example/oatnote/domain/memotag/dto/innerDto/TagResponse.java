@@ -17,7 +17,7 @@ public record TagResponse(
     String name
 ) {
 
-    public static TagResponse fromRawTag(RawTag tag) {
+    public static TagResponse fromRawTag(RawTag tag) { //todo refactor
         return new TagResponse(tag.id(), tag.name());
     }
 

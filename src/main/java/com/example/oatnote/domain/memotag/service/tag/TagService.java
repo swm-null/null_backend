@@ -106,4 +106,10 @@ public class TagService {
         );
         tagEdgeService.createTagEdge(tagEdge);
     }
+
+    public List<Tag> getChildTags(String tagId, String userId) {
+        Map<String, List<String>> tagEdges = tagEdgeService.getTagEdge(userId).getEdges();
+        List<String> childTagIds = tagEdges.getOrDefault(tagId, List.of());
+        return getTags(childTagIds, userId);
+    }
 }

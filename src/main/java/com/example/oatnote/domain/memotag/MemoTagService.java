@@ -35,6 +35,7 @@ import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
+import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
@@ -92,59 +93,11 @@ public class MemoTagService {
         tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
     }
 
-    public MemosResponse getMemos(
-        String tagId,
-        Integer page,
-        Integer limit,
-        MemoSortOrderTypeEnum sortOrder,
-        Boolean isLinked,
-        String userId
-    ) {
-        tagId = Objects.requireNonNullElse(tagId, userId);
-
-        List<String> memoIds = Objects.isNull(isLinked)
-            ? memoTagRelationService.getMemoIds(tagId, userId)
-            : memoTagRelationService.getMemoIds(tagId, isLinked, userId);
-
-        Integer total = memoIds.size();
-        Criteria criteria = Criteria.of(page, limit, total);
-        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getSort(sortOrder));
-
-        Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
-
-        // 메모와 링크태그 배치 처리
-        List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
-
-        Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
-            .collect(Collectors.groupingBy(
-                MemoTagRelation::getMemoId,
-                Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
-            ));
-
-        Set<String> tagIds = memoToTagIdsMap.values().stream()
-            .flatMap(Collection::stream)
-            .collect(Collectors.toSet());
-
-        List<Tag> linkedTags = tagService.getTags(new ArrayList<>(tagIds), userId);
-
-        Map<String, Tag> tagMap = linkedTags.stream()
-            .collect(Collectors.toMap(Tag::getId, tag -> tag));
-
-        Map<String, List<Tag>> linkedTagsMap = memoToTagIdsMap.entrySet().stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue().stream()
-                    .map(tagMap::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())
-            ));
-
-        Page<MemoResponse> memoResponses = memos.map(memo -> {
-            List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
-            return MemoResponse.fromTag(memo, linkedTagsForMemo);
-        });
-
-        return MemosResponse.from(memoResponses, criteria);
+    public List<TagResponse> getChildTags(String tagId, String userId) {
+        List<Tag> childTags = tagService.getChildTags(tagId, userId);
+        return childTags.stream()
+            .map(TagResponse::fromTag)
+            .toList();
     }
 
     public TagsResponse getTags(String tagId, Integer page, Integer limit, String userId) {
@@ -211,6 +164,61 @@ public class MemoTagService {
         Page<SearchHistory> result = searchHistoryService.getSearchHistories(query, pageRequest, userId);
         Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
+    }
+
+    public MemosResponse getMemos(
+        String tagId,
+        Integer page,
+        Integer limit,
+        MemoSortOrderTypeEnum sortOrder,
+        Boolean isLinked,
+        String userId
+    ) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
+
+        List<String> memoIds = Objects.isNull(isLinked)
+            ? memoTagRelationService.getMemoIds(tagId, userId)
+            : memoTagRelationService.getMemoIds(tagId, isLinked, userId);
+
+        Integer total = memoIds.size();
+        Criteria criteria = Criteria.of(page, limit, total);
+        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getSort(sortOrder));
+
+        Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
+
+        // 메모와 링크태그 배치 처리
+        List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
+
+        Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
+            .collect(Collectors.groupingBy(
+                MemoTagRelation::getMemoId,
+                Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
+            ));
+
+        Set<String> tagIds = memoToTagIdsMap.values().stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+        List<Tag> linkedTags = tagService.getTags(new ArrayList<>(tagIds), userId);
+
+        Map<String, Tag> tagMap = linkedTags.stream()
+            .collect(Collectors.toMap(Tag::getId, tag -> tag));
+
+        Map<String, List<Tag>> linkedTagsMap = memoToTagIdsMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().stream()
+                    .map(tagMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())
+            ));
+
+        Page<MemoResponse> memoResponses = memos.map(memo -> {
+            List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
+            return MemoResponse.fromTag(memo, linkedTagsForMemo);
+        });
+
+        return MemosResponse.from(memoResponses, criteria);
     }
 
     public SearchMemosResponse searchMemos(SearchMemosRequest searchMemosRequest, String userId) {
