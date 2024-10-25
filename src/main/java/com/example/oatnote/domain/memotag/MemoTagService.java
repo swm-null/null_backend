@@ -239,21 +239,43 @@ public class MemoTagService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
-        String content = updateMemoRequest.content();
-        List<String> imageUrls = updateMemoRequest.imageUrls();
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(content);
-        AICreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(content, imageUrls);
+        String newContent = updateMemoRequest.content();
+        List<String> newImageUrls = updateMemoRequest.imageUrls();
+
         Memo memo = memoService.getMemo(memoId, userId);
+        List<String> existingImageUrls = memo.getImageUrls();
+
+        AICreateEmbeddingResponse aiCreateEmbeddingResponse = null;
+        AICreateMetadataResponse aiCreateMetadataResponse = null;
+
+        boolean isContentChanged = !newContent.equals(memo.getContent());
+        boolean isImagesChanged = !Objects.equals(newImageUrls, existingImageUrls);
+        if (isContentChanged) {
+            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(newContent);
+        }
+        if (isImagesChanged) {
+            aiCreateMetadataResponse = aiMemoTagClient.createMetadata(newContent, newImageUrls);
+        }
+
+        List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
+            ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
+        String metadata = Objects.nonNull(aiCreateMetadataResponse)
+            ? aiCreateMetadataResponse.metadata() : memo.getMetadata();
+        List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
+            ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
+
         memo.update(
-            updateMemoRequest.content(),
-            updateMemoRequest.imageUrls(),
-            aiCreateEmbeddingResponse.embedding(),
-            aiCreateMetadataResponse.metadata(),
-            aiCreateMetadataResponse.embeddingMetadata()
+            newContent,
+            newImageUrls,
+            embedding,
+            metadata,
+            embeddingMetadata
         );
+
         Memo updatedMemo = memoService.updateMemo(memo);
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
+
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
