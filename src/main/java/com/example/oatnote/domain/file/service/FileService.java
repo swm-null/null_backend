@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.oatnote._commons.message.DeleteFilesMessage;
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
@@ -41,6 +42,9 @@ public class FileService {
             .toList();
 
         return UploadFilesResponse.of(fileUrls);
+    }
+
+    public void deleteFiles(DeleteFilesMessage message) {
     }
 
     String uploadToS3(MultipartFile file, String userId) {

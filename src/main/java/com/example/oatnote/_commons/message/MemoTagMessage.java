@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag.rabbitmq.dto;
+package com.example.oatnote._commons.message;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

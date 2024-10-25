@@ -5,7 +5,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.MemoTagService;
-import com.example.oatnote.domain.memotag.rabbitmq.dto.MemoTagMessage;
+import com.example.oatnote._commons.message.MemoTagMessage;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;

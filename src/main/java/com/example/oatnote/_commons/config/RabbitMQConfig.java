@@ -1,4 +1,4 @@
-package com.example.oatnote._config;
+package com.example.oatnote._commons.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -11,32 +11,32 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${spring.rabbitmq.queue}")
-    private String queueName;
-
     @Value("${spring.rabbitmq.exchange}")
     private String exchangeName;
 
     @Value("${spring.rabbitmq.routing-key}")
     private String routingKey;
 
+    @Value("${spring.rabbitmq.queue}")
+    private String queueName;
+
     @Value("${spring.rabbitmq.dlx.exchange}")
     private String dlxExchangeName;
-
-    @Value("${spring.rabbitmq.dlx.queue}")
-    private String dlxQueueName;
 
     @Value("${spring.rabbitmq.dlx.routing-key}")
     private String dlxRoutingKey;
 
-    @Bean
-    public Queue memoQueue() {
-        return new Queue(queueName, true);
-    }
+    @Value("${spring.rabbitmq.dlx.queue}")
+    private String dlxQueueName;
 
     @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(exchangeName, true, false);
+    }
+
+    @Bean
+    public Queue memoQueue() {
+        return new Queue(queueName, true);
     }
 
     @Bean
@@ -47,13 +47,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue dlxQueue() {
-        return new Queue(dlxQueueName, true);
+    public TopicExchange dlxExchange() {
+        return new TopicExchange(dlxExchangeName, true, false);
     }
 
     @Bean
-    public TopicExchange dlxExchange() {
-        return new TopicExchange(dlxExchangeName, true, false);
+    public Queue dlxQueue() {
+        return new Queue(dlxQueueName, true);
     }
 
     @Bean

@@ -1,6 +1,6 @@
-package com.example.oatnote._config;
+package com.example.oatnote._commons.config;
 
-import com.example.oatnote.util.JwtAuthenticationFilter;
+import com.example.oatnote._commons.util.JwtAuthenticationFilter;
 import com.example.oatnote.web.controller.enums.ErrorEnum;
 import com.example.oatnote.web.controller.dto.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
