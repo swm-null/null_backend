@@ -21,7 +21,7 @@ public class MemoTagMessageConsumer {
     private final MemoTagService memoTagService;
     private final ObjectMapper objectMapper;
 
-    @RabbitListener(queues = "oatnote_user_queue", ackMode = "MANUAL")
+    @RabbitListener(queues = "${spring.rabbitmq.queues.user.queue}", ackMode = "MANUAL")
     public void receiveMemoTagRequest(Message message, Channel channel) {
         try {
             MemoTagMessage memoTagMessage = parseMessageBody(message.getBody());

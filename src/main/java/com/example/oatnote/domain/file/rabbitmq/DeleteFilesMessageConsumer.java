@@ -17,9 +17,7 @@ public class DeleteFilesMessageConsumer {
 
     private final FileService fileService;
 
-    private static final String QUEUE_NAME = "delete.files.queue";
-
-    @RabbitListener(queues = QUEUE_NAME)
+    @RabbitListener(queues = "${spring.rabbitmq.queues.file.queue}")
     public void receiveFilesMessage(@Payload DeleteFilesMessage message) {
         log.info("Received delete files request for userId: {}", message.userId());
 

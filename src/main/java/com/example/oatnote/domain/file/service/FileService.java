@@ -16,6 +16,7 @@ import com.example.oatnote.web.exception.server.OatExternalServiceException;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -45,6 +46,17 @@ public class FileService {
     }
 
     public void deleteFiles(DeleteFilesMessage message) {
+        List<String> fileUrls = message.fileUrls();
+        for (String fileUrl : fileUrls) {
+            try {
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileUrl)
+                    .build());
+            } catch (Exception e) {
+                throw OatExternalServiceException.withDetail("S3 파일 삭제 실패했습니다.", fileUrl);
+            }
+        }
     }
 
     String uploadToS3(MultipartFile file, String userId) {
