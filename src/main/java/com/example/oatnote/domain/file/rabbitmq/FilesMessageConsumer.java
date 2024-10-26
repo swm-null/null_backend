@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteFilesMessageConsumer {
+public class FilesMessageConsumer {
 
     private final FileService fileService;
 
