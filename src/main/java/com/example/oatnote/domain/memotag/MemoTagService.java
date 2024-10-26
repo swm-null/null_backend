@@ -299,14 +299,19 @@ public class MemoTagService {
     }
 
     public void deleteMemo(String memoId, String userId) {
-        // todo 메모의 전체 파일 삭제 메소드 만들기
+        List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
+        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
+
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         memoService.deleteMemo(memoId, userId);
     }
 
     public void deleteTag(String tagId, String userId) {
         List<String> memoIds = memoTagRelationService.getMemoIds(tagId, userId);
-        // todo 메모들의 파일 삭제 메소드 만들기
+
+        List<String> fileUrls = memoService.getFileUrls(memoIds, userId);
+        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
+
         memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 

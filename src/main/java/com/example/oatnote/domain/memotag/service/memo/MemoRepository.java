@@ -26,4 +26,7 @@ public interface MemoRepository extends MongoRepository<Memo, String> {
     void deleteByIdInAndUserId(List<String> memoIds, String userId);
 
     void deleteByUserId(String userId);
+
+    @Query(value = "{ '_id': { '$in': ?0 }, 'userId': ?1 }", fields = "{ 'imageUrls': 1 }")
+    List<Memo> findImageUrlsByIdInAndUserId(List<String> memoIds, String userId);
 }
