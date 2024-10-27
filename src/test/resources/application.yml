@@ -6,16 +6,27 @@ spring:
     password: test
   rabbitmq:
     host: test
-    port: 123
+    port: 5671
     username: test
     password: test
-    exchange: test
-    queue: test
-    routing-key: test
-    dlx:
-      exchange: test
-      queue: test
-      routing-key: test
+    ssl:
+      enabled: true
+    virtual-host: /
+
+    queues:
+      file:
+        exchange: test
+        queue: test
+        routing-key: test
+      user:
+        exchange: test
+        queue: test
+        routing-key: test
+      dlx:
+        exchange: test
+        queue: test
+        routing-key: test
+
   ai:
     url: test
 
