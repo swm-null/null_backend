@@ -3,25 +3,33 @@ package com.example.oatnote.domain.file.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
     private final S3Client s3Client;
@@ -45,8 +53,10 @@ public class FileService {
         return UploadFilesResponse.of(fileUrls);
     }
 
-    public void deleteFiles(DeleteFilesMessage message) {
-        List<String> fileUrls = message.fileUrls();
+    public void deleteFiles(DeleteFilesMessage deleteFilesMessage) {
+        List<String> fileUrls = deleteFilesMessage.fileUrls();
+        String userId = deleteFilesMessage.userId();
+
         for (String fileUrl : fileUrls) {
             try {
                 String s3Key = fileUrl.replace(cloudFrontDomain + "/", "");
@@ -59,7 +69,45 @@ public class FileService {
                 throw OatExternalServiceException.withDetail("S3 파일 삭제 실패했습니다.", fileUrl);
             }
         }
+
+        log.info("S3 파일 삭제 완료 - userId: {}", userId);
     }
+
+    public void deleteAllFiles(DeleteAllFilesMessage deleteAllFilesMessage) {
+        String userId = deleteAllFilesMessage.userId();
+        String prefix = userId + "/";
+        String continuationToken = null;
+
+        ListObjectsV2Response listObjectsResponse;
+        do {
+            listObjectsResponse = s3Client.listObjectsV2(
+                ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .prefix(prefix)
+                    .continuationToken(continuationToken)
+                    .build()
+            );
+
+            List<String> keysToDelete = listObjectsResponse.contents().stream()
+                .map(S3Object::key)
+                .toList();
+
+            if (!keysToDelete.isEmpty()) {
+                DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                    .bucket(bucketName)
+                    .delete(builder -> builder.objects(
+                        keysToDelete.stream()
+                            .map(key -> software.amazon.awssdk.services.s3.model.ObjectIdentifier.builder().key(key).build())
+                            .collect(Collectors.toList())))
+                    .build();
+                s3Client.deleteObjects(deleteObjectsRequest);
+            }
+            continuationToken = listObjectsResponse.nextContinuationToken();
+        } while (listObjectsResponse.isTruncated());
+
+        log.info("S3 전체 파일 삭제 완료 - userId: {}", userId);
+    }
+
 
     String uploadToS3(MultipartFile file, String userId) {
         String filePath = generateFilePath(Objects.requireNonNull(file.getOriginalFilename()), userId);

@@ -8,6 +8,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,17 @@ public class FilesMessageProducer {
         log.info("Producing RabbitMQ delete files request. userId: {}", userId);
         DeleteFilesMessage deleteFilesMessage = DeleteFilesMessage.of(fileUrls, userId);
         rabbitTemplate.convertAndSend(exchangeName, routingKey, deleteFilesMessage);
+    }
+
+    @Retryable(
+        retryFor = {Exception.class},
+        maxAttempts = 2,
+        backoff = @Backoff(delay = 1000)
+    )
+    public void sendDeleteAllFilesRequest(String userId) {
+        log.info("Producing RabbitMQ delete all files request. userId: {}", userId);
+        DeleteAllFilesMessage deleteAllFilesMessage = DeleteAllFilesMessage.of(userId);
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, deleteAllFilesMessage);
     }
 
     @Recover

@@ -254,13 +254,16 @@ public class MemoTagService {
         Memo memo = memoService.getMemo(memoId, userId);
 
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = null;
-        AICreateMetadataResponse aiCreateMetadataResponse = null;
 
         boolean isContentChanged = !updatedContent.equals(memo.getContent());
         if (isContentChanged) {
             aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updatedContent);
         }
-        aiCreateMetadataResponse = aiMemoTagClient.createMetadata(updatedContent, updatedImageUrls);
+
+        AICreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
+            updatedContent,
+            updatedImageUrls
+        );
 
         List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
             ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
@@ -343,7 +346,7 @@ public class MemoTagService {
     }
 
     public void deleteUserAllData(String userId) {
-        // todo 유저의 모든 파일 삭제
+        filesMessageProducer.sendDeleteAllFilesRequest(userId);
         memoTagRelationService.deleteUserAllData(userId);
         memoService.deleteUserAllData(userId);
         tagService.deleteUserAllData(userId);
