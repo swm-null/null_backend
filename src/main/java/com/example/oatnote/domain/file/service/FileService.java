@@ -49,9 +49,11 @@ public class FileService {
         List<String> fileUrls = message.fileUrls();
         for (String fileUrl : fileUrls) {
             try {
+                String s3Key = fileUrl.replace(cloudFrontDomain + "/", "");
+
                 s3Client.deleteObject(DeleteObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileUrl)
+                    .key(s3Key)
                     .build());
             } catch (Exception e) {
                 throw OatExternalServiceException.withDetail("S3 파일 삭제 실패했습니다.", fileUrl);
