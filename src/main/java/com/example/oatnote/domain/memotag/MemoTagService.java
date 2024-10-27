@@ -96,6 +96,7 @@ public class MemoTagService {
     }
 
     public List<TagResponse> getChildTags(String tagId, String userId) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
         List<Tag> childTags = tagService.getChildTags(tagId, userId);
         return childTags.stream()
             .map(TagResponse::fromTag)
