@@ -24,6 +24,8 @@ import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
@@ -126,6 +128,20 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         UpdateTagResponse updateTagResponse = memoTagService.updateTag(tagId, updateTagRequest, userId);
         return ResponseEntity.status(HttpStatus.OK).body(updateTagResponse);
+    }
+
+    @PutMapping("/memo/{memoId}/tags")
+    public ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
+        @PathVariable("memoId") String memoId,
+        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        UpdateMemoTagsResponse updateMemoTagsResponse = memoTagService.updateMemoTags(
+            memoId,
+            updateMemoTagsRequest,
+            userId
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(updateMemoTagsResponse);
     }
 
     @DeleteMapping("/memo/{memoId}")

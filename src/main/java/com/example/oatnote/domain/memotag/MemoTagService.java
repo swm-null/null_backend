@@ -30,6 +30,8 @@ import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
@@ -301,6 +303,14 @@ public class MemoTagService {
         return UpdateTagResponse.from(updatedTag);
     }
 
+    public UpdateMemoTagsResponse updateMemoTags(
+        String memoId,
+        UpdateMemoTagsRequest updateMemoTagsRequest,
+        String userId
+    ) {
+
+    }
+
     public void deleteMemo(String memoId, String userId) {
         List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
         filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
@@ -318,7 +328,6 @@ public class MemoTagService {
         memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
-        //todo refactor
         TagEdge tagEdge = tagService.getTagEdge(userId);
         Map<String, List<String>> tagEdges = tagEdge.getEdges();
         Map<String, List<String>> reverseTagEdges = tagEdge.getReversedEdges();
