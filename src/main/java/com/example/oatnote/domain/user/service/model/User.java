@@ -36,11 +36,12 @@ public class User {
     @Field(name = "uTime")
     private LocalDateTime updatedAt;
 
-    public User(String email, String password, String name) {
+    public User(String email, String password, String name, String profileImageUrl) {
         this.id = UUID.randomUUID().toString();
         this.email = email;
         this.password = password;
         this.name = name;
+        this.profileImageUrl = profileImageUrl;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

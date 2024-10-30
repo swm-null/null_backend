@@ -45,7 +45,7 @@ public record RegisterUserRequest(
     String code
 ) {
 
-    public User toUser(String encodedPassword) {
-        return new User(email, encodedPassword, name);
+    public User toUser(String encodedPassword, String profileImageUrl) {
+        return new User(email, encodedPassword, name, profileImageUrl);
     }
 }
