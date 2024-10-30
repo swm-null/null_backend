@@ -1,7 +1,10 @@
 package com.example.oatnote.domain.user.dto;
 
 import com.example.oatnote.domain.user.service.model.User;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+@JsonNaming(SnakeCaseStrategy.class)
 public record UpdateUserInfoResponse(
     String email,
     String name,
