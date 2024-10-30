@@ -284,13 +284,7 @@ public class MemoTagService {
 
         Memo updatedMemo = memoService.updateMemo(memo);
 
-        // 삭제된 이미지 전송
-        List<String> deletedImageUrls = memo.getImageUrls().stream()
-            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
-            .collect(Collectors.toList());
-        if (!deletedImageUrls.isEmpty()) {
-            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
-        }
+        sendDeletedImages(memo.getImageUrls(), updatedImageUrls, userId);
 
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
@@ -308,7 +302,23 @@ public class MemoTagService {
         UpdateMemoTagsRequest updateMemoTagsRequest,
         String userId
     ) {
+        LocalDateTime now = LocalDateTime.now();
 
+        AICreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAICreateMemoRequest(userId);
+        AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
+
+        Memo rawMemo = memoService.getMemo(memoId, userId);
+
+        sendDeletedImages(rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
+
+        rawMemo.update(
+            updateMemoTagsRequest.content(),
+            updateMemoTagsRequest.imageUrls()
+        );
+
+        memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);
+
+        return UpdateMemoTagsResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
     public void deleteMemo(String memoId, String userId) {
@@ -383,6 +393,10 @@ public class MemoTagService {
         String userId,
         LocalDateTime now
     ) {
+        if (Objects.nonNull(rawMemo.getId())) {
+            memoTagRelationService.deleteRelationsByMemoId(rawMemo.getId(), userId);
+        }
+
         List<Memo> memos = new ArrayList<>();
         List<MemoTagRelation> memoTagRelations = new ArrayList<>();
 
@@ -390,7 +404,11 @@ public class MemoTagService {
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AICreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
-            Memo memo = processedMemo.toMemo(rawMemo);
+            Memo memo = rawMemo.process(
+                processedMemo.metadata(),
+                processedMemo.embedding(),
+                processedMemo.embeddingMetadata()
+            );
             memos.add(memo);
 
             for (String linkedTagId : processedMemo.parentTagIds()) {
@@ -436,5 +454,15 @@ public class MemoTagService {
             case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
             case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
         };
+    }
+
+    void sendDeletedImages(List<String> originalImageUrls, List<String> updatedImageUrls, String userId) {
+        List<String> deletedImageUrls = originalImageUrls.stream()
+            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
+            .collect(Collectors.toList());
+
+        if (!deletedImageUrls.isEmpty()) {
+            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
+        }
     }
 }

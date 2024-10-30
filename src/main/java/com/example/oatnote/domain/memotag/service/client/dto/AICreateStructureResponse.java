@@ -28,9 +28,6 @@ public record AICreateStructureResponse(
         List<String> parentTagIds
     ) {
 
-        public Memo toMemo(Memo memo) {
-            return memo.process(metadata, embedding, embeddingMetadata);
-        }
     }
 
     @JsonNaming(SnakeCaseStrategy.class)
