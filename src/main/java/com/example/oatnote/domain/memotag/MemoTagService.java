@@ -284,7 +284,13 @@ public class MemoTagService {
 
         Memo updatedMemo = memoService.updateMemo(memo);
 
-        sendDeletedImages(memo.getImageUrls(), updatedImageUrls, userId);
+        // 삭제된 이미지 전송
+        List<String> deletedImageUrls = memo.getImageUrls().stream()
+            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
+            .collect(Collectors.toList());
+        if (!deletedImageUrls.isEmpty()) {
+            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
+        }
 
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
@@ -365,7 +371,7 @@ public class MemoTagService {
     }
 
     public void deleteUserAllData(String userId) {
-        filesMessageProducer.sendDeleteAllFilesRequest(userId);
+        filesMessageProducer.sendDeleteUserAllFilesRequest(userId);
         memoTagRelationService.deleteUserAllData(userId);
         memoService.deleteUserAllData(userId);
         tagService.deleteUserAllData(userId);

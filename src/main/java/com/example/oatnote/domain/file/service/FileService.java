@@ -3,14 +3,13 @@ package com.example.oatnote.domain.file.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
+import com.example.oatnote._commons.message.DeleteUserAllFilesMessage;
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
@@ -22,7 +21,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -73,41 +71,37 @@ public class FileService {
         log.info("S3 파일 삭제 완료 - userId: {}", userId);
     }
 
-    public void deleteAllFiles(DeleteAllFilesMessage deleteAllFilesMessage) {
-        String userId = deleteAllFilesMessage.userId();
+    public void deleteUserAllFiles(DeleteUserAllFilesMessage deleteUserAllFilesMessage) {
+        String userId = deleteUserAllFilesMessage.userId();
         String prefix = userId + "/";
-        String continuationToken = null;
 
-        ListObjectsV2Response listObjectsResponse;
-        do {
-            listObjectsResponse = s3Client.listObjectsV2(
-                ListObjectsV2Request.builder()
+        try {
+            List<String> keysToDelete = s3Client.listObjectsV2(ListObjectsV2Request.builder()
                     .bucket(bucketName)
                     .prefix(prefix)
-                    .continuationToken(continuationToken)
-                    .build()
-            );
-
-            List<String> keysToDelete = listObjectsResponse.contents().stream()
+                    .build())
+                .contents().stream()
                 .map(S3Object::key)
                 .toList();
 
             if (!keysToDelete.isEmpty()) {
-                DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                s3Client.deleteObjects(DeleteObjectsRequest.builder()
                     .bucket(bucketName)
                     .delete(builder -> builder.objects(
                         keysToDelete.stream()
-                            .map(key -> software.amazon.awssdk.services.s3.model.ObjectIdentifier.builder().key(key).build())
-                            .collect(Collectors.toList())))
-                    .build();
-                s3Client.deleteObjects(deleteObjectsRequest);
+                            .map(key -> software.amazon.awssdk.services.s3.model.ObjectIdentifier.builder()
+                                .key(key)
+                                .build())
+                            .toList()))
+                    .build());
+                log.info("S3 유저 전체 파일 삭제 완료 - userId: {}", userId);
+            } else {
+                log.info("삭제할 파일이 없습니다 - userId: {}", userId);
             }
-            continuationToken = listObjectsResponse.nextContinuationToken();
-        } while (listObjectsResponse.isTruncated());
-
-        log.info("S3 전체 파일 삭제 완료 - userId: {}", userId);
+        } catch (Exception e) {
+            throw OatExternalServiceException.withDetail("S3 유저 전체 파일 삭제 실패", userId);
+        }
     }
-
 
     String uploadToS3(MultipartFile file, String userId) {
         String filePath = generateFilePath(Objects.requireNonNull(file.getOriginalFilename()), userId);

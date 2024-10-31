@@ -6,7 +6,7 @@ spring:
     password: test
   rabbitmq:
     host: test
-    port: 5671
+    port: 1234
     username: test
     password: test
     ssl:
@@ -16,8 +16,12 @@ spring:
     queues:
       file:
         exchange: test
-        queue: test
-        routing-key: test
+        delete:
+          queue: test
+          routing-key: test
+        delete-all:
+          queue: test
+          routing-key: test
       user:
         exchange: test
         queue: test
