@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.oatnote._commons.message.DeleteUserAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
+import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
@@ -56,7 +56,6 @@ public class FileService {
         String userId = deleteFilesMessage.userId();
 
         for (String fileUrl : fileUrls) {
-            System.out.println();
             try {
                 String s3Key = fileUrl.replace(cloudFrontDomain + "/", "");
 
@@ -72,8 +71,8 @@ public class FileService {
         log.info("S3 파일 삭제 완료 - userId: {}", userId);
     }
 
-    public void deleteUserAllFiles(DeleteUserAllFilesMessage deleteUserAllFilesMessage) {
-        String userId = deleteUserAllFilesMessage.userId();
+    public void deleteAllFiles(DeleteAllFilesMessage deleteAllFilesMessage) {
+        String userId = deleteAllFilesMessage.userId();
         String prefix = userId + "/";
 
         try {

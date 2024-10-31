@@ -41,13 +41,65 @@ public class Memo {
     @Field("uTime")
     private LocalDateTime updatedAt;
 
-    public Memo(String content, List<String> imageUrls, String userId, LocalDateTime time) {
+    public Memo(
+        String id,
+        String content,
+        List<String> imageUrls,
+        String userId,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+    ) {
+        this.id = id;
+        this.content = content;
+        this.imageUrls = imageUrls;
+        this.userId = userId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public Memo(
+        String content,
+        List<String> imageUrls,
+        String userId,
+        LocalDateTime time
+    ) {
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
         this.userId = userId;
         this.createdAt = time;
         this.updatedAt = time;
+    }
+
+    public Memo(
+        String id,
+        String content,
+        List<String> imageUrls,
+        String userId,
+        List<Double> embedding,
+        String metadata,
+        List<Double> embeddingMetadata,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+    ) {
+        this.id = id != null ? id : UUID.randomUUID().toString();
+        this.content = content;
+        this.imageUrls = imageUrls;
+        this.userId = userId;
+        this.embedding = embedding;
+        this.metadata = metadata;
+        this.embeddingMetadata = embeddingMetadata;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public void update(
+        String content,
+        List<String> strings
+    ) {
+        this.content = content;
+        this.imageUrls = strings;
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void update(
@@ -65,7 +117,11 @@ public class Memo {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Memo process(String metadata, List<Double> embedding, List<Double> embeddingMetadata) {
+    public Memo process(
+        String metadata,
+        List<Double> embedding,
+        List<Double> embeddingMetadata
+    ) {
         this.embedding = embedding;
         this.metadata = metadata;
         this.embeddingMetadata = embeddingMetadata;

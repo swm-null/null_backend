@@ -30,6 +30,8 @@ import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
@@ -301,6 +303,30 @@ public class MemoTagService {
         return UpdateTagResponse.from(updatedTag);
     }
 
+    public UpdateMemoTagsResponse updateMemoTags(
+        String memoId,
+        UpdateMemoTagsRequest updateMemoTagsRequest,
+        String userId
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+
+        AICreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAICreateMemoRequest(userId);
+        AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
+
+        Memo rawMemo = memoService.getMemo(memoId, userId);
+
+        processDeletedFiles(rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
+
+        rawMemo.update(
+            updateMemoTagsRequest.content(),
+            updateMemoTagsRequest.imageUrls()
+        );
+
+        memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);
+
+        return UpdateMemoTagsResponse.from(rawMemo, aiCreateTagsResponse.tags());
+    }
+
     public void deleteMemo(String memoId, String userId) {
         List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
         filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
@@ -318,7 +344,6 @@ public class MemoTagService {
         memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
-        //todo refactor
         TagEdge tagEdge = tagService.getTagEdge(userId);
         Map<String, List<String>> tagEdges = tagEdge.getEdges();
         Map<String, List<String>> reverseTagEdges = tagEdge.getReversedEdges();
@@ -346,7 +371,7 @@ public class MemoTagService {
     }
 
     public void deleteUserAllData(String userId) {
-        filesMessageProducer.sendDeleteUserAllFilesRequest(userId);
+        filesMessageProducer.sendDeleteAllFilesRequest(userId);
         memoTagRelationService.deleteUserAllData(userId);
         memoService.deleteUserAllData(userId);
         tagService.deleteUserAllData(userId);
@@ -374,6 +399,10 @@ public class MemoTagService {
         String userId,
         LocalDateTime now
     ) {
+        if (Objects.nonNull(rawMemo.getId())) {
+            memoTagRelationService.deleteRelationsByMemoId(rawMemo.getId(), userId);
+        }
+
         List<Memo> memos = new ArrayList<>();
         List<MemoTagRelation> memoTagRelations = new ArrayList<>();
 
@@ -381,7 +410,11 @@ public class MemoTagService {
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AICreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
-            Memo memo = processedMemo.toMemo(rawMemo);
+            Memo memo = rawMemo.process(
+                processedMemo.metadata(),
+                processedMemo.embedding(),
+                processedMemo.embeddingMetadata()
+            );
             memos.add(memo);
 
             for (String linkedTagId : processedMemo.parentTagIds()) {
@@ -427,5 +460,15 @@ public class MemoTagService {
             case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
             case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
         };
+    }
+
+    void processDeletedFiles(List<String> originalImageUrls, List<String> updatedImageUrls, String userId) {
+        List<String> deletedImageUrls = originalImageUrls.stream()
+            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
+            .collect(Collectors.toList());
+
+        if (!deletedImageUrls.isEmpty()) {
+            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
+        }
     }
 }

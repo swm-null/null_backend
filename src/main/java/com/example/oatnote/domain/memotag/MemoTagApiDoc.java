@@ -22,6 +22,8 @@ import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
@@ -64,6 +66,23 @@ public interface MemoTagApiDoc {
     @PostMapping("/memos/file")
     ResponseEntity<Void> createMemosByEmail(
         @RequestBody @Valid CreateMemosRequest createMemosTagsRequest
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "메모 내용 업데이트 및 태그 재생성")
+    @PutMapping("/memo/{memoId}/tags")
+    ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
+        @PathVariable("memoId") String memoId,
+        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(

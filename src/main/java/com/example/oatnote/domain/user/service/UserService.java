@@ -2,6 +2,7 @@ package com.example.oatnote.domain.user.service;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,9 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Value("${aws.cloudfront.default-profile-image-url}")
+    private String defaultProfileImageUrl;
+
     private static final int CODE_EXPIRY_MINUTES = 10;
     private static final int RE_CODE_EXPIRY_MINUTES = 30;
 
@@ -59,7 +63,7 @@ public class UserService {
 
         emailVerificationService.verifyCode(email, registerUserRequest.code());
 
-        User user = registerUserRequest.toUser(passwordEncoder.encode(password));
+        User user = registerUserRequest.toUser(passwordEncoder.encode(password), defaultProfileImageUrl);
         User createdUser = userRepository.save(user);
         eventPublisher.publishEvent(new RegisterUserEvent(createdUser.getId()));
         log.info("회원가입 완료 - 이메일: {} / 유저: {}", email, createdUser.getId());

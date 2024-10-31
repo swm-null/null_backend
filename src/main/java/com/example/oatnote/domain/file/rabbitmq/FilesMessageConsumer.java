@@ -4,7 +4,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote._commons.message.DeleteUserAllFilesMessage;
+import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
 import com.example.oatnote.domain.file.service.FileService;
 
@@ -31,14 +31,14 @@ public class FilesMessageConsumer {
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queues.file.delete-all.queue}")
-    public void receiveDeleteAllFilesMessage(@Payload DeleteUserAllFilesMessage deleteUserAllFilesMessage) {
-        log.info("Received delete all files request for userId: {}", deleteUserAllFilesMessage.userId());
+    public void receiveDeleteAllFilesMessage(@Payload DeleteAllFilesMessage deleteAllFilesMessage) {
+        log.info("Received delete all files request for userId: {}", deleteAllFilesMessage.userId());
 
         try {
-            fileService.deleteUserAllFiles(deleteUserAllFilesMessage);
-            log.info("All files deletion processed successfully - userId: {}", deleteUserAllFilesMessage.userId());
+            fileService.deleteAllFiles(deleteAllFilesMessage);
+            log.info("All files deletion processed successfully - userId: {}", deleteAllFilesMessage.userId());
         } catch (Exception e) {
-            log.error("Error processing all files deletion - userId: {}", deleteUserAllFilesMessage.userId(), e);
+            log.error("Error processing all files deletion - userId: {}", deleteAllFilesMessage.userId(), e);
         }
     }
 }
