@@ -21,6 +21,8 @@ import com.example.oatnote.domain.memotag.service.client.dto.AICreateMemosReques
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateMemosResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingDbRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingDbResponse;
 
 @Service
 public class AIMemoTagClient {
@@ -79,6 +81,17 @@ public class AIMemoTagClient {
         return aiSearchMemosUsingAiResponse.getBody();
     }
 
+    public AISearchMemosUsingDbResponse searchMemoUsingDb(String query, String userId) {
+        final URI uri = buildUri("/search/db");
+        AISearchMemosUsingDbRequest aiSearchMemosUsingDbRequest = AISearchMemosUsingDbRequest.of(query, userId);
+        ResponseEntity<AISearchMemosUsingDbResponse> aiSearchMemosUsingDbResponse = restTemplate.postForEntity(
+            uri,
+            aiSearchMemosUsingDbRequest,
+            AISearchMemosUsingDbResponse.class
+        );
+        return aiSearchMemosUsingDbResponse.getBody();
+    }
+
     public AICreateEmbeddingResponse createEmbedding(String content) {
         final URI uri = buildUri("/get-embedding");
         AICreateEmbeddingRequest aiCreateEmbeddingRequest = AICreateEmbeddingRequest.from(content);
@@ -101,7 +114,7 @@ public class AIMemoTagClient {
         return aiCreateMetadataResponse.getBody();
     }
 
-    private URI buildUri(String path) {
+    URI buildUri(String path) {
         return UriComponentsBuilder
             .fromUriString(aiUrl)
             .path(path)

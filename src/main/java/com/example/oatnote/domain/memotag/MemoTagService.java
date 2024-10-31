@@ -49,6 +49,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -235,11 +236,37 @@ public class MemoTagService {
             userId
         );
         searchHistoryService.createSearchHistory(searchHistory);
+
         return SearchMemosUsingAiResponse.from(aiSearchMemosUsingAiResponse.processedMessage(), memoResponses);
     }
 
     public SearchMemosUsingDbResponse searchMemosUsingDb(String query, String userId) {
+        AISearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
 
+        List<Memo> memos = memoService.getMemos(aiSearchMemosUsingDbResponse.memoIds(), userId);
+
+        List<String> memoIds = memos.stream()
+            .map(Memo::getId)
+            .toList();
+
+        Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(memoIds, userId);
+
+        List<MemoResponse> memoResponses = memos.stream()
+            .map(memo -> {
+                List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
+                return MemoResponse.fromTag(memo, linkedTagsForMemo);
+            })
+            .toList();
+
+        SearchHistory searchHistory = new SearchHistory(
+            query,
+            null,
+            memoResponses,
+            userId
+        );
+        searchHistoryService.createSearchHistory(searchHistory);
+
+        return SearchMemosUsingDbResponse.from(memoResponses);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {

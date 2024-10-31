@@ -17,11 +17,9 @@ public record SearchMemosUsingDbResponse(
     List<MemoResponse> memos
 ) {
 
-    public static SearchMemosUsingDbResponse from(List<Memo> memos, List<List<Tag>> tagsList) {
+    public static SearchMemosUsingDbResponse from(List<MemoResponse> memos) {
         return new SearchMemosUsingDbResponse(
-            memos.stream()
-                .map(memo -> MemoResponse.fromTag(memo, tagsList.get(memos.indexOf(memo))))
-                .toList()
+            memos
         );
     }
 }
