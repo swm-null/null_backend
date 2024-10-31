@@ -26,7 +26,8 @@ import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
@@ -226,8 +227,8 @@ public class MemoTagService {
         return MemosResponse.from(memoResponses, criteria);
     }
 
-    public SearchMemosResponse searchMemos(SearchMemosRequest searchMemosRequest, String userId) {
-        AISearchMemosRequest aiSearchMemosRequest = searchMemosRequest.toAISearchMemoRequest(userId);
+    public SearchMemosUsingAiResponse searchMemosUsingAi(String query, String userId) {
+        AISearchMemosRequest aiSearchMemosRequest = AISearchMemosRequest.of(query);
         AISearchMemosResponse aiSearchMemosResponse = aiMemoTagClient.searchMemo(aiSearchMemosRequest);
 
         List<Memo> memos = switch (aiSearchMemosResponse.type()) {
@@ -239,14 +240,17 @@ public class MemoTagService {
             .map(memo -> getLinkedTags(memo.getId(), userId))
             .toList();
 
-        SearchMemosResponse searchMemosResponse = SearchMemosResponse.from(
+        SearchMemosUsingAiResponse searchMemosUsingAiResponse = SearchMemosUsingAiResponse.from(
             aiSearchMemosResponse.processedMessage(),
             memos,
             tagsList
         );
-        SearchHistory searchHistory = searchMemosRequest.toSearchHistory(searchMemosResponse, userId);
+        SearchHistory searchHistory = searchMemosRequest.toSearchHistory(searchMemosUsingAiResponse, userId);
         searchHistoryService.createSearchHistory(searchHistory);
-        return searchMemosResponse;
+        return searchMemosUsingAiResponse;
+    }
+
+    public SearchMemosUsingDbResponse searchMemosUsingDb(String query, String userId) {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {

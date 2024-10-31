@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record SearchMemosResponse(
+public record SearchMemosUsingAiResponse(
     @Schema(description = "자연어 응답", example = "일정과 관련된 메모를 찾아드리겠습니다.")
     String processedMessage,
 
@@ -20,8 +20,8 @@ public record SearchMemosResponse(
     List<MemoResponse> memos
 ) {
 
-    public static SearchMemosResponse from(String processedMessage, List<Memo> memos, List<List<Tag>> tagsList) {
-        return new SearchMemosResponse(
+    public static SearchMemosUsingAiResponse from(String processedMessage, List<Memo> memos, List<List<Tag>> tagsList) {
+        return new SearchMemosUsingAiResponse(
             processedMessage,
             memos.stream()
                 .map(memo -> MemoResponse.fromTag(memo, tagsList.get(memos.indexOf(memo))))

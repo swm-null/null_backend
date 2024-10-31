@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
-import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
+import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
-import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
@@ -159,12 +159,29 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "AI 검색을 통한 메모 조회")
-    @PostMapping("/memos/search")
-    ResponseEntity<SearchMemosResponse> searchMemos(
-        @RequestBody @Valid SearchMemosRequest searchMemosRequest,
+    @Operation(summary = "AI 기반 메모 검색")
+    @GetMapping("/memos/search/ai")
+    ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
+        @RequestParam String query,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "DB 기반 메모 검색")
+    @GetMapping("/memos/search/db")
+    ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
+        @RequestParam String query,
         @AuthenticationPrincipal String userId
     );
 

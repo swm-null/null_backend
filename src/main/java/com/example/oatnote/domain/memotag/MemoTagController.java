@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
-import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
+import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
@@ -101,13 +101,22 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);
     }
 
-    @PostMapping("/memos/search")
-    public ResponseEntity<SearchMemosResponse> searchMemos(
-        @RequestBody @Valid SearchMemosRequest searchMemosRequest,
+    @GetMapping("/memos/search/ai")
+    public ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
+        @RequestParam String query,
         @AuthenticationPrincipal String userId
     ) {
-        SearchMemosResponse searchMemosResponse = memoTagService.searchMemos(searchMemosRequest, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemosResponse);
+        SearchMemosUsingAiResponse searchMemosUsingAiResponse = memoTagService.searchMemosUsingAI(query, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingAiResponse);
+    }
+
+    @GetMapping("/memos/search/db")
+    public ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
+        @RequestParam String query,
+        @AuthenticationPrincipal String userId
+    ) {
+        SearchMemosUsingDbResponse searchMemosUsingDbResponse = memoTagService.searchMemosUsingDB(query, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingDbResponse);
     }
 
     @PutMapping("/memo/{memoId}")
