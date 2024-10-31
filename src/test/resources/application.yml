@@ -58,3 +58,5 @@ aws:
     bucket-name: test
   cloudfront:
     custom-domain: test
+    default-profile-image-url: test
+

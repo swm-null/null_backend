@@ -315,7 +315,7 @@ public class MemoTagService {
 
         Memo rawMemo = memoService.getMemo(memoId, userId);
 
-        sendDeletedImages(rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
+        processDeletedFiles(rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
 
         rawMemo.update(
             updateMemoTagsRequest.content(),
@@ -462,7 +462,7 @@ public class MemoTagService {
         };
     }
 
-    void sendDeletedImages(List<String> originalImageUrls, List<String> updatedImageUrls, String userId) {
+    void processDeletedFiles(List<String> originalImageUrls, List<String> updatedImageUrls, String userId) {
         List<String> deletedImageUrls = originalImageUrls.stream()
             .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
             .collect(Collectors.toList());
