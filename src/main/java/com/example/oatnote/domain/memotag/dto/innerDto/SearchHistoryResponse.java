@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public record SearchHistoryResponse(
     String query,
     LocalDateTime createdAt,
-    SearchMemosUsingAiResponse searchMemosUsingAiResponse
+    SearchMemosUsingAiResponse searchMemosUsingAiResponse //todo refactor
 ) {
 
     public static SearchHistoryResponse from(SearchHistory searchHistory) {

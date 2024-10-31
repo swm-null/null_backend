@@ -20,12 +20,10 @@ public record SearchMemosUsingAiResponse(
     List<MemoResponse> memos
 ) {
 
-    public static SearchMemosUsingAiResponse from(String processedMessage, List<Memo> memos, List<List<Tag>> tagsList) {
+    public static SearchMemosUsingAiResponse from(String processedMessage, List<MemoResponse> memos) {
         return new SearchMemosUsingAiResponse(
             processedMessage,
-            memos.stream()
-                .map(memo -> MemoResponse.fromTag(memo, tagsList.get(memos.indexOf(memo))))
-                .toList()
+            memos
         );
     }
 }

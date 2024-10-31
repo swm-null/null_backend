@@ -106,7 +106,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam String query,
         @AuthenticationPrincipal String userId
     ) {
-        SearchMemosUsingAiResponse searchMemosUsingAiResponse = memoTagService.searchMemosUsingAI(query, userId);
+        SearchMemosUsingAiResponse searchMemosUsingAiResponse = memoTagService.searchMemosUsingAi(query, userId);
         return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingAiResponse);
     }
 
@@ -115,7 +115,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam String query,
         @AuthenticationPrincipal String userId
     ) {
-        SearchMemosUsingDbResponse searchMemosUsingDbResponse = memoTagService.searchMemosUsingDB(query, userId);
+        SearchMemosUsingDbResponse searchMemosUsingDbResponse = memoTagService.searchMemosUsingDb(query, userId);
         return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingDbResponse);
     }
 

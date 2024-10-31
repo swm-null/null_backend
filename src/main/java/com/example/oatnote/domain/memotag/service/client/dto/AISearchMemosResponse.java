@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public record AISearchMemosResponse(
     AISearchTypeEnum type, // "similarity" | "regex"
     String processedMessage,
-    List<String> ids,
+    List<String> memoIds,
     String regex
 ) {
 

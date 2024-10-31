@@ -188,36 +188,17 @@ public class MemoTagService {
 
         Integer total = memoIds.size();
         Criteria criteria = Criteria.of(page, limit, total);
-        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), getSort(sortOrder));
+        Sort sort = switch (sortOrder) {
+            case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
+            case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
+        };
+        PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), sort);
 
         Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
-
-        // 메모와 링크태그 배치 처리
-        List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
-
-        Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
-            .collect(Collectors.groupingBy(
-                MemoTagRelation::getMemoId,
-                Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
-            ));
-
-        Set<String> tagIds = memoToTagIdsMap.values().stream()
-            .flatMap(Collection::stream)
-            .collect(Collectors.toSet());
-
-        List<Tag> linkedTags = tagService.getTags(new ArrayList<>(tagIds), userId);
-
-        Map<String, Tag> tagMap = linkedTags.stream()
-            .collect(Collectors.toMap(Tag::getId, tag -> tag));
-
-        Map<String, List<Tag>> linkedTagsMap = memoToTagIdsMap.entrySet().stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue().stream()
-                    .map(tagMap::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())
-            ));
+        List<String> pagedMemoIds = memos.stream()
+            .map(Memo::getId)
+            .toList();
+        Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(pagedMemoIds, userId);
 
         Page<MemoResponse> memoResponses = memos.map(memo -> {
             List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
@@ -228,29 +209,38 @@ public class MemoTagService {
     }
 
     public SearchMemosUsingAiResponse searchMemosUsingAi(String query, String userId) {
-        AISearchMemosRequest aiSearchMemosRequest = AISearchMemosRequest.of(query);
+        AISearchMemosRequest aiSearchMemosRequest = AISearchMemosRequest.of(query, userId);
         AISearchMemosResponse aiSearchMemosResponse = aiMemoTagClient.searchMemo(aiSearchMemosRequest);
 
         List<Memo> memos = switch (aiSearchMemosResponse.type()) {
-            case SIMILARITY -> memoService.getMemos(aiSearchMemosResponse.ids(), userId);
+            case SIMILARITY -> memoService.getMemos(aiSearchMemosResponse.memoIds(), userId);
             case REGEX -> memoService.getMemosContainingRegex(aiSearchMemosResponse.regex(), userId);
         };
 
-        List<List<Tag>> tagsList = memos.stream()
-            .map(memo -> getLinkedTags(memo.getId(), userId))
+        List<String> memoIds = memos.stream()
+            .map(Memo::getId)
             .toList();
 
-        SearchMemosUsingAiResponse searchMemosUsingAiResponse = SearchMemosUsingAiResponse.from(
-            aiSearchMemosResponse.processedMessage(),
-            memos,
-            tagsList
+        Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(memoIds, userId);
+
+        List<MemoResponse> memoResponses = memos.stream()
+            .map(memo -> {
+                List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
+                return MemoResponse.fromTag(memo, linkedTagsForMemo);
+            })
+            .toList();
+
+        SearchHistory searchHistory = new SearchHistory(
+            query,
+            aiSearchMemosResponse.type().name(),
+            userId
         );
-        SearchHistory searchHistory = searchMemosRequest.toSearchHistory(searchMemosUsingAiResponse, userId);
-        searchHistoryService.createSearchHistory(searchHistory);
-        return searchMemosUsingAiResponse;
+        searchHistoryService.createSearchHistory(searchHistory, userId);
+        return SearchMemosUsingAiResponse.from(aiSearchMemosResponse.processedMessage(), memoResponses);
     }
 
     public SearchMemosUsingDbResponse searchMemosUsingDb(String query, String userId) {
+
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
@@ -296,7 +286,7 @@ public class MemoTagService {
             filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
         }
 
-        return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
+        return UpdateMemoResponse.from(updatedMemo, getLinkedTagsMap(List.of(memo.getId()), userId));
     }
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {
@@ -454,16 +444,32 @@ public class MemoTagService {
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
-    List<Tag> getLinkedTags(String memoId, String userId) {
-        List<String> tagIds = memoTagRelationService.getLinkedTagIds(memoId, userId);
-        return tagService.getTags(tagIds, userId);
-    }
+    Map<String, List<Tag>> getLinkedTagsMap(List<String> memoIds, String userId) {
+        List<MemoTagRelation> memoTagRelations = memoTagRelationService.getLinkedMemoTagRelations(memoIds, userId);
 
-    Sort getSort(MemoSortOrderTypeEnum sortOrder) {
-        return switch (sortOrder) {
-            case LATEST -> Sort.by(Sort.Direction.DESC, "uTime");
-            case OLDEST -> Sort.by(Sort.Direction.ASC, "uTime");
-        };
+        Map<String, List<String>> memoToTagIdsMap = memoTagRelations.stream()
+            .collect(Collectors.groupingBy(
+                MemoTagRelation::getMemoId,
+                Collectors.mapping(MemoTagRelation::getTagId, Collectors.toList())
+            ));
+
+        Set<String> tagIds = memoToTagIdsMap.values().stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+
+        List<Tag> linkedTags = tagService.getTags(new ArrayList<>(tagIds), userId);
+
+        Map<String, Tag> tagMap = linkedTags.stream()
+            .collect(Collectors.toMap(Tag::getId, tag -> tag));
+
+        return memoToTagIdsMap.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().stream()
+                    .map(tagMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList())
+            ));
     }
 
     void processDeletedFiles(List<String> originalImageUrls, List<String> updatedImageUrls, String userId) {
