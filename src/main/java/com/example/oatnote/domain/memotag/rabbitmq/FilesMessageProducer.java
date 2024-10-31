@@ -26,8 +26,8 @@ public class FilesMessageProducer {
     @Value("${spring.rabbitmq.queues.file.delete.routing-key}")
     private String deleteFileRoutingKey;
 
-    @Value("${spring.rabbitmq.queues.file.delete-all.routing-key}")
-    private String deleteAllFilesRoutingKey;
+    @Value("${spring.rabbitmq.queues.file.delete-user-all.routing-key}")
+    private String deleteUserAllFilesRoutingKey;
 
     @Value("${spring.rabbitmq.queues.dlx.exchange}")
     private String dlxExchangeName;
@@ -54,7 +54,7 @@ public class FilesMessageProducer {
     public void sendDeleteUserAllFilesRequest(String userId) {
         log.info("Producing RabbitMQ delete all files request. userId: {}", userId);
         DeleteUserAllFilesMessage deleteUserAllFilesMessage = DeleteUserAllFilesMessage.of(userId);
-        rabbitTemplate.convertAndSend(fileExchangeName, deleteAllFilesRoutingKey, deleteUserAllFilesMessage);
+        rabbitTemplate.convertAndSend(fileExchangeName, deleteUserAllFilesRoutingKey, deleteUserAllFilesMessage);
     }
 
     @Recover

@@ -30,8 +30,8 @@ public class FilesMessageConsumer {
         }
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.queues.file.delete-all.queue}")
-    public void receiveDeleteAllFilesMessage(@Payload DeleteUserAllFilesMessage deleteUserAllFilesMessage) {
+    @RabbitListener(queues = "${spring.rabbitmq.queues.file.delete-user-all.queue}")
+    public void receiveDeleteUserAllFilesMessage(@Payload DeleteUserAllFilesMessage deleteUserAllFilesMessage) {
         log.info("Received delete all files request for userId: {}", deleteUserAllFilesMessage.userId());
 
         try {
