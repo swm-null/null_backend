@@ -25,7 +25,6 @@ import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
-import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.dto.TagsResponse;
@@ -48,8 +47,8 @@ import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiResponse;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -209,12 +208,11 @@ public class MemoTagService {
     }
 
     public SearchMemosUsingAiResponse searchMemosUsingAi(String query, String userId) {
-        AISearchMemosRequest aiSearchMemosRequest = AISearchMemosRequest.of(query, userId);
-        AISearchMemosResponse aiSearchMemosResponse = aiMemoTagClient.searchMemo(aiSearchMemosRequest);
+        AISearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
-        List<Memo> memos = switch (aiSearchMemosResponse.type()) {
-            case SIMILARITY -> memoService.getMemos(aiSearchMemosResponse.memoIds(), userId);
-            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemosResponse.regex(), userId);
+        List<Memo> memos = switch (aiSearchMemosUsingAiResponse.type()) {
+            case SIMILARITY -> memoService.getMemos(aiSearchMemosUsingAiResponse.memoIds(), userId);
+            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemosUsingAiResponse.regex(), userId);
         };
 
         List<String> memoIds = memos.stream()
@@ -232,11 +230,12 @@ public class MemoTagService {
 
         SearchHistory searchHistory = new SearchHistory(
             query,
-            aiSearchMemosResponse.type().name(),
+            aiSearchMemosUsingAiResponse.processedMessage(),
+            memoResponses,
             userId
         );
-        searchHistoryService.createSearchHistory(searchHistory, userId);
-        return SearchMemosUsingAiResponse.from(aiSearchMemosResponse.processedMessage(), memoResponses);
+        searchHistoryService.createSearchHistory(searchHistory);
+        return SearchMemosUsingAiResponse.from(aiSearchMemosUsingAiResponse.processedMessage(), memoResponses);
     }
 
     public SearchMemosUsingDbResponse searchMemosUsingDb(String query, String userId) {
@@ -286,7 +285,9 @@ public class MemoTagService {
             filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
         }
 
-        return UpdateMemoResponse.from(updatedMemo, getLinkedTagsMap(List.of(memo.getId()), userId));
+        Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(List.of(memo.getId()), userId);
+        List<Tag> linkedTags = linkedTagsMap.getOrDefault(memo.getId(), List.of());
+        return UpdateMemoResponse.from(updatedMemo, linkedTags);
     }
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {

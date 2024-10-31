@@ -19,8 +19,8 @@ import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateMemosRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateMemosResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiResponse;
 
 @Service
 public class AIMemoTagClient {
@@ -68,14 +68,15 @@ public class AIMemoTagClient {
         return aiCreateKakaoMemosResponse.getBody();
     }
 
-    public AISearchMemosResponse searchMemo(AISearchMemosRequest aiSearchMemosRequest) {
-        final URI uri = buildUri("/search");
-        ResponseEntity<AISearchMemosResponse> aiSearchMemosResponse = restTemplate.postForEntity(
+    public AISearchMemosUsingAiResponse searchMemoUsingAi(String query, String userId) {
+        final URI uri = buildUri("/search/ai");
+        AISearchMemosUsingAiRequest aiSearchMemosUsingAiRequest = AISearchMemosUsingAiRequest.of(query, userId);
+        ResponseEntity<AISearchMemosUsingAiResponse> aiSearchMemosUsingAiResponse = restTemplate.postForEntity(
             uri,
-            aiSearchMemosRequest,
-            AISearchMemosResponse.class
+            aiSearchMemosUsingAiRequest,
+            AISearchMemosUsingAiResponse.class
         );
-        return aiSearchMemosResponse.getBody();
+        return aiSearchMemosUsingAiResponse.getBody();
     }
 
     public AICreateEmbeddingResponse createEmbedding(String content) {

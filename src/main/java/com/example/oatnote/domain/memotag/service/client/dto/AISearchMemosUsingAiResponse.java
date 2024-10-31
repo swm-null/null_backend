@@ -8,7 +8,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.enums.AISearchTypeE
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AISearchMemosResponse(
+public record AISearchMemosUsingAiResponse(
     AISearchTypeEnum type, // "similarity" | "regex"
     String processedMessage,
     List<String> memoIds,
