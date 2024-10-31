@@ -69,4 +69,11 @@ public class MemoService {
         log.info("메모 리스트 삭제 - 메모: {} / 유저: {}", memoIds, userId);
         memoRepository.deleteByIdInAndUserId(memoIds, userId);
     }
+
+    public List<String> getFileUrls(List<String> memoIds, String userId) {
+        return memoRepository.findImageUrlsByIdInAndUserId(memoIds, userId).stream()
+            .map(Memo::getImageUrls)
+            .flatMap(List::stream)
+            .toList();
+    }
 }

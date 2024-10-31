@@ -1,4 +1,4 @@
-package com.example.oatnote._config;
+package com.example.oatnote._commons.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

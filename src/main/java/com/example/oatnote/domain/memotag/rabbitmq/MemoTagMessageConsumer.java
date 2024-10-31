@@ -5,7 +5,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.MemoTagService;
-import com.example.oatnote.domain.memotag.rabbitmq.dto.MemoTagMessage;
+import com.example.oatnote._commons.message.MemoTagMessage;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -21,7 +21,7 @@ public class MemoTagMessageConsumer {
     private final MemoTagService memoTagService;
     private final ObjectMapper objectMapper;
 
-    @RabbitListener(queues = "oatnote_user_queue", ackMode = "MANUAL")
+    @RabbitListener(queues = "${spring.rabbitmq.queues.user.queue}", ackMode = "MANUAL")
     public void receiveMemoTagRequest(Message message, Channel channel) {
         try {
             MemoTagMessage memoTagMessage = parseMessageBody(message.getBody());

@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -28,6 +27,7 @@ import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
 import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
@@ -36,6 +36,7 @@ import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
+import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
 import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
@@ -69,6 +70,7 @@ public class MemoTagService {
     private final MemoTagRelationService memoTagRelationService;
     private final SearchHistoryService searchHistoryService;
     private final MemoTagMessageProducer memoTagMessageProducer;
+    private final FilesMessageProducer filesMessageProducer;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
 
@@ -246,20 +248,22 @@ public class MemoTagService {
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
-        String newContent = updateMemoRequest.content();
-        List<String> newImageUrls = updateMemoRequest.imageUrls();
+        String updatedContent = updateMemoRequest.content();
+        List<String> updatedImageUrls = updateMemoRequest.imageUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
-        List<String> existingImageUrls = memo.getImageUrls();
 
         AICreateEmbeddingResponse aiCreateEmbeddingResponse = null;
-        AICreateMetadataResponse aiCreateMetadataResponse = null;
 
-        boolean isContentChanged = !newContent.equals(memo.getContent());
+        boolean isContentChanged = !updatedContent.equals(memo.getContent());
         if (isContentChanged) {
-            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(newContent);
+            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updatedContent);
         }
-        aiCreateMetadataResponse = aiMemoTagClient.createMetadata(newContent, newImageUrls);
+
+        AICreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
+            updatedContent,
+            updatedImageUrls
+        );
 
         List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
             ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
@@ -269,14 +273,23 @@ public class MemoTagService {
             ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
 
         memo.update(
-            newContent,
-            newImageUrls,
+            updatedContent,
+            updatedImageUrls,
             embedding,
             metadata,
             embeddingMetadata
         );
 
         Memo updatedMemo = memoService.updateMemo(memo);
+
+        // 삭제된 이미지 전송
+        List<String> deletedImageUrls = memo.getImageUrls().stream()
+            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
+            .collect(Collectors.toList());
+        if (!deletedImageUrls.isEmpty()) {
+            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
+        }
+
         return UpdateMemoResponse.from(updatedMemo, getLinkedTags(memo.getId(), userId));
     }
 
@@ -289,12 +302,19 @@ public class MemoTagService {
     }
 
     public void deleteMemo(String memoId, String userId) {
+        List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
+        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
+
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         memoService.deleteMemo(memoId, userId);
     }
 
     public void deleteTag(String tagId, String userId) {
         List<String> memoIds = memoTagRelationService.getMemoIds(tagId, userId);
+
+        List<String> fileUrls = memoService.getFileUrls(memoIds, userId);
+        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
+
         memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
@@ -326,6 +346,7 @@ public class MemoTagService {
     }
 
     public void deleteUserAllData(String userId) {
+        filesMessageProducer.sendDeleteUserAllFilesRequest(userId);
         memoTagRelationService.deleteUserAllData(userId);
         memoService.deleteUserAllData(userId);
         tagService.deleteUserAllData(userId);

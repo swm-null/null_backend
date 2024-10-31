@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.5'
 }
 
@@ -39,8 +39,11 @@ dependencies {
     // RabbitMQ
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
+    // AspectJ
+    implementation 'org.aspectj:aspectjweaver:1.9.20'
+
     // S3
-    implementation 'software.amazon.awssdk:s3:2.20.50'
+    implementation 'software.amazon.awssdk:s3:2.20.51'
 
     // HealthCheck
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

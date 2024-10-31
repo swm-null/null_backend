@@ -1,4 +1,4 @@
-package com.example.oatnote.util;
+package com.example.oatnote._commons.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
