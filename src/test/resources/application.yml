@@ -19,7 +19,7 @@ spring:
         delete:
           queue: test
           routing-key: test
-        delete-user-all:
+        delete-all:
           queue: test
           routing-key: test
       user:

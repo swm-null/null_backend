@@ -8,7 +8,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote._commons.message.DeleteUserAllFilesMessage;
+import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ public class FilesMessageProducer {
     @Value("${spring.rabbitmq.queues.file.delete.routing-key}")
     private String deleteFileRoutingKey;
 
-    @Value("${spring.rabbitmq.queues.file.delete-user-all.routing-key}")
-    private String deleteUserAllFilesRoutingKey;
+    @Value("${spring.rabbitmq.queues.file.delete-all.routing-key}")
+    private String deleteAllFilesRoutingKey;
 
     @Value("${spring.rabbitmq.queues.dlx.exchange}")
     private String dlxExchangeName;
@@ -51,10 +51,10 @@ public class FilesMessageProducer {
         maxAttempts = 2,
         backoff = @Backoff(delay = 1000)
     )
-    public void sendDeleteUserAllFilesRequest(String userId) {
+    public void sendDeleteAllFilesRequest(String userId) {
         log.info("Producing RabbitMQ delete all files request. userId: {}", userId);
-        DeleteUserAllFilesMessage deleteUserAllFilesMessage = DeleteUserAllFilesMessage.of(userId);
-        rabbitTemplate.convertAndSend(fileExchangeName, deleteUserAllFilesRoutingKey, deleteUserAllFilesMessage);
+        DeleteAllFilesMessage deleteAllFilesMessage = DeleteAllFilesMessage.of(userId);
+        rabbitTemplate.convertAndSend(fileExchangeName, deleteAllFilesRoutingKey, deleteAllFilesMessage);
     }
 
     @Recover

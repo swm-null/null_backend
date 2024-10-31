@@ -24,11 +24,11 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.queues.file.delete.routing-key}")
     private String deleteFileRoutingKey;
 
-    @Value("${spring.rabbitmq.queues.file.delete-user-all.queue}")
-    private String deleteUserAllFilesQueueName;
+    @Value("${spring.rabbitmq.queues.file.delete-all.queue}")
+    private String deleteAllFilesQueueName;
 
-    @Value("${spring.rabbitmq.queues.file.delete-user-all.routing-key}")
-    private String deleteUserAllFilesRoutingKey;
+    @Value("${spring.rabbitmq.queues.file.delete-all.routing-key}")
+    private String deleteAllFilesRoutingKey;
 
     @Value("${spring.rabbitmq.queues.dlx.exchange}")
     private String dlxExchangeName;
@@ -65,8 +65,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue deleteUserAllFilesQueue() {
-        return new Queue(deleteUserAllFilesQueueName, true);
+    public Queue deleteAllFilesQueue() {
+        return new Queue(deleteAllFilesQueueName, true);
     }
 
     @Bean
@@ -77,10 +77,10 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding deleteUserAllFilesBinding(Queue deleteUserAllFilesQueue, TopicExchange fileTopicExchange) {
-        return BindingBuilder.bind(deleteUserAllFilesQueue)
+    public Binding deleteAllFilesBinding(Queue deleteAllFilesQueue, TopicExchange fileTopicExchange) {
+        return BindingBuilder.bind(deleteAllFilesQueue)
             .to(fileTopicExchange)
-            .with(deleteUserAllFilesRoutingKey);
+            .with(deleteAllFilesRoutingKey);
     }
 
     @Bean
