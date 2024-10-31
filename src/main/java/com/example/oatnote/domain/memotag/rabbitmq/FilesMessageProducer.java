@@ -8,7 +8,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote._commons.message.DeleteAllFilesMessage;
+import com.example.oatnote._commons.message.DeleteUserAllFilesMessage;
 import com.example.oatnote._commons.message.DeleteFilesMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,13 @@ public class FilesMessageProducer {
     private final RabbitTemplate rabbitTemplate;
 
     @Value("${spring.rabbitmq.queues.file.exchange}")
-    private String exchangeName;
+    private String fileExchangeName;
 
-    @Value("${spring.rabbitmq.queues.file.routing-key}")
-    private String routingKey;
+    @Value("${spring.rabbitmq.queues.file.delete.routing-key}")
+    private String deleteFileRoutingKey;
+
+    @Value("${spring.rabbitmq.queues.file.delete-all.routing-key}")
+    private String deleteAllFilesRoutingKey;
 
     @Value("${spring.rabbitmq.queues.dlx.exchange}")
     private String dlxExchangeName;
@@ -40,7 +43,7 @@ public class FilesMessageProducer {
     public void sendDeleteFilesRequest(List<String> fileUrls, String userId) {
         log.info("Producing RabbitMQ delete files request. userId: {}", userId);
         DeleteFilesMessage deleteFilesMessage = DeleteFilesMessage.of(fileUrls, userId);
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, deleteFilesMessage);
+        rabbitTemplate.convertAndSend(fileExchangeName, deleteFileRoutingKey, deleteFilesMessage);
     }
 
     @Retryable(
@@ -48,10 +51,10 @@ public class FilesMessageProducer {
         maxAttempts = 2,
         backoff = @Backoff(delay = 1000)
     )
-    public void sendDeleteAllFilesRequest(String userId) {
+    public void sendDeleteUserAllFilesRequest(String userId) {
         log.info("Producing RabbitMQ delete all files request. userId: {}", userId);
-        DeleteAllFilesMessage deleteAllFilesMessage = DeleteAllFilesMessage.of(userId);
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, deleteAllFilesMessage);
+        DeleteUserAllFilesMessage deleteUserAllFilesMessage = DeleteUserAllFilesMessage.of(userId);
+        rabbitTemplate.convertAndSend(fileExchangeName, deleteAllFilesRoutingKey, deleteUserAllFilesMessage);
     }
 
     @Recover

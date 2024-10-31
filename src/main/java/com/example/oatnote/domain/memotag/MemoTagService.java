@@ -346,7 +346,7 @@ public class MemoTagService {
     }
 
     public void deleteUserAllData(String userId) {
-        filesMessageProducer.sendDeleteAllFilesRequest(userId);
+        filesMessageProducer.sendDeleteUserAllFilesRequest(userId);
         memoTagRelationService.deleteUserAllData(userId);
         memoService.deleteUserAllData(userId);
         tagService.deleteUserAllData(userId);
