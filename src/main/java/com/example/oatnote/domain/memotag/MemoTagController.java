@@ -83,8 +83,8 @@ public class MemoTagController implements MemoTagApiDoc {
     @GetMapping("/tags")
     public ResponseEntity<TagsResponse> getTags(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
         TagsResponse tagsResponse = memoTagService.getTags(tagId, page, limit, userId);
@@ -94,10 +94,10 @@ public class MemoTagController implements MemoTagApiDoc {
     @GetMapping("/tag/memos")
     public ResponseEntity<MemosResponse> getMemos(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
-        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
-        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(value = "sortOrder") MemoSortOrderTypeEnum sortOrder,
+        @RequestParam(value = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     ) {
         MemosResponse memosResponse = memoTagService.getMemos(tagId, page, limit, sortOrder, isLinked, userId);
@@ -106,7 +106,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/search/ai")
     public ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
-        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     ) {
         SearchMemosUsingAiResponse searchMemosUsingAiResponse = memoTagService.searchMemosUsingAi(
@@ -118,7 +118,7 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/search/db")
     public ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
-        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     ) {
         SearchMemosUsingDbResponse searchMemosUsingDbResponse = memoTagService.searchMemosUsingDb(
@@ -130,9 +130,9 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/search/histories")
     public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(name = "query", defaultValue = "") String query,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "15") Integer limit,
+        @RequestParam(value = "query", defaultValue = "") String query,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
         SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(query, page, limit, userId);

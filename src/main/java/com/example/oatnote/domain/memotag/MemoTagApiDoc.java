@@ -112,8 +112,8 @@ public interface MemoTagApiDoc {
     @GetMapping("/tags")
     ResponseEntity<TagsResponse> getTags(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     );
 
@@ -129,10 +129,10 @@ public interface MemoTagApiDoc {
     @GetMapping("/tag/memos")
     ResponseEntity<MemosResponse> getMemos(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
-        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
-        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(value = "sortOrder") MemoSortOrderTypeEnum sortOrder,
+        @RequestParam(value = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     );
 
@@ -148,7 +148,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "AI 기반 메모 검색")
     @GetMapping("/memos/search/ai")
     ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
-        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     );
 
@@ -164,7 +164,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "DB 기반 메모 검색")
     @GetMapping("/memos/search/db")
     ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
-        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     );
 
@@ -179,9 +179,9 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 검색 기록 조회")
     @GetMapping("memos/search/histories")
     ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(name = "query", defaultValue = "") String query,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "15") Integer limit,
+        @RequestParam(value = "query", defaultValue = "") String query,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     );
 
