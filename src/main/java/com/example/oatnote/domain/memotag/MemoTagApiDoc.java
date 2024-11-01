@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
@@ -70,18 +72,16 @@ public interface MemoTagApiDoc {
 
     @ApiResponses(
         value = {
-            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 내용 업데이트 및 태그 재생성")
-    @PutMapping("/memo/{memoId}/tags")
-    ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
-        @PathVariable("memoId") String memoId,
-        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
+    @Operation(summary = "메모 검색 기록 생성")
+    @PostMapping("/memos/search/history")
+    ResponseEntity<CreateSearchHistoryResponse> createSearchHistory(
+        @RequestBody @Valid CreateSearchHistoryRequest createSearchHistoryRequest,
         @AuthenticationPrincipal String userId
     );
 
@@ -142,9 +142,41 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 검색 히스토리 조회")
+    @Operation(summary = "AI 기반 메모 검색")
+    @GetMapping("/memos/search/ai")
+    ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
+        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "DB 기반 메모 검색")
+    @GetMapping("/memos/search/db")
+    ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
+        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "메모 검색 기록 조회")
     @GetMapping("memos/search/histories")
     ResponseEntity<SearchHistoriesResponse> getSearchHistories(
         @RequestParam(name = "query", defaultValue = "") String query,
@@ -162,43 +194,28 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "AI 기반 메모 검색")
-    @GetMapping("/memos/search/ai")
-    ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
-        @RequestParam String query,
-        @AuthenticationPrincipal String userId
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "DB 기반 메모 검색")
-    @GetMapping("/memos/search/db")
-    ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
-        @RequestParam String query,
-        @AuthenticationPrincipal String userId
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
     @Operation(summary = "메모 수정")
     @PutMapping("/memo/{memoId}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
         @PathVariable("memoId") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "메모 내용 업데이트 및 태그 재생성")
+    @PutMapping("/memo/{memoId}/tags")
+    ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
+        @PathVariable("memoId") String memoId,
+        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
         @AuthenticationPrincipal String userId
     );
 

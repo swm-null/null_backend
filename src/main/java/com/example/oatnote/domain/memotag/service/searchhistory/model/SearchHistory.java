@@ -1,7 +1,6 @@
 package com.example.oatnote.domain.memotag.service.searchhistory.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -9,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,10 +24,11 @@ public class SearchHistory {
     @Field("query")
     private String query;
 
-    @Field("pMsg")
-    private String processedMessage;
+    @Field("aiRes")
+    private SearchMemosUsingAiResponse searchMemosUsingAiResponse;
 
-    private List<MemoResponse> memos;
+    @Field("dbRes")
+    private SearchMemosUsingDbResponse searchMemosUsingDbResponse;
 
     @Field("uId")
     private String userId;
@@ -38,14 +38,10 @@ public class SearchHistory {
 
     public SearchHistory(
         String query,
-        String processedMessage,
-        List<MemoResponse> memos,
         String userId
     ) {
         this.id = UUID.randomUUID().toString();
         this.query = query;
-        this.processedMessage = processedMessage;
-        this.memos = memos;
         this.userId = userId;
         this.createdAt = LocalDateTime.now();
     }

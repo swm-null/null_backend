@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
@@ -47,7 +49,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
@@ -94,8 +95,13 @@ public class MemoTagService {
         //todo refactor
     }
 
-    public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
-        tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
+    public CreateSearchHistoryResponse createSearchHistory(
+        CreateSearchHistoryRequest createSearchHistoryRequest,
+        String userId
+    ) {
+        SearchHistory searchHistory = createSearchHistoryRequest.toSearchHistory(userId);
+        SearchHistory createdSearchHistory = searchHistoryService.createSearchHistory(searchHistory);
+        return CreateSearchHistoryResponse.from(createdSearchHistory);
     }
 
     public List<TagResponse> getChildTags(String tagId, String userId) {
@@ -208,7 +214,9 @@ public class MemoTagService {
         return MemosResponse.from(memoResponses, criteria);
     }
 
-    public SearchMemosUsingAiResponse searchMemosUsingAi(String query, String userId) {
+    public SearchMemosUsingAiResponse searchMemosUsingAi(String searchHistoryId, String userId) {
+        String query = searchHistoryService.getQuery(searchHistoryId, userId);
+
         AISearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
         List<Memo> memos = switch (aiSearchMemosUsingAiResponse.type()) {
@@ -219,9 +227,7 @@ public class MemoTagService {
         List<String> memoIds = memos.stream()
             .map(Memo::getId)
             .toList();
-
         Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(memoIds, userId);
-
         List<MemoResponse> memoResponses = memos.stream()
             .map(memo -> {
                 List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
@@ -229,28 +235,25 @@ public class MemoTagService {
             })
             .toList();
 
-        SearchHistory searchHistory = new SearchHistory(
-            query,
+        SearchMemosUsingAiResponse searchMemosUsingAiResponse = SearchMemosUsingAiResponse.from(
             aiSearchMemosUsingAiResponse.processedMessage(),
-            memoResponses,
-            userId
+            memoResponses
         );
-        searchHistoryService.createSearchHistory(searchHistory);
+        searchHistoryService.updateAiResponse(searchHistoryId, searchMemosUsingAiResponse, userId);
 
-        return SearchMemosUsingAiResponse.from(aiSearchMemosUsingAiResponse.processedMessage(), memoResponses);
+        return searchMemosUsingAiResponse;
     }
 
-    public SearchMemosUsingDbResponse searchMemosUsingDb(String query, String userId) {
+    public SearchMemosUsingDbResponse searchMemosUsingDb(String searchHistoryId, String userId) {
+        String query = searchHistoryService.getQuery(searchHistoryId, userId);
+
         AISearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
 
         List<Memo> memos = memoService.getMemos(aiSearchMemosUsingDbResponse.memoIds(), userId);
-
         List<String> memoIds = memos.stream()
             .map(Memo::getId)
             .toList();
-
         Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(memoIds, userId);
-
         List<MemoResponse> memoResponses = memos.stream()
             .map(memo -> {
                 List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
@@ -258,15 +261,10 @@ public class MemoTagService {
             })
             .toList();
 
-        SearchHistory searchHistory = new SearchHistory(
-            query,
-            null,
-            memoResponses,
-            userId
-        );
-        searchHistoryService.createSearchHistory(searchHistory);
+        SearchMemosUsingDbResponse searchMemosUsingDbResponse = SearchMemosUsingDbResponse.from(memoResponses);
+        searchHistoryService.updateDbResponse(searchHistoryId, searchMemosUsingDbResponse, userId);
 
-        return SearchMemosUsingDbResponse.from(memoResponses);
+        return searchMemosUsingDbResponse;
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
@@ -413,6 +411,10 @@ public class MemoTagService {
         );
         AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
         processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
+    }
+
+    public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
+        tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
     }
 
     void processMemoTag(

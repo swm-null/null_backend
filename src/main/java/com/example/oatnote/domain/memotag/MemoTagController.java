@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
 import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
@@ -57,6 +59,18 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/memos/search/history")
+    public ResponseEntity<CreateSearchHistoryResponse> createSearchHistory(
+        @RequestBody @Valid CreateSearchHistoryRequest createSearchHistoryRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        CreateSearchHistoryResponse createSearchHistoryResponse = memoTagService.createSearchHistory(
+            createSearchHistoryRequest,
+            userId
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(createSearchHistoryResponse);
+    }
+
     @GetMapping("/childTags")
     public ResponseEntity<List<TagResponse>> getChildTags(
         @RequestParam(value = "tagId", required = false) String tagId,
@@ -90,6 +104,30 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.OK).body(memosResponse);
     }
 
+    @GetMapping("/memos/search/ai")
+    public ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
+        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @AuthenticationPrincipal String userId
+    ) {
+        SearchMemosUsingAiResponse searchMemosUsingAiResponse = memoTagService.searchMemosUsingAi(
+            searchHistoryId,
+            userId
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingAiResponse);
+    }
+
+    @GetMapping("/memos/search/db")
+    public ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
+        @RequestParam(name = "searchHistoryId") String searchHistoryId,
+        @AuthenticationPrincipal String userId
+    ) {
+        SearchMemosUsingDbResponse searchMemosUsingDbResponse = memoTagService.searchMemosUsingDb(
+            searchHistoryId,
+            userId
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingDbResponse);
+    }
+
     @GetMapping("/memos/search/histories")
     public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
         @RequestParam(name = "query", defaultValue = "") String query,
@@ -99,24 +137,6 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(query, page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);
-    }
-
-    @GetMapping("/memos/search/ai")
-    public ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
-        @RequestParam String query,
-        @AuthenticationPrincipal String userId
-    ) {
-        SearchMemosUsingAiResponse searchMemosUsingAiResponse = memoTagService.searchMemosUsingAi(query, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingAiResponse);
-    }
-
-    @GetMapping("/memos/search/db")
-    public ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
-        @RequestParam String query,
-        @AuthenticationPrincipal String userId
-    ) {
-        SearchMemosUsingDbResponse searchMemosUsingDbResponse = memoTagService.searchMemosUsingDb(query, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(searchMemosUsingDbResponse);
     }
 
     @PutMapping("/memo/{memoId}")
