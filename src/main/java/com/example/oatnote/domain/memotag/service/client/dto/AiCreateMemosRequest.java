@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AICreateMemosRequest(
+public record AiCreateMemosRequest(
     String content,
     String type,
     String userId
 ) {
 
-    public static AICreateMemosRequest from(String content, String type, String userId) {
-        return new AICreateMemosRequest(content, type, userId);
+    public static AiCreateMemosRequest from(String content, String type, String userId) {
+        return new AiCreateMemosRequest(content, type, userId);
     }
 }

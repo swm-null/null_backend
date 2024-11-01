@@ -42,15 +42,15 @@ import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
 import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
-import com.example.oatnote.domain.memotag.service.client.AIMemoTagClient;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AISearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -68,7 +68,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemoTagService {
 
-    private final AIMemoTagClient aiMemoTagClient;
+    private final AiMemoTagClient aiMemoTagClient;
     private final MemoService memoService;
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
@@ -81,8 +81,8 @@ public class MemoTagService {
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest, String userId) {
         LocalDateTime now = LocalDateTime.now();
 
-        AICreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAICreateMemoRequest(userId);
-        AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
+        AiCreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAiCreateMemoRequest(userId);
+        AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
         Memo rawMemo = createMemoRequest.toRawMemo(userId, now);
 
@@ -217,7 +217,7 @@ public class MemoTagService {
     public SearchMemosUsingAiResponse searchMemosUsingAi(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
 
-        AISearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
+        AiSearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
         List<Memo> memos = switch (aiSearchMemosUsingAiResponse.type()) {
             case SIMILARITY -> memoService.getMemos(aiSearchMemosUsingAiResponse.memoIds(), userId);
@@ -247,7 +247,7 @@ public class MemoTagService {
     public SearchMemosUsingDbResponse searchMemosUsingDb(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
 
-        AISearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
+        AiSearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
 
         List<Memo> memos = memoService.getMemos(aiSearchMemosUsingDbResponse.memoIds(), userId);
         List<String> memoIds = memos.stream()
@@ -273,14 +273,14 @@ public class MemoTagService {
 
         Memo memo = memoService.getMemo(memoId, userId);
 
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = null;
+        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = null;
 
         boolean isContentChanged = !updatedContent.equals(memo.getContent());
         if (isContentChanged) {
             aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updatedContent);
         }
 
-        AICreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
+        AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
             updatedContent,
             updatedImageUrls
         );
@@ -316,7 +316,7 @@ public class MemoTagService {
     }
 
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {
-        AICreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
+        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
         Tag tag = tagService.getTag(tagId, userId);
         tag.update(updateTagRequest.name(), aiCreateEmbeddingResponse.embedding());
         Tag updatedTag = tagService.updateTag(tag);
@@ -330,8 +330,8 @@ public class MemoTagService {
     ) {
         LocalDateTime now = LocalDateTime.now();
 
-        AICreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAICreateMemoRequest(userId);
-        AICreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
+        AiCreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAiCreateMemoRequest(userId);
+        AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
         Memo rawMemo = memoService.getMemo(memoId, userId);
 
@@ -400,16 +400,16 @@ public class MemoTagService {
 
     // rabbitmq 수신
     public void createStructures(
-        AICreateTagsResponse aiCreateTagsResponse,
+        AiCreateTagsResponse aiCreateTagsResponse,
         Memo rawMemo,
         String userId,
         LocalDateTime now
     ) {
-        AICreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAICreateStructureRequest(
+        AiCreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAiCreateStructureRequest(
             rawMemo,
             userId
         );
-        AICreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
+        AiCreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
         processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
     }
 
@@ -418,7 +418,7 @@ public class MemoTagService {
     }
 
     void processMemoTag(
-        AICreateStructureResponse aiCreateStructureResponse,
+        AiCreateStructureResponse aiCreateStructureResponse,
         Memo rawMemo,
         String userId,
         LocalDateTime now
@@ -433,7 +433,7 @@ public class MemoTagService {
         Map<String, List<String>> reversedTagEdge = aiCreateStructureResponse.newReversedStructure();
         Set<String> visitedTagIds = new HashSet<>();
 
-        for (AICreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
+        for (AiCreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
             Memo memo = rawMemo.process(
                 processedMemo.metadata(),
                 processedMemo.embedding(),

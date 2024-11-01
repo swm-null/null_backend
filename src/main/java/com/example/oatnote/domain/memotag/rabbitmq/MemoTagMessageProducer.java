@@ -8,7 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.example.oatnote._commons.message.MemoTagMessage;
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,7 +28,7 @@ public class MemoTagMessageProducer {
     private String exchange;
 
     public void sendCreateStructuresRequest(
-        AICreateTagsResponse aiCreateTagsResponse,
+        AiCreateTagsResponse aiCreateTagsResponse,
         Memo rawMemo,
         String userId,
         LocalDateTime time

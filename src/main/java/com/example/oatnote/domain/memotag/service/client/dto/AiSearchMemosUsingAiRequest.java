@@ -5,13 +5,13 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AISearchMemosUsingAiRequest(
+public record AiSearchMemosUsingAiRequest(
     String query,
     String userId
 ) {
 
-    public static AISearchMemosUsingAiRequest of(String query, String userId) {
-        return new AISearchMemosUsingAiRequest(
+    public static AiSearchMemosUsingAiRequest of(String query, String userId) {
+        return new AiSearchMemosUsingAiRequest(
             query,
             userId
         );
