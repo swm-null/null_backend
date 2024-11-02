@@ -12,7 +12,8 @@ public class MemoAtLeastOneRequiredValidator implements ConstraintValidator<Memo
     @Override
     public boolean isValid(CreateMemoRequest request, ConstraintValidatorContext context) {
         return (Objects.nonNull(request.content()) && !request.content().isBlank()) ||
-            (Objects.nonNull(request.imageUrls()) && !request.imageUrls().isEmpty());
+            (Objects.nonNull(request.imageUrls()) && !request.imageUrls().isEmpty()) ||
+            (Objects.nonNull(request.voiceUrls()) && !request.voiceUrls().isEmpty());
     }
 }
 

@@ -15,7 +15,7 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = { MemoAtLeastOneRequiredValidator.class })
 public @interface MemoAtLeastOneRequired {
 
-    String message() default "메모 내용, 이미지 URL 중 하나는 필수입니다.";
+    String message() default "메모 내용, 이미지 URL, 음성 URL 중 하나는 필수입니다.";
 
     Class<?>[] groups() default {};
 
