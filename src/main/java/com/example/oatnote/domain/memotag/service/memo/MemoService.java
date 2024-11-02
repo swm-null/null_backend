@@ -3,6 +3,7 @@ package com.example.oatnote.domain.memotag.service.memo;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,9 +72,11 @@ public class MemoService {
     }
 
     public List<String> getFileUrls(List<String> memoIds, String userId) {
-        return memoRepository.findImageUrlsByIdInAndUserId(memoIds, userId).stream()
-            .map(Memo::getImageUrls)
-            .flatMap(List::stream)
+        return memoRepository.findFileUrlsByIdInAndUserId(memoIds, userId).stream()
+            .flatMap(memo -> Stream.concat(
+                memo.getImageUrls().stream(),
+                memo.getVoiceUrls().stream()
+            ))
             .toList();
     }
 }

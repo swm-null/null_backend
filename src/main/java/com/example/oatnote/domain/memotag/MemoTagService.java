@@ -315,8 +315,7 @@ public class MemoTagService {
 
     public void deleteMemo(String memoId, String userId) {
         List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
-        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
-
+        sendDeleteFilesRequest(fileUrls, userId);
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         memoService.deleteMemo(memoId, userId);
     }
@@ -493,10 +492,14 @@ public class MemoTagService {
         List<String> deletedFilesUrls = Stream.concat(
             memo.getImageUrls().stream().filter(imageUrl -> !updatedImageUrls.contains(imageUrl)),
             memo.getVoiceUrls().stream().filter(voiceUrl -> !updatedVoiceUrls.contains(voiceUrl))
-        ).collect(Collectors.toList());
+        ).toList();
 
-        if (!deletedFilesUrls.isEmpty()) {
-            filesMessageProducer.sendDeleteFilesRequest(deletedFilesUrls, userId);
+        sendDeleteFilesRequest(deletedFilesUrls, userId);
+    }
+
+    void sendDeleteFilesRequest(List<String> fileUrls, String userId) {
+        if (!fileUrls.isEmpty()) {
+            filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
         }
     }
 }
