@@ -42,7 +42,6 @@ import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
-import com.example.oatnote.domain.memotag.rabbitmq.MemoTagMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
@@ -74,7 +73,6 @@ public class MemoTagService {
     private final MemoTagRelationService memoTagRelationService;
     private final SearchHistoryService searchHistoryService;
     private final AiMemoTagClient aiMemoTagClient;
-    private final MemoTagMessageProducer memoTagMessageProducer;
     private final FilesMessageProducer filesMessageProducer;
 
     private final static boolean IS_LINKED_MEMO_TAG = true;
