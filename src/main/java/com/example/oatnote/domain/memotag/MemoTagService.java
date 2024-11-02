@@ -323,8 +323,7 @@ public class MemoTagService {
 
     public void deleteMemo(String memoId, String userId) {
         List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
-        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
-
+        sendDeleteFilesRequest(fileUrls, userId);
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         memoService.deleteMemo(memoId, userId);
     }
