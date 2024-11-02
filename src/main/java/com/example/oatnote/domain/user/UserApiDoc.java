@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.oatnote.domain.user.dto.CheckEmailRequest;
+import com.example.oatnote.domain.user.dto.CheckEmailDuplicationRequest;
 import com.example.oatnote.domain.user.dto.FindPasswordRequest;
 import com.example.oatnote.domain.user.dto.LoginUserRequest;
 import com.example.oatnote.domain.user.dto.LoginUserResponse;
@@ -70,7 +70,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/checkEmail")
     ResponseEntity<Void> checkEmailDuplication(
-        @RequestBody @Valid CheckEmailRequest checkEmailRequest
+        @RequestBody @Valid CheckEmailDuplicationRequest checkEmailDuplicationRequest
     );
 
     @Operation(summary = "이메일 인증 코드 전송")

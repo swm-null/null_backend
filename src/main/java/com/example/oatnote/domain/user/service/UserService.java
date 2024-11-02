@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.user.dto.CheckEmailRequest;
+import com.example.oatnote.domain.user.dto.CheckEmailDuplicationRequest;
 import com.example.oatnote.domain.user.dto.FindPasswordRequest;
 import com.example.oatnote.domain.user.dto.LoginUserRequest;
 import com.example.oatnote.domain.user.dto.LoginUserResponse;
@@ -97,8 +97,8 @@ public class UserService {
         return RefreshUserResponse.of(newAccessToken, refreshToken);
     }
 
-    public void checkEmailDuplication(CheckEmailRequest checkEmailRequest) {
-        String email = checkEmailRequest.email();
+    public void checkEmailDuplication(CheckEmailDuplicationRequest checkEmailDuplicationRequest) {
+        String email = checkEmailDuplicationRequest.email();
         if (userRepository.findByEmail(email).isPresent()) {
             throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.", email);
         }
