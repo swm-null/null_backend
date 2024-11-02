@@ -19,11 +19,11 @@ public record MemoResponse(
     @Schema(description = "내용", example = "내일은 5시 멘토링을 들어야해")
     String content,
 
-    @Schema(
-        description = "이미지 URL 리스트",
-        example = "[\"https://oatnote.com/image1.jpg\", \"https://oatnote.com/image2.jpg\"]"
-    )
+    @Schema(description = "이미지 URL 리스트", example = "[\"https://oatnote.com/image1.jpg\"]")
     List<String> imageUrls,
+
+    @Schema(description = "메타데이터", example = "")
+    String metadata,
 
     @Schema(description = "생성일시", example = "2024-08-21T03:47:23.328108")
     LocalDateTime createdAt,
@@ -40,6 +40,7 @@ public record MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
+            memo.getMetadata(),
             memo.getCreatedAt(),
             memo.getUpdatedAt(),
             tags.stream().map(TagResponse::fromRawTag).toList()
@@ -51,6 +52,7 @@ public record MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
+            memo.getMetadata(),
             memo.getCreatedAt(),
             memo.getUpdatedAt(),
             tags.stream().map(TagResponse::fromTag).toList()
