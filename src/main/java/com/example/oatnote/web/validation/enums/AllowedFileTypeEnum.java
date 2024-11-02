@@ -15,7 +15,7 @@ public enum AllowedFileTypeEnum {
         "webp", "image/webp",
         "gif", "image/gif"
     )),
-    AUDIO(Map.of(
+    VOICE(Map.of(
         "mp3", "audio/mpeg",
         "wav", "audio/wav"
     )),

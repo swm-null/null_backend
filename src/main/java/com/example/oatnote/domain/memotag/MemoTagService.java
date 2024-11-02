@@ -240,6 +240,7 @@ public class MemoTagService {
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
         String updatedContent = updateMemoRequest.content();
         List<String> updatedImageUrls = updateMemoRequest.imageUrls();
+        List<String> updatedVoiceUrls = updateMemoRequest.voiceUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
 
@@ -252,7 +253,8 @@ public class MemoTagService {
 
         AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
             updatedContent,
-            updatedImageUrls
+            updatedImageUrls,
+            updatedVoiceUrls
         );
 
         List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
@@ -265,8 +267,9 @@ public class MemoTagService {
         memo.update(
             updatedContent,
             updatedImageUrls,
-            embedding,
+            updatedVoiceUrls,
             metadata,
+            embedding,
             embeddingMetadata
         );
 
@@ -308,7 +311,8 @@ public class MemoTagService {
 
         rawMemo.update(
             updateMemoTagsRequest.content(),
-            updateMemoTagsRequest.imageUrls()
+            updateMemoTagsRequest.imageUrls(),
+            updateMemoTagsRequest.voiceUrls()
         );
 
         memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);

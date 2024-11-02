@@ -103,9 +103,9 @@ public class AiMemoTagClient {
         return aiCreateEmbeddingResponse.getBody();
     }
 
-    public AiCreateMetadataResponse createMetadata(String content, List<String> imageUrls) {
+    public AiCreateMetadataResponse createMetadata(String content, List<String> imageUrls, List<String> voiceUrls) {
         final URI uri = buildUri("/get-metadata-with-embedding");
-        AiCreateMetadataRequest aiCreateMetadataRequest = AiCreateMetadataRequest.from(content, imageUrls);
+        AiCreateMetadataRequest aiCreateMetadataRequest = AiCreateMetadataRequest.from(content, imageUrls, voiceUrls);
         ResponseEntity<AiCreateMetadataResponse> aiCreateMetadataResponse = restTemplate.postForEntity(
             uri,
             aiCreateMetadataRequest,

@@ -16,6 +16,7 @@ public record AiCreateStructureRequest(
     public record RawMemo(
         String content,
         List<String> imageUrls,
+        List<String> voiceUrls,
         List<RawTag> tags
     ) {
 

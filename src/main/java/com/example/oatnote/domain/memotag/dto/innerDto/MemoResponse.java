@@ -22,7 +22,10 @@ public record MemoResponse(
     @Schema(description = "이미지 URL 리스트", example = "[\"https://oatnote.com/image1.jpg\"]")
     List<String> imageUrls,
 
-    @Schema(description = "메타데이터", example = "")
+    @Schema(description = "음성 URL 리스트", example = "[\"https://oatnote.com/voice1.mp3\"]")
+    List<String> voiceUrls,
+
+    @Schema(description = "메타데이터")
     String metadata,
 
     @Schema(description = "생성일시", example = "2024-08-21T03:47:23.328108")
@@ -40,6 +43,7 @@ public record MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
+            memo.getVoiceUrls(),
             memo.getMetadata(),
             memo.getCreatedAt(),
             memo.getUpdatedAt(),
@@ -52,6 +56,7 @@ public record MemoResponse(
             memo.getId(),
             memo.getContent(),
             memo.getImageUrls(),
+            memo.getVoiceUrls(),
             memo.getMetadata(),
             memo.getCreatedAt(),
             memo.getUpdatedAt(),

@@ -25,13 +25,16 @@ public class Memo {
     @Field("imgs")
     private List<String> imageUrls;
 
+    @Field("voices")
+    private List<String> voiceUrls;
+
     @Indexed
     @Field("uId")
     private String userId;
 
-    private List<Double> embedding;
-
     private String metadata;
+
+    private List<Double> embedding;
 
     private List<Double> embeddingMetadata;
 
@@ -45,6 +48,7 @@ public class Memo {
         String id,
         String content,
         List<String> imageUrls,
+        List<String> voiceUrls,
         String userId,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -52,6 +56,7 @@ public class Memo {
         this.id = id;
         this.content = content;
         this.imageUrls = imageUrls;
+        this.voiceUrls = voiceUrls;
         this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -60,12 +65,14 @@ public class Memo {
     public Memo(
         String content,
         List<String> imageUrls,
+        List<String> voiceUrls,
         String userId,
         LocalDateTime time
     ) {
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
+        this.voiceUrls = voiceUrls;
         this.userId = userId;
         this.createdAt = time;
         this.updatedAt = time;
@@ -75,9 +82,10 @@ public class Memo {
         String id,
         String content,
         List<String> imageUrls,
+        List<String> voiceUrls,
         String userId,
-        List<Double> embedding,
         String metadata,
+        List<Double> embedding,
         List<Double> embeddingMetadata,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -85,9 +93,10 @@ public class Memo {
         this.id = id != null ? id : UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
+        this.voiceUrls = voiceUrls;
         this.userId = userId;
-        this.embedding = embedding;
         this.metadata = metadata;
+        this.embedding = embedding;
         this.embeddingMetadata = embeddingMetadata;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -95,22 +104,26 @@ public class Memo {
 
     public void update(
         String content,
-        List<String> strings
+        List<String> imageUrls,
+        List<String> voiceUrls
     ) {
         this.content = content;
-        this.imageUrls = strings;
+        this.imageUrls = imageUrls;
+        this.voiceUrls = voiceUrls;
         this.updatedAt = LocalDateTime.now();
     }
 
     public void update(
         String content,
         List<String> imageUrls,
-        List<Double> embedding,
+        List<String> voiceUrls,
         String metadata,
+        List<Double> embedding,
         List<Double> embeddingMetadata
     ) {
         this.content = content;
         this.imageUrls = imageUrls;
+        this.voiceUrls = voiceUrls;
         this.metadata = metadata;
         this.embedding = embedding;
         this.embeddingMetadata = embeddingMetadata;
@@ -122,8 +135,8 @@ public class Memo {
         List<Double> embedding,
         List<Double> embeddingMetadata
     ) {
-        this.embedding = embedding;
         this.metadata = metadata;
+        this.embedding = embedding;
         this.embeddingMetadata = embeddingMetadata;
         return this;
     }

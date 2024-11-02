@@ -16,6 +16,7 @@ public record AiCreateTagsResponse(
         AiCreateStructureRequest.RawMemo rawMemo = new AiCreateStructureRequest.RawMemo(
             memo.getContent(),
             memo.getImageUrls(),
+            memo.getVoiceUrls(),
             tags
         );
 
