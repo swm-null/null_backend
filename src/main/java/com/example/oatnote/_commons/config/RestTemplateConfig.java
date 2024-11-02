@@ -19,7 +19,7 @@ public class RestTemplateConfig {
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(0, new MappingJackson2HttpMessageConverter(objectMapper));
-        restTemplate.setErrorHandler(new AIResponseErrorHandler());
+        restTemplate.setErrorHandler(new AiResponseErrorHandler());
         return restTemplate;
     }
 }

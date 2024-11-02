@@ -12,18 +12,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
-import com.example.oatnote.domain.memotag.dto.SearchMemosRequest;
-import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryRequest;
+import com.example.oatnote.domain.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.MemosResponse;
+import com.example.oatnote.domain.memotag.dto.SearchHistoriesResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.dto.TagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoResponse;
-import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
@@ -70,18 +72,16 @@ public interface MemoTagApiDoc {
 
     @ApiResponses(
         value = {
-            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 내용 업데이트 및 태그 재생성")
-    @PutMapping("/memo/{memoId}/tags")
-    ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
-        @PathVariable("memoId") String memoId,
-        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
+    @Operation(summary = "메모 검색 기록 생성")
+    @PostMapping("/memos/search/history")
+    ResponseEntity<CreateSearchHistoryResponse> createSearchHistory(
+        @RequestBody @Valid CreateSearchHistoryRequest createSearchHistoryRequest,
         @AuthenticationPrincipal String userId
     );
 
@@ -112,8 +112,8 @@ public interface MemoTagApiDoc {
     @GetMapping("/tags")
     ResponseEntity<TagsResponse> getTags(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     );
 
@@ -129,10 +129,42 @@ public interface MemoTagApiDoc {
     @GetMapping("/tag/memos")
     ResponseEntity<MemosResponse> getMemos(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "10") Integer limit,
-        @RequestParam(name = "sortOrder") MemoSortOrderTypeEnum sortOrder,
-        @RequestParam(name = "isLinked", required = false) Boolean isLinked,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+        @RequestParam(value = "sortOrder") MemoSortOrderTypeEnum sortOrder,
+        @RequestParam(value = "isLinked", required = false) Boolean isLinked,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "AI 기반 메모 검색")
+    @GetMapping("/memos/search/ai")
+    ResponseEntity<SearchMemosUsingAiResponse> searchMemosUsingAi(
+        @RequestParam(value = "searchHistoryId") String searchHistoryId,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "DB 기반 메모 검색")
+    @GetMapping("/memos/search/db")
+    ResponseEntity<SearchMemosUsingDbResponse> searchMemosUsingDb(
+        @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     );
 
@@ -144,27 +176,12 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 검색 히스토리 조회")
+    @Operation(summary = "메모 검색 기록 조회")
     @GetMapping("memos/search/histories")
     ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(name = "query", defaultValue = "") String query,
-        @RequestParam(name = "page", defaultValue = "1") Integer page,
-        @RequestParam(name = "limit", defaultValue = "15") Integer limit,
-        @AuthenticationPrincipal String userId
-    );
-
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
-    @Operation(summary = "AI 검색을 통한 메모 조회")
-    @PostMapping("/memos/search")
-    ResponseEntity<SearchMemosResponse> searchMemos(
-        @RequestBody @Valid SearchMemosRequest searchMemosRequest,
+        @RequestParam(value = "query", defaultValue = "") String query,
+        @RequestParam(value = "page", defaultValue = "1") Integer page,
+        @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     );
 
@@ -182,6 +199,23 @@ public interface MemoTagApiDoc {
     ResponseEntity<UpdateMemoResponse> updateMemo(
         @PathVariable("memoId") String memoId,
         @RequestBody @Valid UpdateMemoRequest updateMemoRequest,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "메모 내용 업데이트 및 태그 재생성")
+    @PutMapping("/memo/{memoId}/tags")
+    ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
+        @PathVariable("memoId") String memoId,
+        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
         @AuthenticationPrincipal String userId
     );
 

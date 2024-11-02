@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record UpdateMemoResponse(
-    @Schema(description = "메모")
-    MemoResponse memo
+public record SearchMemosUsingDbResponse(
+    @Schema(description = "메모 리스트")
+    List<MemoResponse> memos
 ) {
 
-    public static UpdateMemoResponse from(MemoResponse memo) {
-        return new UpdateMemoResponse(
-            memo
+    public static SearchMemosUsingDbResponse from(List<MemoResponse> memos) {
+        return new SearchMemosUsingDbResponse(
+            memos
         );
     }
 }

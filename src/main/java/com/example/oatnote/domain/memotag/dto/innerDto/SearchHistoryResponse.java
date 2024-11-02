@@ -4,22 +4,25 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseS
 
 import java.time.LocalDateTime;
 
-import com.example.oatnote.domain.memotag.dto.SearchMemosResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.dto.SearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHistory;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record SearchHistoryResponse(
     String query,
-    LocalDateTime createdAt,
-    SearchMemosResponse searchMemosResponse
+    SearchMemosUsingAiResponse ai,
+    SearchMemosUsingDbResponse db,
+    LocalDateTime createdAt
 ) {
 
     public static SearchHistoryResponse from(SearchHistory searchHistory) {
         return new SearchHistoryResponse(
             searchHistory.getQuery(),
-            searchHistory.getCreatedAt(),
-            searchHistory.getSearchMemosResponse()
+            searchHistory.getSearchMemosUsingAiResponse(),
+            searchHistory.getSearchMemosUsingDbResponse(),
+            searchHistory.getCreatedAt()
         );
     }
 }

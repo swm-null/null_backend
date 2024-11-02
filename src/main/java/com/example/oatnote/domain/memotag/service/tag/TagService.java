@@ -1,9 +1,6 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
-import static com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse.NewTag;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.service.client.dto.AICreateStructureResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
@@ -70,7 +67,7 @@ public class TagService {
         tagEdgeService.deleteUserAllData(userId);
     }
 
-    public void processTags(AICreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
+    public void processTags(AiCreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
         List<Tag> tags = aiCreateStructureResponse.newTags().stream()
             .map(newTag -> newTag.toTag(userId, time))
             .toList();

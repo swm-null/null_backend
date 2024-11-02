@@ -8,18 +8,18 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record AICreateTagsResponse(
+public record AiCreateTagsResponse(
     List<RawTag> tags
 ) {
 
-    public AICreateStructureRequest toAICreateStructureRequest(Memo memo, String userId) {
-        AICreateStructureRequest.RawMemo rawMemo = new AICreateStructureRequest.RawMemo(
+    public AiCreateStructureRequest toAiCreateStructureRequest(Memo memo, String userId) {
+        AiCreateStructureRequest.RawMemo rawMemo = new AiCreateStructureRequest.RawMemo(
             memo.getContent(),
             memo.getImageUrls(),
             tags
         );
 
-        return new AICreateStructureRequest(
+        return new AiCreateStructureRequest(
             List.of(rawMemo),
             userId
         );

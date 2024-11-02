@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.domain.user.dto.CheckEmailRequest;
+import com.example.oatnote.domain.user.dto.CheckEmailDuplicationRequest;
 import com.example.oatnote.domain.user.dto.FindPasswordRequest;
 import com.example.oatnote.domain.user.dto.LoginUserRequest;
 import com.example.oatnote.domain.user.dto.LoginUserResponse;
@@ -58,9 +58,9 @@ public class UserController implements UserApiDoc {
 
     @PostMapping("/user/checkEmail")
     public ResponseEntity<Void> checkEmailDuplication(
-        @RequestBody @Valid CheckEmailRequest checkEmailRequest
+        @RequestBody @Valid CheckEmailDuplicationRequest checkEmailDuplicationRequest
     ) {
-        userService.checkEmailDuplication(checkEmailRequest);
+        userService.checkEmailDuplication(checkEmailDuplicationRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

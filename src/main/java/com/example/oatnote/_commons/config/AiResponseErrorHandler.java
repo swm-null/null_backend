@@ -10,7 +10,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import com.example.oatnote.web.exception.server.OatExternalServiceException;
 
 @Component
-public class AIResponseErrorHandler implements ResponseErrorHandler {
+public class AiResponseErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
