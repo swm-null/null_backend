@@ -1,6 +1,7 @@
 package com.example.oatnote.domain.memotag.dto;
 
 import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.IMAGE;
+import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.VOICE;
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
@@ -28,7 +29,13 @@ public record UpdateMemoRequest(
     @NotNull(message = "이미지 URL 리스트는 null일 수 없습니다.")
     @Size(max = 5, message = "이미지 URL 리스트는 5개 이하로 입력해주세요.")
     @AllowedFileType(IMAGE)
-    List<String> imageUrls
+    List<String> imageUrls,
+
+    @Schema(description = "음성 URL 리스트", example = "[\"https://example.com/voice1.mp3\"]")
+    @NotNull(message = "음성 URL 리스트는 null일 수 없습니다.")
+    @Size(max = 1, message = "이미지 URL 리스트는 1개 이하로 입력해주세요.")
+    @AllowedFileType(VOICE)
+    List<String> voiceUrls
 ) {
 
 }

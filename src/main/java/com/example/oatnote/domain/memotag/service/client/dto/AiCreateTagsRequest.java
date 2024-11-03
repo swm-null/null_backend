@@ -14,7 +14,8 @@ public record AiCreateTagsRequest(
 
     public record RawMemo(
         String content,
-        List<String> imageUrls
+        List<String> imageUrls,
+        List<String> voiceUrls
     ) {
 
     }

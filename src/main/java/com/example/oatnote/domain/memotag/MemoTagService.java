@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -240,6 +241,7 @@ public class MemoTagService {
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
         String updatedContent = updateMemoRequest.content();
         List<String> updatedImageUrls = updateMemoRequest.imageUrls();
+        List<String> updatedVoiceUrls = updateMemoRequest.voiceUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
 
@@ -252,7 +254,8 @@ public class MemoTagService {
 
         AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
             updatedContent,
-            updatedImageUrls
+            updatedImageUrls,
+            updatedVoiceUrls
         );
 
         List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
@@ -262,24 +265,17 @@ public class MemoTagService {
         List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
             ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
 
+        processDeletedFiles(memo, updatedImageUrls, updatedVoiceUrls, userId);
+
         memo.update(
             updatedContent,
             updatedImageUrls,
-            embedding,
+            updatedVoiceUrls,
             metadata,
+            embedding,
             embeddingMetadata
         );
-
         Memo updatedMemo = memoService.updateMemo(memo);
-
-        // 삭제된 이미지 전송
-        List<String> deletedImageUrls = memo.getImageUrls().stream()
-            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
-            .collect(Collectors.toList());
-        if (!deletedImageUrls.isEmpty()) {
-            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
-        }
-
         MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo), userId).get(0);
         return UpdateMemoResponse.from(memoResponse);
     }
@@ -304,11 +300,12 @@ public class MemoTagService {
 
         Memo rawMemo = memoService.getMemo(memoId, userId);
 
-        processDeletedFiles(rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
+        processDeletedFiles(rawMemo, updateMemoTagsRequest.imageUrls(), updateMemoTagsRequest.voiceUrls(), userId);
 
         rawMemo.update(
             updateMemoTagsRequest.content(),
-            updateMemoTagsRequest.imageUrls()
+            updateMemoTagsRequest.imageUrls(),
+            updateMemoTagsRequest.voiceUrls()
         );
 
         memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);
@@ -318,8 +315,7 @@ public class MemoTagService {
 
     public void deleteMemo(String memoId, String userId) {
         List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
-        filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
-
+        sendDeleteFilesRequest(fileUrls, userId);
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         memoService.deleteMemo(memoId, userId);
     }
@@ -492,13 +488,18 @@ public class MemoTagService {
             ));
     }
 
-    void processDeletedFiles(List<String> originalImageUrls, List<String> updatedImageUrls, String userId) {
-        List<String> deletedImageUrls = originalImageUrls.stream()
-            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
-            .collect(Collectors.toList());
+    void processDeletedFiles(Memo memo, List<String> updatedImageUrls, List<String> updatedVoiceUrls, String userId) {
+        List<String> deletedFilesUrls = Stream.concat(
+            memo.getImageUrls().stream().filter(imageUrl -> !updatedImageUrls.contains(imageUrl)),
+            memo.getVoiceUrls().stream().filter(voiceUrl -> !updatedVoiceUrls.contains(voiceUrl))
+        ).toList();
 
-        if (!deletedImageUrls.isEmpty()) {
-            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
+        sendDeleteFilesRequest(deletedFilesUrls, userId);
+    }
+
+    void sendDeleteFilesRequest(List<String> fileUrls, String userId) {
+        if (!fileUrls.isEmpty()) {
+            filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
         }
     }
 }

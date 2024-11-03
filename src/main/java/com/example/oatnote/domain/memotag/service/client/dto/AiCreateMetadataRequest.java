@@ -8,10 +8,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @JsonNaming(SnakeCaseStrategy.class)
 public record AiCreateMetadataRequest(
     String content,
-    List<String> imageUrls
+    List<String> imageUrls,
+    List<String> voiceUrls
 ) {
 
-    public static AiCreateMetadataRequest from(String content, List<String> imageUrls) {
-        return new AiCreateMetadataRequest(content, imageUrls);
+    public static AiCreateMetadataRequest from(String content, List<String> imageUrls, List<String> voiceUrls) {
+        return new AiCreateMetadataRequest(content, imageUrls, voiceUrls);
     }
 }
