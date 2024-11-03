@@ -45,8 +45,6 @@ import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
 import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
@@ -72,10 +70,9 @@ public class MemoTagService {
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
     private final SearchHistoryService searchHistoryService;
+    private final AsyncMemoTagService asyncMemoTagService;
     private final AiMemoTagClient aiMemoTagClient;
     private final FilesMessageProducer filesMessageProducer;
-
-    private final static boolean IS_LINKED_MEMO_TAG = true;
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest, String userId) {
         LocalDateTime now = LocalDateTime.now();
@@ -85,7 +82,7 @@ public class MemoTagService {
 
         Memo rawMemo = createMemoRequest.toRawMemo(userId, now);
 
-        memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);
+        asyncMemoTagService.createStructures(aiCreateTagsResponse, rawMemo, userId, now);
 
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
@@ -314,7 +311,7 @@ public class MemoTagService {
             updateMemoTagsRequest.voiceUrls()
         );
 
-        memoTagMessageProducer.sendCreateStructuresRequest(aiCreateTagsResponse, rawMemo, userId, now);
+        asyncMemoTagService.createStructures(aiCreateTagsResponse, rawMemo, userId, now);
 
         return UpdateMemoTagsResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
@@ -369,80 +366,8 @@ public class MemoTagService {
         searchHistoryService.deleteUserAllData(userId);
     }
 
-    // rabbitmq 수신
-    public void createStructures(
-        AiCreateTagsResponse aiCreateTagsResponse,
-        Memo rawMemo,
-        String userId,
-        LocalDateTime now
-    ) {
-        AiCreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAiCreateStructureRequest(
-            rawMemo,
-            userId
-        );
-        AiCreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
-        processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
-    }
-
     public void createDefaultTagStructureForNewUser(String rootTagName, String userId) {
         tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
-    }
-
-    void processMemoTag(
-        AiCreateStructureResponse aiCreateStructureResponse,
-        Memo rawMemo,
-        String userId,
-        LocalDateTime now
-    ) {
-        if (Objects.nonNull(rawMemo.getId())) {
-            memoTagRelationService.deleteRelationsByMemoId(rawMemo.getId(), userId);
-        }
-
-        List<Memo> memos = new ArrayList<>();
-        List<MemoTagRelation> memoTagRelations = new ArrayList<>();
-
-        Map<String, List<String>> reversedTagEdge = aiCreateStructureResponse.newReversedStructure();
-        Set<String> visitedTagIds = new HashSet<>();
-
-        for (AiCreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
-            Memo memo = rawMemo.process(
-                processedMemo.metadata(),
-                processedMemo.embedding(),
-                processedMemo.embeddingMetadata()
-            );
-            memos.add(memo);
-
-            for (String linkedTagId : processedMemo.parentTagIds()) {
-                MemoTagRelation memoTagRelation = MemoTagRelation.of(
-                    memo.getId(),
-                    linkedTagId,
-                    IS_LINKED_MEMO_TAG,
-                    userId
-                );
-                memoTagRelations.add(memoTagRelation);
-            }
-
-            Queue<String> queue = new LinkedList<>(processedMemo.parentTagIds());
-            while (!queue.isEmpty()) {
-                String currentTagId = queue.poll();
-                if (visitedTagIds.add(currentTagId)) {
-                    List<String> parentTagIds = reversedTagEdge.getOrDefault(currentTagId, List.of());
-                    queue.addAll(parentTagIds);
-                    for (String parentTagId : parentTagIds) {
-                        MemoTagRelation memoTagRelation = MemoTagRelation.of(
-                            memo.getId(),
-                            parentTagId,
-                            !IS_LINKED_MEMO_TAG,
-                            userId
-                        );
-                        memoTagRelations.add(memoTagRelation);
-                    }
-                }
-            }
-        }
-        tagService.processTags(aiCreateStructureResponse, userId, now);
-        memoService.createMemos(memos, userId);
-        memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
     List<MemoResponse> getMemoResponses(List<Memo> memos, String userId) {
