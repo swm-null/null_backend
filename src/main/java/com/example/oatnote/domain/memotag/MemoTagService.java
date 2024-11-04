@@ -260,6 +260,8 @@ public class MemoTagService {
         List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
             ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
 
+        processDeletedFiles(memo, updatedImageUrls, updatedVoiceUrls, userId);
+
         memo.update(
             updatedContent,
             updatedImageUrls,
@@ -268,17 +270,7 @@ public class MemoTagService {
             embedding,
             embeddingMetadata
         );
-
         Memo updatedMemo = memoService.updateMemo(memo);
-
-        // 삭제된 이미지 전송
-        List<String> deletedImageUrls = memo.getImageUrls().stream()
-            .filter(imageUrl -> !updatedImageUrls.contains(imageUrl))
-            .collect(Collectors.toList());
-        if (!deletedImageUrls.isEmpty()) {
-            filesMessageProducer.sendDeleteFilesRequest(deletedImageUrls, userId);
-        }
-
         MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo), userId).get(0);
         return UpdateMemoResponse.from(memoResponse);
     }
@@ -303,7 +295,7 @@ public class MemoTagService {
 
         Memo rawMemo = memoService.getMemo(memoId, userId);
 
-        processDeletedFiles(rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
+        processDeletedFiles(rawMemo, rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
 
         rawMemo.update(
             updateMemoTagsRequest.content(),

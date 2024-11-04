@@ -22,14 +22,18 @@ spring:
         delete-all:
           queue: test
           routing-key: test
-      user:
-        exchange: test
-        queue: test
-        routing-key: test
       dlx:
         exchange: test
         queue: test
         routing-key: test
+
+  data:
+    mongodb:
+      uri: test
+    redis:
+      host: test
+      port: 1234
+      password: test
 
   ai:
     url: test
