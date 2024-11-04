@@ -20,6 +20,7 @@ public record AiCreateStructureResponse(
     public record ProcessedMemo(
         String content,
         List<String> imageUrls,
+        List<String> voiceUrls,
         String metadata,
         List<Double> embedding,
         List<Double> embeddingMetadata,
