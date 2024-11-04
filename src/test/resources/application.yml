@@ -29,7 +29,7 @@ spring:
 
   data:
     mongodb:
-      uri: test
+      uri: mongodb+srv://test:test@cluster.test.mongodb.net/test?
     redis:
       host: test
       port: 1234
