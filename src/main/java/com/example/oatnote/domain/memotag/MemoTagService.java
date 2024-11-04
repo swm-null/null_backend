@@ -295,7 +295,7 @@ public class MemoTagService {
 
         Memo rawMemo = memoService.getMemo(memoId, userId);
 
-        processDeletedFiles(rawMemo, rawMemo.getImageUrls(), updateMemoTagsRequest.imageUrls(), userId);
+        processDeletedFiles(rawMemo, updateMemoTagsRequest.imageUrls(), updateMemoTagsRequest.voiceUrls(), userId);
 
         rawMemo.update(
             updateMemoTagsRequest.content(),
