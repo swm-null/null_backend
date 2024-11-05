@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag.service.client;
+package com.example.oatnote.domain.memotag.service.aiClient;
 
 import java.net.URI;
 import java.util.List;
@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateEmbeddingRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateMetadataRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateMetadataResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
 
 @Service
 public class AiMemoTagClient {

@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag.service.client.dto;
+package com.example.oatnote.domain.memotag.service.aiClient.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

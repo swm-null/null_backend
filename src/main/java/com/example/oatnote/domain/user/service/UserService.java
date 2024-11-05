@@ -74,7 +74,7 @@ public class UserService {
         log.info("로그인 시도 / 이메일: {}", email);
 
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("이메일이 잘못 되었습니다.", email));
 
         String password = loginUserRequest.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -156,6 +156,12 @@ public class UserService {
         );
         User updatedUser = userRepository.save(user);
         return UpdateUserInfoResponse.from(updatedUser);
+    }
+
+    public String getUserIdByEmail(String email) { //todo msa refactor
+        return userRepository.findByEmail(email)
+            .map(User::getId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
     }
 }
 

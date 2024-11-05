@@ -43,7 +43,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource(corsProperties)))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/user/login", "/user/register", "/user/refresh",
+                .requestMatchers("/user/login", "/user/register", "/user/refresh", "/memos",
                     "/user/checkEmail", "/user/sendCode", "/user/verifyCode", "/user/findPassword").permitAll()
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
@@ -53,7 +53,8 @@ public class SecurityConfig {
             .exceptionHandling(exceptionHandling -> exceptionHandling
                 .authenticationEntryPoint(this::OatAuthenticationEntryPoint)
             )
-            .formLogin(AbstractHttpConfigurer::disable);
+            .formLogin(AbstractHttpConfigurer::disable)
+            .anonymous(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

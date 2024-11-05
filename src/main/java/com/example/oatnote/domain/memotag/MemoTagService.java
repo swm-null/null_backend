@@ -41,13 +41,13 @@ import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
-import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateMetadataResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -57,6 +57,7 @@ import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHist
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
+import com.example.oatnote.domain.user.service.UserService;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,7 @@ public class MemoTagService {
     private final SearchHistoryService searchHistoryService;
     private final AsyncMemoTagService asyncMemoTagService;
     private final AiMemoTagClient aiMemoTagClient;
+    private final UserService userService;
     private final FilesMessageProducer filesMessageProducer;
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest, String userId) {
@@ -85,6 +87,7 @@ public class MemoTagService {
     }
 
     public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
+        userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(createMemosRequest.email()));
         asyncMemoTagService.createStructure(createMemosRequest.fileUrl(), userId);
     }
 

@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag.service.client.dto.innerDto;
+package com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto;
 
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
