@@ -64,10 +64,11 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "txt 혹은 csv 파일을 통해 메모 불러오기")
-    @PostMapping("/memos/file")
-    ResponseEntity<Void> createMemosByEmail(
-        @RequestBody @Valid CreateMemosRequest createMemosTagsRequest
+    @Operation(summary = "메모 리스트 생성")
+    @PostMapping("/memos")
+    ResponseEntity<Void> createMemos(
+        @RequestBody @Valid CreateMemosRequest createMemosRequest,
+        @AuthenticationPrincipal String userId
     );
 
     @ApiResponses(

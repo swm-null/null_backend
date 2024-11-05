@@ -87,8 +87,8 @@ public class MemoTagService {
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
-    public void createMemos(CreateMemosRequest createMemosRequest) {
-        //todo refactor
+    public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
+
     }
 
     public CreateSearchHistoryResponse createSearchHistory(
