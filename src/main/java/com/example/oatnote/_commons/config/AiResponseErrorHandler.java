@@ -7,7 +7,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
-import com.example.oatnote.web.exception.server.OatExternalServiceException;
+import com.example.oatnote.web.controller.exception.server.OatExternalServiceException;
 
 @Component
 public class AiResponseErrorHandler implements ResponseErrorHandler {

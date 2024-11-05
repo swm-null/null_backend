@@ -1,4 +1,4 @@
-package com.example.oatnote.web.exception;
+package com.example.oatnote.web.controller.exception;
 
 import com.example.oatnote.web.controller.enums.ErrorEnum;
 

@@ -2,14 +2,21 @@ package com.example.oatnote._commons.config;
 
 import java.util.concurrent.Executor;
 
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import com.example.oatnote.web.controller.exception.OatException;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
 @EnableAsync
-public class AsyncConfig {
+@Slf4j
+public class AsyncConfig implements AsyncConfigurer {
 
     @Bean(name = "AsyncMemoTagExecutor")
     public Executor asyncExecutor() {
@@ -21,5 +28,13 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
-}
 
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (ex, method, params) -> {
+            OatException oatException = (OatException)ex;
+            log.error("Async error in method {} with message: {}, detail: {}",
+                method.getName(), oatException.getMessage(), oatException.getDetail());
+        };
+    }
+}

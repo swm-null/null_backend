@@ -24,9 +24,9 @@ import com.example.oatnote.domain.user.service.model.User;
 import com.example.oatnote.event.RegisterUserEvent;
 import com.example.oatnote.event.WithdrawUserEvent;
 import com.example.oatnote._commons.util.JwtUtil;
-import com.example.oatnote.web.exception.auth.OatInvalidPasswordException;
-import com.example.oatnote.web.exception.client.OatDataNotFoundException;
-import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
+import com.example.oatnote.web.controller.exception.auth.OatInvalidPasswordException;
+import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
-package com.example.oatnote.web.exception.auth;
+package com.example.oatnote.web.controller.exception.auth;
 
 import com.example.oatnote.web.controller.enums.ErrorEnum;
-import com.example.oatnote.web.exception.OatException;
+import com.example.oatnote.web.controller.exception.OatException;
 
 public class OatAuthorizationException extends OatException {
 

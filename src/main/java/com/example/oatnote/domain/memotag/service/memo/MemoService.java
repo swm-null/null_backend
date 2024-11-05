@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
-import com.example.oatnote.web.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

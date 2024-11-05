@@ -39,7 +39,6 @@ public class AsyncMemoTagService {
     public void createStructure(AiCreateTagsResponse aiCreateTagsResponse, Memo memo, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
         lock.lock();
-
         try {
             AiCreateStructureRequest aiCreateStructureRequest
                 = aiCreateTagsResponse.toAiCreateStructureRequest(memo, userId);
@@ -58,14 +57,9 @@ public class AsyncMemoTagService {
     public void createStructure(String fileUrl, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
         lock.lock();
-        System.out.println("왜 안됨");
         try {
-            System.out.println("왜 안됨");
             AiCreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(fileUrl, userId);
-            System.out.println("12312321321");
-
             processMemoTag(aiCreateStructureResponse, null, userId);
-            System.out.println("왜 안됨");
         } finally {
             lock.unlock();
         }

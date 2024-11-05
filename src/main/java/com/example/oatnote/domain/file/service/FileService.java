@@ -12,7 +12,7 @@ import com.example.oatnote._commons.message.DeleteFilesMessage;
 import com.example.oatnote._commons.message.DeleteAllFilesMessage;
 import com.example.oatnote.domain.file.dto.UploadFileResponse;
 import com.example.oatnote.domain.file.dto.UploadFilesResponse;
-import com.example.oatnote.web.exception.server.OatExternalServiceException;
+import com.example.oatnote.web.controller.exception.server.OatExternalServiceException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

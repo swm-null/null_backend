@@ -12,7 +12,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRe
 import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
-import com.example.oatnote.web.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

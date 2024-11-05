@@ -1,7 +1,7 @@
-package com.example.oatnote.web.exception.server;
+package com.example.oatnote.web.controller.exception.server;
 
 import com.example.oatnote.web.controller.enums.ErrorEnum;
-import com.example.oatnote.web.exception.OatException;
+import com.example.oatnote.web.controller.exception.OatException;
 
 public class OatIllegalStateException extends OatException {
 

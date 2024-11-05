@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.oatnote.web.controller.dto.ErrorResponse;
-import com.example.oatnote.web.exception.auth.OatAuthorizationException;
+import com.example.oatnote.web.controller.exception.auth.OatAuthorizationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
