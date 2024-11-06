@@ -19,9 +19,11 @@ import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AsyncMemoTagService {
 
     private final MemoService memoService;
@@ -34,37 +36,42 @@ public class AsyncMemoTagService {
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
 
     @Async("AsyncMemoTagExecutor")
-    public void createStructures(
-        AiCreateTagsResponse aiCreateTagsResponse,
-        Memo rawMemo,
-        String userId,
-        LocalDateTime now
-    ) {
+    public void createStructure(AiCreateTagsResponse aiCreateTagsResponse, Memo memo, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
         lock.lock();
 
         try {
-            AiCreateStructureRequest aiCreateStructureRequest = aiCreateTagsResponse.toAiCreateStructureRequest(
-                rawMemo,
-                userId
-            );
-            AiCreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(aiCreateStructureRequest);
-            processMemoTag(aiCreateStructureResponse, rawMemo, userId, now);
+            AiCreateStructureRequest aiCreateStructureRequest
+                = aiCreateTagsResponse.toAiCreateStructureRequest(memo, userId);
+            AiCreateStructureResponse aiCreateStructureResponse
+                = aiMemoTagClient.createStructure(aiCreateStructureRequest);
+
+            memoTagRelationService.deleteRelationsByMemoId(memo.getId(), userId);
+
+            processMemoTag(aiCreateStructureResponse, memo.getId(), userId);
         } finally {
             lock.unlock();
         }
     }
 
-    void processMemoTag(
-        AiCreateStructureResponse aiCreateStructureResponse,
-        Memo rawMemo,
-        String userId,
-        LocalDateTime now
-    ) {
-        if (Objects.nonNull(rawMemo.getId())) {
-            memoTagRelationService.deleteRelationsByMemoId(rawMemo.getId(), userId);
-        }
+    @Async("AsyncMemoTagExecutor")
+    public void createStructure(String fileUrl, String userId) {
+        RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
+        lock.lock();
+        System.out.println("왜 안됨");
+        try {
+            System.out.println("왜 안됨");
+            AiCreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(fileUrl, userId);
+            System.out.println("12312321321");
 
+            processMemoTag(aiCreateStructureResponse, null, userId);
+            System.out.println("왜 안됨");
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    void processMemoTag(AiCreateStructureResponse aiCreateStructureResponse, String memoId, String userId) {
         List<Memo> memos = new ArrayList<>();
         List<MemoTagRelation> memoTagRelations = new ArrayList<>();
 
@@ -72,10 +79,16 @@ public class AsyncMemoTagService {
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AiCreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
-            Memo memo = rawMemo.process(
+            Memo memo = Memo.of(
+                memoId,
+                processedMemo.content(),
+                processedMemo.imageUrls(),
+                processedMemo.voiceUrls(),
+                userId,
                 processedMemo.metadata(),
                 processedMemo.embedding(),
-                processedMemo.embeddingMetadata()
+                processedMemo.embeddingMetadata(),
+                processedMemo.timestamp()
             );
             memos.add(memo);
 
@@ -107,7 +120,7 @@ public class AsyncMemoTagService {
                 }
             }
         }
-        tagService.processTags(aiCreateStructureResponse, userId, now);
+        tagService.processTags(aiCreateStructureResponse, userId);
         memoService.createMemos(memos, userId);
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }

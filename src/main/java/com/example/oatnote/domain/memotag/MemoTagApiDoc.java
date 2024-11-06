@@ -61,10 +61,11 @@ public interface MemoTagApiDoc {
         value = {
             @ApiResponse(responseCode = "201"),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @Operation(summary = "메모 리스트 생성")
+    @Operation(summary = "파일로 메모 리스트 생성")
     @PostMapping("/memos")
     ResponseEntity<Void> createMemos(
         @RequestBody @Valid CreateMemosRequest createMemosRequest,

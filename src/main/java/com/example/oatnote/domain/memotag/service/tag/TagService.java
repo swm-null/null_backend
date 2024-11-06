@@ -1,6 +1,5 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,9 +66,9 @@ public class TagService {
         tagEdgeService.deleteUserAllData(userId);
     }
 
-    public void processTags(AiCreateStructureResponse aiCreateStructureResponse, String userId, LocalDateTime time) {
+    public void processTags(AiCreateStructureResponse aiCreateStructureResponse, String userId) {
         List<Tag> tags = aiCreateStructureResponse.newTags().stream()
-            .map(newTag -> newTag.toTag(userId, time))
+            .map(newTag -> newTag.toTag(userId))
             .toList();
         createTags(tags, userId);
 

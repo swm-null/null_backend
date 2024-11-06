@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service.client.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
@@ -17,11 +18,14 @@ public record AiCreateTagsResponse(
             memo.getContent(),
             memo.getImageUrls(),
             memo.getVoiceUrls(),
+            LocalDateTime.now(),
             tags
         );
 
         return new AiCreateStructureRequest(
             List.of(rawMemo),
+            null,
+            null,
             userId
         );
     }

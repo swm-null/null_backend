@@ -45,40 +45,21 @@ public class Memo {
     private LocalDateTime updatedAt;
 
     public Memo(
-        String id,
         String content,
         List<String> imageUrls,
         List<String> voiceUrls,
-        String userId,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-    ) {
-        this.id = id;
-        this.content = content;
-        this.imageUrls = imageUrls;
-        this.voiceUrls = voiceUrls;
-        this.userId = userId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public Memo(
-        String content,
-        List<String> imageUrls,
-        List<String> voiceUrls,
-        String userId,
-        LocalDateTime time
+        String userId
     ) {
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
         this.voiceUrls = voiceUrls;
         this.userId = userId;
-        this.createdAt = time;
-        this.updatedAt = time;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Memo(
+    private Memo(
         String id,
         String content,
         List<String> imageUrls,
@@ -100,6 +81,31 @@ public class Memo {
         this.embeddingMetadata = embeddingMetadata;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public static Memo of(
+        String memoId,
+        String content,
+        List<String> imageUrls,
+        List<String> voiceUrls,
+        String userId,
+        String metadata,
+        List<Double> embedding,
+        List<Double> embeddingMetadata,
+        LocalDateTime timestamp
+    ) {
+        return new Memo(
+            memoId,
+            content,
+            imageUrls,
+            voiceUrls,
+            userId,
+            metadata,
+            embedding,
+            embeddingMetadata,
+            timestamp,
+            timestamp
+        );
     }
 
     public void update(
@@ -128,16 +134,5 @@ public class Memo {
         this.embedding = embedding;
         this.embeddingMetadata = embeddingMetadata;
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public Memo process(
-        String metadata,
-        List<Double> embedding,
-        List<Double> embeddingMetadata
-    ) {
-        this.metadata = metadata;
-        this.embedding = embedding;
-        this.embeddingMetadata = embeddingMetadata;
-        return this;
     }
 }

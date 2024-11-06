@@ -47,16 +47,4 @@ public record UpdateMemoTagsRequest(
             userId
         );
     }
-
-    public Memo toRawMemo(String memoId, String userId, LocalDateTime now) {
-        return new Memo(
-            memoId,
-            content,
-            imageUrls,
-            voiceUrls,
-            userId,
-            null,
-            now
-        );
-    }
 }

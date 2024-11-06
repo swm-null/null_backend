@@ -17,8 +17,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMemosRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMemosResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbRequest;
@@ -58,16 +56,16 @@ public class AiMemoTagClient {
         return aiCreateStructureResponse.getBody();
     }
 
-    public AiCreateMemosResponse createMemosTags(String content, String userId) {
+    public AiCreateStructureResponse createStructure(String fileUrl, String userId) {
         final URI uri = buildUri("/kakao-parser");
-        final String type = content.substring(content.length() - 3);
-        AiCreateMemosRequest aiCreateMemosRequest = AiCreateMemosRequest.from(content, type, userId);
-        ResponseEntity<AiCreateMemosResponse> aiCreateKakaoMemosResponse = restTemplate.postForEntity(
+        final String type = fileUrl.substring(fileUrl.lastIndexOf('.') + 1).toLowerCase();
+        AiCreateStructureRequest aiCreateStructureRequest = AiCreateStructureRequest.from(fileUrl, type, userId);
+        ResponseEntity<AiCreateStructureResponse> aiCreateStructureResponse = restTemplate.postForEntity(
             uri,
-            aiCreateMemosRequest,
-            AiCreateMemosResponse.class
+            aiCreateStructureRequest,
+            AiCreateStructureResponse.class
         );
-        return aiCreateKakaoMemosResponse.getBody();
+        return aiCreateStructureResponse.getBody();
     }
 
     public AiSearchMemosUsingAiResponse searchMemoUsingAi(String query, String userId) {

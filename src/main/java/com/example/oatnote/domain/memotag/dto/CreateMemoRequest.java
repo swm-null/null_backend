@@ -46,13 +46,12 @@ public record CreateMemoRequest(
         );
     }
 
-    public Memo toRawMemo(String userId, LocalDateTime time) {
+    public Memo toRawMemo(String userId) {
         return new Memo(
             content,
             imageUrls,
             voiceUrls,
-            userId,
-            time
+            userId
         );
     }
 }

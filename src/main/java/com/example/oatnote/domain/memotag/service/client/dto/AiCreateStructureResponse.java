@@ -38,13 +38,12 @@ public record AiCreateStructureResponse(
         List<Double> embedding
     ) {
 
-        public Tag toTag(String userId, LocalDateTime time) {
+        public Tag toTag(String userId) {
             return new Tag(
                 id,
                 name,
                 userId,
-                embedding,
-                time
+                embedding
             );
         }
     }
