@@ -293,19 +293,19 @@ public class MemoTagService {
         AiCreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
-        Memo rawMemo = memoService.getMemo(memoId, userId);
+        Memo memo = memoService.getMemo(memoId, userId);
 
-        processDeletedFiles(rawMemo, updateMemoTagsRequest.imageUrls(), updateMemoTagsRequest.voiceUrls(), userId);
+        processDeletedFiles(memo, updateMemoTagsRequest.imageUrls(), updateMemoTagsRequest.voiceUrls(), userId);
 
-        rawMemo.update(
+        memo.update(
             updateMemoTagsRequest.content(),
             updateMemoTagsRequest.imageUrls(),
             updateMemoTagsRequest.voiceUrls()
         );
 
-        asyncMemoTagService.createStructures(aiCreateTagsResponse, rawMemo, userId, now);
+        asyncMemoTagService.createStructures(aiCreateTagsResponse, memo, userId, now);
 
-        return UpdateMemoTagsResponse.from(rawMemo, aiCreateTagsResponse.tags());
+        return UpdateMemoTagsResponse.from(memo, aiCreateTagsResponse.tags());
     }
 
     public void deleteMemo(String memoId, String userId) {
@@ -317,37 +317,14 @@ public class MemoTagService {
 
     public void deleteTag(String tagId, String userId) {
         List<String> memoIds = memoTagRelationService.getMemoIds(tagId, userId);
+        memoService.deleteMemos(memoIds, userId);
 
         List<String> fileUrls = memoService.getFileUrls(memoIds, userId);
         filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
 
-        memoService.deleteMemos(memoIds, userId);
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
 
-        TagEdge tagEdge = tagService.getTagEdge(userId);
-        Map<String, List<String>> tagEdges = tagEdge.getEdges();
-        Map<String, List<String>> reverseTagEdges = tagEdge.getReversedEdges();
-
-        Queue<String> queue = new LinkedList<>();
-        queue.add(tagId);
-        Set<String> visitedTagIds = new HashSet<>();
-
-        while (!queue.isEmpty()) {
-            String currentTagId = queue.poll();
-            tagEdges.remove(currentTagId);
-
-            if (visitedTagIds.add(currentTagId)) {
-                List<String> childTagIds = tagEdges.getOrDefault(currentTagId, List.of());
-                queue.addAll(childTagIds);
-
-                for (String childTagId : childTagIds) {
-                    reverseTagEdges.getOrDefault(childTagId, new ArrayList<>()).remove(currentTagId);
-                }
-            }
-        }
-        tagEdge.updateEdges(tagEdges, reverseTagEdges);
-        tagService.updateTagEdge(tagEdge, userId);
-        tagService.deleteTags(visitedTagIds, userId);
+        deleteTagAndDescendants(tagId, userId);
     }
 
     public void deleteUserAllData(String userId) {
@@ -406,9 +383,42 @@ public class MemoTagService {
                 Map.Entry::getKey,
                 entry -> entry.getValue().stream()
                     .map(tagMap::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())
+                    .toList()
             ));
+    }
+
+    void deleteTagAndDescendants(String tagId, String userId) {
+        TagEdge tagEdge = tagService.getTagEdge(userId);
+        Map<String, List<String>> tagEdges = tagEdge.getEdges();
+        Map<String, List<String>> reverseTagEdges = tagEdge.getReversedEdges();
+
+        Queue<String> queue = new LinkedList<>();
+        queue.add(tagId);
+        Set<String> visitedTagIds = new HashSet<>();
+
+        while (!queue.isEmpty()) {
+            String currentTagId = queue.poll();
+
+            if (!visitedTagIds.contains(currentTagId)) {
+                visitedTagIds.add(currentTagId);
+
+                List<String> childTagIds = tagEdges.getOrDefault(currentTagId, List.of());
+                queue.addAll(childTagIds);
+
+                tagEdges.remove(currentTagId);
+                for (String childTagId : childTagIds) {
+                    List<String> childToParentTagIds = reverseTagEdges.getOrDefault(childTagId, new ArrayList<>());
+                    childToParentTagIds.remove(currentTagId);
+                    if (childToParentTagIds.isEmpty()) {
+                        reverseTagEdges.remove(childTagId);
+                    }
+                }
+            }
+        }
+        tagEdge.updateEdges(tagEdges, reverseTagEdges);
+        tagService.updateTagEdge(tagEdge, userId);
+
+        tagService.deleteTags(visitedTagIds, userId);
     }
 
     void processDeletedFiles(Memo memo, List<String> updatedImageUrls, List<String> updatedVoiceUrls, String userId) {

@@ -16,9 +16,9 @@ public record UpdateMemoTagsResponse(
     MemoResponse memo
 ) {
 
-    public static UpdateMemoTagsResponse from(Memo rawMemo, List<RawTag> tags) {
+    public static UpdateMemoTagsResponse from(Memo memo, List<RawTag> tags) {
         return new UpdateMemoTagsResponse(
-            MemoResponse.fromRawTag(rawMemo, tags)
+            MemoResponse.fromRawTag(memo, tags)
         );
     }
 }
