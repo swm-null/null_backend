@@ -29,7 +29,7 @@ public class EmailVerificationService {
     private static final int CODE_LENGTH = 6;
 
     public void sendCode(String email, int expiryMinutes) {
-        log.info("이메일 인증 코드 전송 - 이메일: {}", email);
+        log.info("이메일 인증 코드 전송 / 이메일: {}", email);
         try {
             String code = RandomStringUtils.randomNumeric(CODE_LENGTH);
             sendEmail(email, code);
@@ -40,7 +40,7 @@ public class EmailVerificationService {
     }
 
     public void insertEmailVerification(String email, String code, int expiryMinutes) {
-        log.info("이메일 인증 코드 저장 - 이메일: {}", email);
+        log.info("이메일 인증 코드 저장 / 이메일: {}", email);
         if (emailVerificationRepository.existsByEmail(email)) {
             emailVerificationRepository.deleteByEmail(email);
         }
@@ -49,7 +49,7 @@ public class EmailVerificationService {
     }
 
     public void verifyCode(String email, String code) {
-        log.info("이메일 인증 코드 확인 - 이메일: {}", email);
+        log.info("이메일 인증 코드 확인 / 이메일: {}", email);
         EmailVerification emailVerification = emailVerificationRepository.findByEmail(email)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("인증 코드가 발급되지 않았습니다.", email));
 
@@ -75,7 +75,7 @@ public class EmailVerificationService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
         helper.setTo(to);
-        helper.setSubject(String.format("Oatnote : 이메일 인증 코드 - %s", code));
+        helper.setSubject(String.format("Oatnote : 인증 코드 - %s", code));
         helper.setText(htmlMessage, true);
         mailSender.send(message);
     }

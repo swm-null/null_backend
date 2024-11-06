@@ -27,12 +27,12 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public void createTag(Tag tag) {
-        log.info("태그 생성 - 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
+        log.info("태그 생성 / ID: {} / 유저: {}", tag.getId(), tag.getUserId());
         tagRepository.insert(tag);
     }
 
     public void createTags(List<Tag> tags, String userId) {
-        log.info("태그 리스트 생성 - 태그: {} / 유저: {}", tags, userId);
+        log.info("태그 리스트 생성 / IDs: {} / 유저: {}", tags.stream().map(Tag::getId).toList(), userId);
         tagRepository.insert(tags);
     }
 
@@ -50,19 +50,19 @@ public class TagService {
     }
 
     public Tag updateTag(Tag tag) {
-        log.info("태그 업데이트 - 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
+        log.info("태그 업데이트 / 태그: {} / 유저: {}", tag.getId(), tag.getUserId());
         tagRepository.findByIdAndUserId(tag.getId(), tag.getUserId())
             .orElseThrow(() -> OatDataNotFoundException.withDetail("태그를 찾지 못했습니다.", tag.getId()));
         return tagRepository.save(tag);
     }
 
     public void deleteTags(Set<String> tagIds, String userId) {
-        log.info("태그 리스트 삭제 - 태그: {} / 유저: {}", tagIds, userId);
+        log.info("태그 리스트 삭제 / 태그: {} / 유저: {}", tagIds, userId);
         tagRepository.deleteByIdInAndUserId(tagIds, userId);
     }
 
     public void deleteUserAllData(String userId) {
-        log.info("태그 전체 삭제 - 유저: {}", userId);
+        log.info("태그 전체 삭제 / 유저: {}", userId);
         tagRepository.deleteByUserId(userId);
         tagEdgeService.deleteUserAllData(userId);
     }

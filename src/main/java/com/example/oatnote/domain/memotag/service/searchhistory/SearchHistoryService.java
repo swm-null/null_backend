@@ -25,7 +25,7 @@ public class SearchHistoryService {
     private final MongoTemplate mongoTemplate;
 
     public SearchHistory createSearchHistory(SearchHistory searchHistory) {
-        log.info("검색 히스토리 생성 - 검색어: {} / 유저: {}", searchHistory.getQuery(), searchHistory.getUserId());
+        log.info("검색 히스토리 생성 / 검색어: {} / 유저: {}", searchHistory.getQuery(), searchHistory.getUserId());
         return searchHistoryRepository.insert(searchHistory);
     }
 
@@ -40,21 +40,21 @@ public class SearchHistoryService {
     }
 
     public void updateAiResponse(String searchHistoryId, SearchMemosUsingAiResponse aiResponse, String userId) {
-        log.info("AI 검색 결과 업데이트 - 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
+        log.info("AI 검색 결과 업데이트 / 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
         Query query = new Query(Criteria.where("_id").is(searchHistoryId).and("uId").is(userId));
         Update update = new Update().set("aiRes", aiResponse);
         mongoTemplate.updateFirst(query, update, SearchHistory.class);
     }
 
     public void updateDbResponse(String searchHistoryId, SearchMemosUsingDbResponse dbResponse, String userId) {
-        log.info("DB 검색 결과 업데이트 - 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
+        log.info("DB 검색 결과 업데이트 / 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
         Query query = new Query(Criteria.where("_id").is(searchHistoryId).and("uId").is(userId));
         Update update = new Update().set("dbRes", dbResponse);
         mongoTemplate.updateFirst(query, update, SearchHistory.class);
     }
 
     public void deleteUserAllData(String userId) {
-        log.info("검색 히스토리 전체 삭제 - 유저: {}", userId);
+        log.info("검색 히스토리 전체 삭제 / 유저: {}", userId);
         searchHistoryRepository.deleteByUserId(userId);
     }
 
