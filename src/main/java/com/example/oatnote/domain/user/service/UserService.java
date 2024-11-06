@@ -24,9 +24,9 @@ import com.example.oatnote.domain.user.service.model.User;
 import com.example.oatnote.event.RegisterUserEvent;
 import com.example.oatnote.event.WithdrawUserEvent;
 import com.example.oatnote._commons.util.JwtUtil;
-import com.example.oatnote.web.exception.auth.OatInvalidPasswordException;
-import com.example.oatnote.web.exception.client.OatDataNotFoundException;
-import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
+import com.example.oatnote.web.controller.exception.auth.OatInvalidPasswordException;
+import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class UserService {
         log.info("로그인 시도 / 이메일: {}", email);
 
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("이메일이 잘못 되었습니다.", email));
 
         String password = loginUserRequest.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -156,6 +156,12 @@ public class UserService {
         );
         User updatedUser = userRepository.save(user);
         return UpdateUserInfoResponse.from(updatedUser);
+    }
+
+    public String getUserIdByEmail(String email) { //todo msa refactor
+        return userRepository.findByEmail(email)
+            .map(User::getId)
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
     }
 }
 

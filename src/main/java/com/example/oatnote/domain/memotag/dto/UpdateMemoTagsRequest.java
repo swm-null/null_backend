@@ -4,11 +4,9 @@ import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.IMAGE
 import static com.example.oatnote.web.validation.enums.AllowedFileTypeEnum.VOICE;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.memo.model.Memo;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
 import com.example.oatnote.web.validation.AllowedFileType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -45,18 +43,6 @@ public record UpdateMemoTagsRequest(
         return new AiCreateTagsRequest(
             new AiCreateTagsRequest.RawMemo(content, imageUrls, voiceUrls),
             userId
-        );
-    }
-
-    public Memo toRawMemo(String memoId, String userId, LocalDateTime now) {
-        return new Memo(
-            memoId,
-            content,
-            imageUrls,
-            voiceUrls,
-            userId,
-            null,
-            now
         );
     }
 }

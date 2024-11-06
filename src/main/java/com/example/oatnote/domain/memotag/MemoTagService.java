@@ -3,7 +3,6 @@ package com.example.oatnote.domain.memotag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,13 +41,13 @@ import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
-import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateMetadataResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -58,6 +57,7 @@ import com.example.oatnote.domain.memotag.service.searchhistory.model.SearchHist
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
+import com.example.oatnote.domain.user.service.UserService;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -72,23 +72,23 @@ public class MemoTagService {
     private final SearchHistoryService searchHistoryService;
     private final AsyncMemoTagService asyncMemoTagService;
     private final AiMemoTagClient aiMemoTagClient;
+    private final UserService userService;
     private final FilesMessageProducer filesMessageProducer;
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest, String userId) {
-        LocalDateTime now = LocalDateTime.now();
-
         AiCreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
-        Memo rawMemo = createMemoRequest.toRawMemo(userId, now);
+        Memo memo = createMemoRequest.toRawMemo(userId);
 
-        asyncMemoTagService.createStructures(aiCreateTagsResponse, rawMemo, userId, now);
+        asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
 
-        return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
+        return CreateMemoResponse.from(memo, aiCreateTagsResponse.tags());
     }
 
-    public void createMemos(CreateMemosRequest createMemosRequest) {
-        //todo refactor
+    public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
+        userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(createMemosRequest.email()));
+        asyncMemoTagService.createStructure(createMemosRequest.fileUrl(), userId);
     }
 
     public CreateSearchHistoryResponse createSearchHistory(
@@ -288,8 +288,6 @@ public class MemoTagService {
         UpdateMemoTagsRequest updateMemoTagsRequest,
         String userId
     ) {
-        LocalDateTime now = LocalDateTime.now();
-
         AiCreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
@@ -303,7 +301,7 @@ public class MemoTagService {
             updateMemoTagsRequest.voiceUrls()
         );
 
-        asyncMemoTagService.createStructures(aiCreateTagsResponse, memo, userId, now);
+        asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
 
         return UpdateMemoTagsResponse.from(memo, aiCreateTagsResponse.tags());
     }

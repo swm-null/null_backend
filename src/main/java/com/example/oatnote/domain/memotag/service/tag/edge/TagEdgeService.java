@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
-import com.example.oatnote.web.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

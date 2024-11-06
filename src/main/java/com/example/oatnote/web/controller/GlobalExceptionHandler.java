@@ -21,12 +21,12 @@ import org.springframework.web.util.WebUtils;
 
 import com.example.oatnote.web.controller.dto.ErrorResponse;
 import com.example.oatnote.web.controller.enums.ErrorEnum;
-import com.example.oatnote.web.exception.auth.OatAuthorizationException;
-import com.example.oatnote.web.exception.client.OatDataNotFoundException;
-import com.example.oatnote.web.exception.OatException;
-import com.example.oatnote.web.exception.server.OatExternalServiceException;
-import com.example.oatnote.web.exception.client.OatIllegalArgumentException;
-import com.example.oatnote.web.exception.server.OatIllegalStateException;
+import com.example.oatnote.web.controller.exception.auth.OatAuthorizationException;
+import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.OatException;
+import com.example.oatnote.web.controller.exception.server.OatExternalServiceException;
+import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
+import com.example.oatnote.web.controller.exception.server.OatIllegalStateException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;

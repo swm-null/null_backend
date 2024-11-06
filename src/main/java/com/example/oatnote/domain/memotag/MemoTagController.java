@@ -51,11 +51,12 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
-    @PostMapping("/memos/email")
-    public ResponseEntity<Void> createMemosByEmail(
-        @RequestBody @Valid CreateMemosRequest createMemosRequest
+    @PostMapping("/memos")
+    public ResponseEntity<Void> createMemos(
+        @RequestBody @Valid CreateMemosRequest createMemosRequest,
+        @AuthenticationPrincipal String userId
     ) {
-        memoTagService.createMemos(createMemosRequest);
+        memoTagService.createMemos(createMemosRequest, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
