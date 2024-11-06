@@ -402,23 +402,34 @@ public class MemoTagService {
             if (!visitedTagIds.contains(currentTagId)) {
                 visitedTagIds.add(currentTagId);
 
+                updateTagEdge(currentTagId, tagEdges, reverseTagEdges, userId);
+
                 List<String> childTagIds = tagEdges.getOrDefault(currentTagId, List.of());
                 queue.addAll(childTagIds);
-
                 tagEdges.remove(currentTagId);
-                for (String childTagId : childTagIds) {
-                    List<String> childToParentTagIds = reverseTagEdges.getOrDefault(childTagId, new ArrayList<>());
-                    childToParentTagIds.remove(currentTagId);
-                    if (childToParentTagIds.isEmpty()) {
-                        reverseTagEdges.remove(childTagId);
-                    }
-                }
             }
         }
         tagEdge.updateEdges(tagEdges, reverseTagEdges);
         tagService.updateTagEdge(tagEdge, userId);
 
         tagService.deleteTags(visitedTagIds, userId);
+    }
+
+    private void updateTagEdge(
+        String tagId,
+        Map<String, List<String>> tagEdges,
+        Map<String, List<String>> reverseTagEdges,
+        String userId
+    ) {
+        List<String> parentTagIds = reverseTagEdges.getOrDefault(tagId, new ArrayList<>());
+        for (String parentTagId : parentTagIds) {
+            List<String> childTagIds = tagEdges.getOrDefault(parentTagId, new ArrayList<>());
+            childTagIds.remove(tagId);
+            if (childTagIds.isEmpty() && !Objects.equals(parentTagId, userId)) {
+                tagEdges.remove(parentTagId);
+            }
+        }
+        reverseTagEdges.remove(tagId);
     }
 
     void processDeletedFiles(Memo memo, List<String> updatedImageUrls, List<String> updatedVoiceUrls, String userId) {
