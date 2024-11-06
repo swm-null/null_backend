@@ -32,9 +32,12 @@ public class AsyncConfig implements AsyncConfigurer {
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (ex, method, params) -> {
-            OatException oatException = (OatException)ex;
-            log.error("Async error in method {} with message: {}, detail: {}",
-                method.getName(), oatException.getMessage(), oatException.getDetail());
+            if (ex instanceof OatException oatException) {
+                log.error("Async error in method {} with message: {}, detail: {}",
+                    method.getName(), oatException.getMessage(), oatException.getDetail());
+            } else {
+                log.error("Unexpected async error in method {}: {}", method.getName(), ex.getMessage(), ex);
+            }
         };
     }
 }
