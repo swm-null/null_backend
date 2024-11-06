@@ -20,25 +20,25 @@ public class FilesMessageConsumer {
 
     @RabbitListener(queues = "${spring.rabbitmq.queues.file.delete.queue}")
     public void receiveDeleteFilesMessage(@Payload DeleteFilesMessage deleteFilesMessage) {
-        log.info("Received delete files request for userId: {}", deleteFilesMessage.userId());
+        log.info("Received delete files request / userId: {}", deleteFilesMessage.userId());
 
         try {
             fileService.deleteFiles(deleteFilesMessage);
-            log.info("Files deletion processed successfully - userId: {}", deleteFilesMessage.userId());
+            log.info("Files deletion processed successfully / userId: {}", deleteFilesMessage.userId());
         } catch (Exception e) {
-            log.error("Error processing files deletion - userId: {}", deleteFilesMessage.userId(), e);
+            log.error("Error processing files deletion / userId: {}", deleteFilesMessage.userId(), e);
         }
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queues.file.delete-all.queue}")
     public void receiveDeleteAllFilesMessage(@Payload DeleteAllFilesMessage deleteAllFilesMessage) {
-        log.info("Received delete all files request for userId: {}", deleteAllFilesMessage.userId());
+        log.info("Received delete all files request / userId: {}", deleteAllFilesMessage.userId());
 
         try {
             fileService.deleteAllFiles(deleteAllFilesMessage);
-            log.info("All files deletion processed successfully - userId: {}", deleteAllFilesMessage.userId());
+            log.info("All files deletion processed successfully / userId: {}", deleteAllFilesMessage.userId());
         } catch (Exception e) {
-            log.error("Error processing all files deletion - userId: {}", deleteAllFilesMessage.userId(), e);
+            log.error("Error processing all files deletion / userId: {}", deleteAllFilesMessage.userId(), e);
         }
     }
 }

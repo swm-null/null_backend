@@ -23,9 +23,9 @@ public class MemoService {
 
     private final MemoRepository memoRepository;
 
-    public void createMemos(List<Memo> memosToCreate, String userId) {
-        log.info("메모 리스트 생성 - 개수: {} / 유저: {}", memosToCreate.size(), userId);
-        memoRepository.insert(memosToCreate);
+    public void createMemos(List<Memo> memos, String userId) {
+        log.info("메모 리스트 생성 / IDs: {} / 유저: {}", memos.stream().map(Memo::getId).toList(), userId);
+        memoRepository.insert(memos);
     }
 
     public Memo getMemo(String memoId, String userId) {
@@ -50,24 +50,24 @@ public class MemoService {
     }
 
     public Memo updateMemo(Memo memo) {
-        log.info("메모 업데이트 - 메모: {} / 유저: {}", memo.getId(), memo.getUserId());
+        log.info("메모 업데이트 / 메모: {} / 유저: {}", memo.getId(), memo.getUserId());
         memoRepository.findByIdAndUserId(memo.getId(), memo.getUserId())
             .orElseThrow(() -> OatDataNotFoundException.withDetail("메모를 찾지 못했습니다.", memo.getId()));
         return memoRepository.save(memo);
     }
 
     public void deleteMemo(String memoId, String userId) {
-        log.info("메모 삭제 - 메모: {} / 유저: {}", memoId, userId);
+        log.info("메모 삭제 / 메모: {} / 유저: {}", memoId, userId);
         memoRepository.deleteByIdAndUserId(memoId, userId);
     }
 
     public void deleteUserAllData(String userId) {
-        log.info("메모 전체 삭제 - 유저: {}", userId);
+        log.info("메모 전체 삭제 / 유저: {}", userId);
         memoRepository.deleteByUserId(userId);
     }
 
     public void deleteMemos(List<String> memoIds, String userId) {
-        log.info("메모 리스트 삭제 - 메모: {} / 유저: {}", memoIds, userId);
+        log.info("메모 리스트 삭제 / 메모: {} / 유저: {}", memoIds, userId);
         memoRepository.deleteByIdInAndUserId(memoIds, userId);
     }
 

@@ -64,11 +64,11 @@ public class FileService {
                     .key(s3Key)
                     .build());
             } catch (Exception e) {
-                throw OatExternalServiceException.withDetail("S3 파일 삭제 실패했습니다.", fileUrl);
+                throw OatExternalServiceException.withDetail("S3 파일 삭제 실패했 / userId: {}", fileUrl);
             }
         }
 
-        log.info("S3 파일 삭제 완료 - userId: {}", userId);
+        log.info("S3 파일 삭제 완료 / userId: {}", userId);
     }
 
     public void deleteAllFiles(DeleteAllFilesMessage deleteAllFilesMessage) {
@@ -94,9 +94,9 @@ public class FileService {
                                 .build())
                             .toList()))
                     .build());
-                log.info("S3 유저 전체 파일 삭제 완료 - userId: {}", userId);
+                log.info("S3 유저 전체 파일 삭제 완료 / userId: {}", userId);
             } else {
-                log.info("삭제할 파일이 없습니다 - userId: {}", userId);
+                log.info("삭제할 파일이 없습니다. / userId: {}", userId);
             }
         } catch (Exception e) {
             throw OatExternalServiceException.withDetail("S3 유저 전체 파일 삭제 실패", userId);

@@ -53,7 +53,7 @@ public class UserService {
         String password = registerUserRequest.password();
         String confirmPassword = registerUserRequest.confirmPassword();
 
-        log.info("회원가입 시도 - 이메일: {}", email);
+        log.info("회원가입 시도 / 이메일: {}", email);
         if (!Objects.equals(password, confirmPassword)) {
             throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.", email);
         }
@@ -66,12 +66,12 @@ public class UserService {
         User user = registerUserRequest.toUser(passwordEncoder.encode(password), defaultProfileImageUrl);
         User createdUser = userRepository.save(user);
         eventPublisher.publishEvent(new RegisterUserEvent(createdUser.getId()));
-        log.info("회원가입 완료 - 이메일: {} / 유저: {}", email, createdUser.getId());
+        log.info("회원가입 완료 / 이메일: {} / 유저: {}", email, createdUser.getId());
     }
 
     public LoginUserResponse login(LoginUserRequest loginUserRequest) {
         String email = loginUserRequest.email();
-        log.info("로그인 시도 - 이메일: {}", email);
+        log.info("로그인 시도 / 이메일: {}", email);
 
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
@@ -83,7 +83,7 @@ public class UserService {
         String accessToken = jwtUtil.generateAccessToken(user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId());
 
-        log.info("로그인 성공 - 이메일: {} / 유저: {}", email, user.getId());
+        log.info("로그인 성공 / 이메일: {} / 유저: {}", email, user.getId());
         return LoginUserResponse.of(accessToken, refreshToken);
     }
 
@@ -93,7 +93,7 @@ public class UserService {
         String userId = jwtUtil.extractUserId(refreshToken);
         String newAccessToken = jwtUtil.generateAccessToken(userId);
 
-        log.info("토큰 갱신 - 유저: {}", userId);
+        log.info("토큰 갱신 / 유저: {}", userId);
         return RefreshUserResponse.of(newAccessToken, refreshToken);
     }
 
@@ -131,7 +131,7 @@ public class UserService {
             .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        log.info("비밀번호 찾기 후 변경 - 유저: {}", user.getId());
+        log.info("비밀번호 찾기 후 변경 / 유저: {}", user.getId());
     }
 
     public UserInfoResponse getUserInfo(String userId) {
@@ -141,7 +141,7 @@ public class UserService {
     }
 
     public void withdraw(String userId) {
-        log.info("회원탈퇴 - 유저: {}", userId);
+        log.info("회원탈퇴 / 유저: {}", userId);
         userRepository.deleteById(userId);
         eventPublisher.publishEvent(new WithdrawUserEvent(userId));
     }
@@ -156,7 +156,6 @@ public class UserService {
         );
         User updatedUser = userRepository.save(user);
         return UpdateUserInfoResponse.from(updatedUser);
-
     }
 }
 
