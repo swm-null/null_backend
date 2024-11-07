@@ -22,7 +22,7 @@ public class MemoService {
 
     public void createMemos(List<Memo> memos, String userId) {
         log.info("메모 리스트 생성 / IDs: {} / 유저: {}", memos.stream().map(Memo::getId).toList(), userId);
-        memoRepository.insert(memos);
+        memoRepository.saveAll(memos);
     }
 
     public Memo getMemo(String memoId, String userId) {
