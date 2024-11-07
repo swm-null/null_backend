@@ -12,6 +12,7 @@ public record AiCreateTagsRequest(
     String userId
 ) {
 
+    @JsonNaming(SnakeCaseStrategy.class)
     public record RawMemo(
         String content,
         List<String> imageUrls,
