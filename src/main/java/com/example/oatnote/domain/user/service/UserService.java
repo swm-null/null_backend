@@ -55,10 +55,10 @@ public class UserService {
 
         log.info("회원가입 시도 / 이메일: {}", email);
         if (!Objects.equals(password, confirmPassword)) {
-            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.", email);
+            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
         if (userRepository.findByEmail(email).isPresent()) {
-            throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.", email);
+            throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.");
         }
 
         emailVerificationService.verifyCode(email, registerUserRequest.code());
@@ -74,11 +74,11 @@ public class UserService {
         log.info("로그인 시도 / 이메일: {}", email);
 
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail("이메일이 잘못 되었습니다.", email));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("이메일이 잘못 되었습니다."));
 
         String password = loginUserRequest.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.", email);
+            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
         String accessToken = jwtUtil.generateAccessToken(user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId());
@@ -121,14 +121,14 @@ public class UserService {
         String newPassword = findPasswordRequest.newPassword();
         String confirmPassword = findPasswordRequest.confirmPassword();
         if (!Objects.equals(newPassword, confirmPassword)) {
-            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.", email);
+            throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
 
         String code = findPasswordRequest.code();
         emailVerificationService.verifyCode(email, code);
 
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("존재하지 않는 유저입니다."));
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         log.info("비밀번호 찾기 후 변경 / 유저: {}", user.getId());
@@ -136,7 +136,7 @@ public class UserService {
 
     public UserInfoResponse getUserInfo(String userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", userId));
+            .orElseThrow(() -> OatDataNotFoundException.withDetail("존재하지 않는 유저입니다.", userId));
         return UserInfoResponse.from(user);
     }
 
