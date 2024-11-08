@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record SearchHistoryResponse(
+    String id,
     String query,
     SearchMemosUsingAiResponse ai,
     SearchMemosUsingDbResponse db,
@@ -19,6 +20,7 @@ public record SearchHistoryResponse(
 
     public static SearchHistoryResponse from(SearchHistory searchHistory) {
         return new SearchHistoryResponse(
+            searchHistory.getId(),
             searchHistory.getQuery(),
             searchHistory.getSearchMemosUsingAiResponse(),
             searchHistory.getSearchMemosUsingDbResponse(),
