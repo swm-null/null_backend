@@ -100,6 +100,10 @@ public class MemoTagService {
         return CreateSearchHistoryResponse.from(createdSearchHistory);
     }
 
+    public List<TagResponse> getParentTags(String tagId, String userId) {
+
+    }
+
     public List<TagResponse> getChildTags(String tagId, String userId) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         List<Tag> childTags = tagService.getChildTags(tagId, userId);
