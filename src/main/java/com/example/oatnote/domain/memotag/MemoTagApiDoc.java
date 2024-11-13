@@ -95,9 +95,10 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
-    @GetMapping("/parentTags")
-    ResponseEntity<List<TagResponse>> getParentTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
+    @Operation(summary = "특정 태그의 조상 태그 리스트 조회")
+    @GetMapping("/ancestorTags")
+    ResponseEntity<List<TagResponse>> getAncestorTags(
+        @RequestParam(value = "tagId") String tagId,
         @AuthenticationPrincipal String userId
     );
 

@@ -72,12 +72,12 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(createSearchHistoryResponse);
     }
 
-    @GetMapping("/parentTags")
-    public ResponseEntity<List<TagResponse>> getParentTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
+    @GetMapping("/ancestorTags")
+    public ResponseEntity<List<TagResponse>> getAncestorTags(
+        @RequestParam(value = "tagId") String tagId,
         @AuthenticationPrincipal String userId
     ) {
-        List<TagResponse> childTagsResponse = memoTagService.getParentTags(tagId, userId);
+        List<TagResponse> childTagsResponse = memoTagService.getAncestorTags(tagId, userId);
         return ResponseEntity.status(HttpStatus.OK).body(childTagsResponse);
     }
 

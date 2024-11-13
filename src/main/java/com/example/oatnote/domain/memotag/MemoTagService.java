@@ -100,8 +100,11 @@ public class MemoTagService {
         return CreateSearchHistoryResponse.from(createdSearchHistory);
     }
 
-    public List<TagResponse> getParentTags(String tagId, String userId) {
-
+    public List<TagResponse> getAncestorTags(String tagId, String userId) {
+        List<Tag> parentTags = tagService.getAncestorTags(tagId, userId);
+        return parentTags.stream()
+            .map(TagResponse::fromTag)
+            .toList();
     }
 
     public List<TagResponse> getChildTags(String tagId, String userId) {
