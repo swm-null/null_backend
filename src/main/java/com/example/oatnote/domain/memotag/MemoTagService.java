@@ -154,7 +154,6 @@ public class MemoTagService {
     }
 
     public SearchHistoriesResponse getSearchHistories(
-        String query,
         Integer searchHistoryPage,
         Integer searchHistoryLimit,
         String userId
@@ -166,7 +165,7 @@ public class MemoTagService {
             criteria.getLimit(),
             Sort.by(Sort.Direction.DESC, "cTime")
         );
-        Page<SearchHistory> result = searchHistoryService.getSearchHistories(query, pageRequest, userId);
+        Page<SearchHistory> result = searchHistoryService.getSearchHistories(pageRequest, userId);
         Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }

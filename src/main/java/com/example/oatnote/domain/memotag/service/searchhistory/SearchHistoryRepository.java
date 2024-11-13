@@ -15,7 +15,7 @@ public interface SearchHistoryRepository extends MongoRepository<SearchHistory, 
     Optional<SearchHistory> findQueryByIdAndUserId(String searchHistoryId, String userId);
 
     @Query("{ 'query': { $regex: ?0, $options: 'i' }, 'userId': ?1 }")
-    Page<SearchHistory> findBySearchTermContainingAndUserId(String query, Pageable pageable, String userId);
+    Page<SearchHistory> findByUserId(Pageable pageable, String userId);
 
     void deleteByUserId(String userId);
 

@@ -131,12 +131,11 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/search/histories")
     public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(value = "query", defaultValue = "") String query,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(query, page, limit, userId);
+        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);
     }
 
