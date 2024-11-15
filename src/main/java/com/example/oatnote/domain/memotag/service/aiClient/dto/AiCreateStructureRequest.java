@@ -29,6 +29,7 @@ public record AiCreateStructureRequest(
         String content,
         List<String> imageUrls,
         List<String> voiceUrls,
+        String metadata,
         LocalDateTime timestamp,
         List<RawTag> tags
     ) {

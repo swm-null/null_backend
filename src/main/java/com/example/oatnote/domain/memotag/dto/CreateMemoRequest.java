@@ -45,12 +45,13 @@ public record CreateMemoRequest(
         );
     }
 
-    public Memo toRawMemo(String userId) {
+    public Memo toRawMemo(String userId, String metadata) {
         return new Memo(
             content,
             imageUrls,
             voiceUrls,
-            userId
+            userId,
+            metadata
         );
     }
 }

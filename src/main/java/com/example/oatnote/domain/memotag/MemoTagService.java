@@ -79,7 +79,7 @@ public class MemoTagService {
         AiCreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
-        Memo memo = createMemoRequest.toRawMemo(userId);
+        Memo memo = createMemoRequest.toRawMemo(userId, aiCreateTagsResponse.metadata());
 
         asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
 
@@ -304,7 +304,8 @@ public class MemoTagService {
         memo.update(
             updateMemoTagsRequest.content(),
             updateMemoTagsRequest.imageUrls(),
-            updateMemoTagsRequest.voiceUrls()
+            updateMemoTagsRequest.voiceUrls(),
+            aiCreateTagsResponse.metadata()
         );
 
         asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
