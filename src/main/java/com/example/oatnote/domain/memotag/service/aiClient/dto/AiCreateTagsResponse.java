@@ -10,7 +10,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(SnakeCaseStrategy.class)
 public record AiCreateTagsResponse(
-    List<RawTag> tags
+    List<RawTag> tags,
+    String metadata
 ) {
 
     public AiCreateStructureRequest toAiCreateStructureRequest(Memo memo, String userId) {
@@ -18,6 +19,7 @@ public record AiCreateTagsResponse(
             memo.getContent(),
             memo.getImageUrls(),
             memo.getVoiceUrls(),
+            memo.getMetadata(),
             LocalDateTime.now(),
             tags
         );

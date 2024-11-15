@@ -48,13 +48,15 @@ public class Memo {
         String content,
         List<String> imageUrls,
         List<String> voiceUrls,
-        String userId
+        String userId,
+        String metadata
     ) {
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.imageUrls = imageUrls;
         this.voiceUrls = voiceUrls;
         this.userId = userId;
+        this.metadata = metadata;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
