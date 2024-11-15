@@ -113,11 +113,13 @@ public class Memo {
     public void update(
         String content,
         List<String> imageUrls,
-        List<String> voiceUrls
+        List<String> voiceUrls,
+        String metadata
     ) {
         this.content = content;
         this.imageUrls = imageUrls;
         this.voiceUrls = voiceUrls;
+        this.metadata = metadata;
         this.updatedAt = LocalDateTime.now();
     }
 

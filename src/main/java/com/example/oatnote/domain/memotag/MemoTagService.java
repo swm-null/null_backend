@@ -304,7 +304,8 @@ public class MemoTagService {
         memo.update(
             updateMemoTagsRequest.content(),
             updateMemoTagsRequest.imageUrls(),
-            updateMemoTagsRequest.voiceUrls()
+            updateMemoTagsRequest.voiceUrls(),
+            aiCreateTagsResponse.metadata()
         );
 
         asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
