@@ -95,6 +95,21 @@ public interface MemoTagApiDoc {
             @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
         }
     )
+    @Operation(summary = "특정 태그의 조상 태그 리스트 조회")
+    @GetMapping("/ancestorTags")
+    ResponseEntity<List<TagResponse>> getAncestorTags(
+        @RequestParam(value = "tagId") String tagId,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
     @Operation(summary = "특정 태그의 전체 자식 태그 리스트 조회")
     @GetMapping("/childTags")
     ResponseEntity<List<TagResponse>> getChildTags(
@@ -181,7 +196,6 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 검색 기록 조회")
     @GetMapping("memos/search/histories")
     ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(value = "query", defaultValue = "") String query,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId

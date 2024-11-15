@@ -35,8 +35,8 @@ public class SearchHistoryService {
             .orElseThrow(() -> OatDataNotFoundException.withDetail("검색 기록를 찾을 수 없습니다.", searchHistoryId));
     }
 
-    public Page<SearchHistory> getSearchHistories(String query, PageRequest pageRequest, String userId) {
-        return searchHistoryRepository.findBySearchTermContainingAndUserId(query, pageRequest, userId);
+    public Page<SearchHistory> getSearchHistories(PageRequest pageRequest, String userId) {
+        return searchHistoryRepository.findByUserId(pageRequest, userId);
     }
 
     public void updateAiResponse(String searchHistoryId, SearchMemosUsingAiResponse aiResponse, String userId) {

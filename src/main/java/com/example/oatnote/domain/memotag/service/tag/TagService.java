@@ -1,5 +1,7 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,9 +105,35 @@ public class TagService {
         tagEdgeService.createTagEdge(tagEdge);
     }
 
+    public List<Tag> getAncestorTags(String tagId, String userId) {
+        Map<String, List<String>> reversedTagEdges = tagEdgeService.getTagEdge(userId).getReversedEdges();
+        List<Tag> ancestorTags = new LinkedList<>();
+        getAncestorTagsUsingDFS(tagId, userId, reversedTagEdges, ancestorTags, new HashSet<>());
+        return ancestorTags;
+    }
+
     public List<Tag> getChildTags(String tagId, String userId) {
         Map<String, List<String>> tagEdges = tagEdgeService.getTagEdge(userId).getEdges();
         List<String> childTagIds = tagEdges.getOrDefault(tagId, List.of());
         return getTags(childTagIds, userId);
+    }
+
+    void getAncestorTagsUsingDFS(
+        String currentTagId,
+        String userId,
+        Map<String, List<String>> reversedTagEdges,
+        List<Tag> ancestorTags,
+        Set<String> visited
+    ) {
+        if (visited.contains(currentTagId) || currentTagId.equals(userId)) {
+            return;
+        }
+        visited.add(currentTagId);
+
+        Tag currentTag = getTag(currentTagId, userId);
+        ancestorTags.add(0, currentTag);
+
+        List<String> parentTagIds = reversedTagEdges.getOrDefault(currentTagId, List.of());
+        getAncestorTagsUsingDFS(parentTagIds.get(0), userId, reversedTagEdges, ancestorTags, visited);
     }
 }

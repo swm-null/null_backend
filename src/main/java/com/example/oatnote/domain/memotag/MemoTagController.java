@@ -72,6 +72,15 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(createSearchHistoryResponse);
     }
 
+    @GetMapping("/ancestorTags")
+    public ResponseEntity<List<TagResponse>> getAncestorTags(
+        @RequestParam(value = "tagId") String tagId,
+        @AuthenticationPrincipal String userId
+    ) {
+        List<TagResponse> childTagsResponse = memoTagService.getAncestorTags(tagId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(childTagsResponse);
+    }
+
     @GetMapping("/childTags")
     public ResponseEntity<List<TagResponse>> getChildTags(
         @RequestParam(value = "tagId", required = false) String tagId,
@@ -131,12 +140,11 @@ public class MemoTagController implements MemoTagApiDoc {
 
     @GetMapping("/memos/search/histories")
     public ResponseEntity<SearchHistoriesResponse> getSearchHistories(
-        @RequestParam(value = "query", defaultValue = "") String query,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(query, page, limit, userId);
+        SearchHistoriesResponse searchHistoriesResponse = memoTagService.getSearchHistories(page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(searchHistoriesResponse);
     }
 

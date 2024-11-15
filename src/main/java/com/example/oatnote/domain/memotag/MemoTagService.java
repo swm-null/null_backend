@@ -100,6 +100,13 @@ public class MemoTagService {
         return CreateSearchHistoryResponse.from(createdSearchHistory);
     }
 
+    public List<TagResponse> getAncestorTags(String tagId, String userId) {
+        List<Tag> parentTags = tagService.getAncestorTags(tagId, userId);
+        return parentTags.stream()
+            .map(TagResponse::fromTag)
+            .toList();
+    }
+
     public List<TagResponse> getChildTags(String tagId, String userId) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         List<Tag> childTags = tagService.getChildTags(tagId, userId);
@@ -154,7 +161,6 @@ public class MemoTagService {
     }
 
     public SearchHistoriesResponse getSearchHistories(
-        String query,
         Integer searchHistoryPage,
         Integer searchHistoryLimit,
         String userId
@@ -166,7 +172,7 @@ public class MemoTagService {
             criteria.getLimit(),
             Sort.by(Sort.Direction.DESC, "cTime")
         );
-        Page<SearchHistory> result = searchHistoryService.getSearchHistories(query, pageRequest, userId);
+        Page<SearchHistory> result = searchHistoryService.getSearchHistories(pageRequest, userId);
         Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }
