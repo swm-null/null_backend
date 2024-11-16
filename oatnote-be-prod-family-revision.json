@@ -1,0 +1,41 @@
+{
+  "family": "oatnote-be-prod-family",
+  "containerDefinitions": [
+    {
+      "name": "oatnote-be-prod-container",
+      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote-be/prod:${IMAGE_TAG}",
+      "cpu": 2048,
+      "memory": 5120,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/oatnote-be-prod-family",
+          "mode": "non-blocking",
+          "max-buffer-size": "25m",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "taskRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::905418277583:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "2048",
+  "memory": "5120",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
