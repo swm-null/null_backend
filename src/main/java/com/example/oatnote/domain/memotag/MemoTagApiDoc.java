@@ -69,8 +69,8 @@ public interface MemoTagApiDoc {
         }
     )
     @Operation(summary = "특정 태그와 연결된 메모 생성")
-    @PostMapping("/memo")
-    ResponseEntity<CreateMemoResponse> createMemo(
+    @PostMapping("/linkedMemo")
+    ResponseEntity<CreateMemoResponse> createLinkedMemo(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateMemoRequest createMemoRequest,
         @AuthenticationPrincipal String userId

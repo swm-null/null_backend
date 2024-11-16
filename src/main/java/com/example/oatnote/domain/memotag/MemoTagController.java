@@ -53,13 +53,13 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
-    @PostMapping("/memo")
-    public ResponseEntity<CreateMemoResponse> createMemo(
+    @PostMapping("/linkedMemo")
+    public ResponseEntity<CreateMemoResponse> createLinkedMemo(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateMemoRequest createMemoRequest,
         @AuthenticationPrincipal String userId
     ) {
-        CreateMemoResponse createMemoResponse = memoTagService.createMemo(tagId, createMemoRequest, userId);
+        CreateMemoResponse createMemoResponse = memoTagService.createLinkedMemo(tagId, createMemoRequest, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 

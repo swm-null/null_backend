@@ -89,7 +89,7 @@ public class MemoTagService {
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
-    public CreateMemoResponse createMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
+    public CreateMemoResponse createLinkedMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
