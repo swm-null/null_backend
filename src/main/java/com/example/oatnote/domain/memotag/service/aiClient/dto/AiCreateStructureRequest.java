@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
+import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -14,6 +15,22 @@ public record AiCreateStructureRequest(
     String type,
     String userId
 ) {
+
+    public static AiCreateStructureRequest from(List<RawTag> rawTags, Memo memo, String userId) {
+        return new AiCreateStructureRequest(
+            List.of(new RawMemo(
+                memo.getContent(),
+                memo.getImageUrls(),
+                memo.getVoiceUrls(),
+                memo.getMetadata(),
+                LocalDateTime.now(),
+                rawTags
+            )),
+            null,
+            null,
+            userId
+        );
+    }
 
     public static AiCreateStructureRequest from(String fileUrl, String type, String userId) {
         return new AiCreateStructureRequest(
