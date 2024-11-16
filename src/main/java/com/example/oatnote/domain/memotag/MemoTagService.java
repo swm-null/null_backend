@@ -89,6 +89,8 @@ public class MemoTagService {
     }
 
     public CreateMemoResponse createMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
+
     }
 
     public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
@@ -97,6 +99,10 @@ public class MemoTagService {
     }
 
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest createChildTagRequest, String userId) {
+        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(createChildTagRequest.name());
+        Tag childTag = createChildTagRequest.toTag(userId, aiCreateEmbeddingResponse.embedding());
+        Tag createdChildTag = tagService.createChildTag(tagId, childTag, userId);
+        return CreateChildTagResponse.from(createdChildTag);
     }
 
     public CreateSearchHistoryResponse createSearchHistory(

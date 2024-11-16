@@ -1,6 +1,7 @@
 package com.example.oatnote.domain.memotag.dto;
 
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
+import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -12,4 +13,9 @@ public record CreateChildTagResponse(
     TagResponse tag
 ) {
 
+    public static CreateChildTagResponse from(Tag tag) {
+        return new CreateChildTagResponse(
+            TagResponse.fromTag(tag)
+        );
+    }
 }

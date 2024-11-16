@@ -2,6 +2,9 @@ package com.example.oatnote.domain.memotag.dto;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+import java.util.List;
+
+import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -13,4 +16,12 @@ public record CreateChildTagRequest(
     String name
 ) {
 
+    public Tag toTag(String userId, List<Double> embedding) {
+        return new Tag(
+            null,
+            name,
+            userId,
+            embedding
+        );
+    }
 }

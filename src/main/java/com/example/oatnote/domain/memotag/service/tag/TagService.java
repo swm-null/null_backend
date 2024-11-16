@@ -27,13 +27,25 @@ public class TagService {
     private final TagEdgeService tagEdgeService;
     private final TagRepository tagRepository;
 
-    public void createTag(Tag tag) {
-        log.info("태그 생성 / ID: {} / 유저: {}", tag.getId(), tag.getUserId());
-        tagRepository.insert(tag);
+    public Tag createTag(Tag tag, String userId) {
+        log.info("태그 생성 {} / 유저: {}", tag.getId(), userId);
+        return tagRepository.insert(tag);
+    }
+
+    public Tag createChildTag(String tagId, Tag childTag, String userId) {
+        TagEdge tagEdge = tagEdgeService.getTagEdge(userId);
+        Map<String, List<String>> tagEdges = tagEdge.getEdges();
+        Map<String, List<String>> reversedTagEdges = tagEdge.getReversedEdges();
+        tagEdges.get(tagId).add(childTag.getId());
+        tagEdges.put(childTag.getId(), List.of());
+        reversedTagEdges.put(childTag.getId(), List.of(tagId));
+        tagEdgeService.updateTagEdge(tagEdge, userId);
+
+        return createTag(childTag, userId);
     }
 
     public void createTags(List<Tag> tags, String userId) {
-        log.info("태그 리스트 생성 / IDs: {} / 유저: {}", tags.stream().map(Tag::getId).toList(), userId);
+        log.info("태그 리스트 생성 {} / 유저: {}", tags.stream().map(Tag::getId).toList(), userId);
         tagRepository.insert(tags);
     }
 
@@ -95,7 +107,7 @@ public class TagService {
             rootTagName,
             userId
         );
-        createTag(tag);
+        createTag(tag, userId);
 
         TagEdge tagEdge = TagEdge.of(
             Map.of(tag.getId(), List.of()),
