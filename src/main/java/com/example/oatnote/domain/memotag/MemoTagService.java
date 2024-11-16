@@ -20,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.oatnote.domain.memotag.dto.CreateChildTagRequest;
+import com.example.oatnote.domain.memotag.dto.CreateChildTagResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -86,9 +88,15 @@ public class MemoTagService {
         return CreateMemoResponse.from(memo, aiCreateTagsResponse.tags());
     }
 
+    public CreateMemoResponse createMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
+    }
+
     public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
         userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(createMemosRequest.email()));
         asyncMemoTagService.createStructure(createMemosRequest.fileUrl(), userId);
+    }
+
+    public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest createChildTagRequest, String userId) {
     }
 
     public CreateSearchHistoryResponse createSearchHistory(

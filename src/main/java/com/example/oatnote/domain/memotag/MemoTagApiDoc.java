@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.oatnote.domain.memotag.dto.CreateChildTagRequest;
+import com.example.oatnote.domain.memotag.dto.CreateChildTagResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -53,7 +55,24 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 생성")
     @PostMapping("/memo")
     ResponseEntity<CreateMemoResponse> createMemo(
-        @RequestBody @Valid CreateMemoRequest createMemoTagsRequest,
+        @RequestBody @Valid CreateMemoRequest createMemoRequest,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "특정 태그와 연결된 메모 생성")
+    @PostMapping("/memo")
+    ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestBody @Valid CreateMemoRequest createMemoRequest,
         @AuthenticationPrincipal String userId
     );
 
@@ -69,6 +88,22 @@ public interface MemoTagApiDoc {
     @PostMapping("/memos")
     ResponseEntity<Void> createMemos(
         @RequestBody @Valid CreateMemosRequest createMemosRequest,
+        @AuthenticationPrincipal String userId
+    );
+
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+        }
+    )
+    @Operation(summary = "특정 태그 하위에 자식 태그 생성")
+    @PostMapping("/childTag")
+    ResponseEntity<CreateChildTagResponse> createChildTag(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestBody @Valid CreateChildTagRequest createChildTagRequest,
         @AuthenticationPrincipal String userId
     );
 

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.oatnote.domain.memotag.dto.CreateChildTagRequest;
+import com.example.oatnote.domain.memotag.dto.CreateChildTagResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.domain.memotag.dto.CreateMemoResponse;
 import com.example.oatnote.domain.memotag.dto.CreateMemosRequest;
@@ -51,6 +53,16 @@ public class MemoTagController implements MemoTagApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
     }
 
+    @PostMapping("/memo")
+    public ResponseEntity<CreateMemoResponse> createMemo(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestBody @Valid CreateMemoRequest createMemoRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        CreateMemoResponse createMemoResponse = memoTagService.createMemo(tagId, createMemoRequest, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createMemoResponse);
+    }
+
     @PostMapping("/memos")
     public ResponseEntity<Void> createMemos(
         @RequestBody @Valid CreateMemosRequest createMemosRequest,
@@ -58,6 +70,16 @@ public class MemoTagController implements MemoTagApiDoc {
     ) {
         memoTagService.createMemos(createMemosRequest, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/childTag")
+    public ResponseEntity<CreateChildTagResponse> createChildTag(
+        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestBody @Valid CreateChildTagRequest createChildTagRequest,
+        @AuthenticationPrincipal String userId
+    ) {
+        CreateChildTagResponse createChildTagResponse = memoTagService.createChildTag(tagId, createChildTagRequest, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createChildTagResponse);
     }
 
     @PostMapping("/memos/search/history")
