@@ -21,6 +21,8 @@ import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsin
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbRequest;
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
+import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 
 @Service
 public class AiMemoTagClient {

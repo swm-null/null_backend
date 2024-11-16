@@ -50,6 +50,7 @@ import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsReque
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -81,16 +82,27 @@ public class MemoTagService {
         AiCreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
-        Memo memo = createMemoRequest.toRawMemo(userId, aiCreateTagsResponse.metadata());
+        Memo rawMemo = createMemoRequest.toRawMemo(userId, aiCreateTagsResponse.metadata());
+        List<RawTag> rawTags = aiCreateTagsResponse.tags();
+        asyncMemoTagService.createStructure(rawTags, rawMemo, userId);
 
-        asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
-
-        return CreateMemoResponse.from(memo, aiCreateTagsResponse.tags());
+        return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
     public CreateMemoResponse createMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
         tagId = Objects.requireNonNullElse(tagId, userId);
+        Tag tag = tagService.getTag(tagId, userId);
 
+        AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
+            createMemoRequest.content(),
+            createMemoRequest.imageUrls(),
+            createMemoRequest.voiceUrls()
+        );
+        Memo rawMemo = createMemoRequest.toRawMemo(userId, aiCreateMetadataResponse.metadata());
+        RawTag rawTag = new RawTag(tag.getId(), tag.getName(), false);
+        asyncMemoTagService.createStructure(List.of(rawTag), rawMemo, userId);
+
+        return CreateMemoResponse.from(rawMemo, List.of(rawTag));
     }
 
     public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
@@ -312,17 +324,16 @@ public class MemoTagService {
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
         Memo memo = memoService.getMemo(memoId, userId);
-
         processDeletedFiles(memo, updateMemoTagsRequest.imageUrls(), updateMemoTagsRequest.voiceUrls(), userId);
-
         memo.update(
             updateMemoTagsRequest.content(),
             updateMemoTagsRequest.imageUrls(),
             updateMemoTagsRequest.voiceUrls(),
             aiCreateTagsResponse.metadata()
         );
+        List<RawTag> rawTags = aiCreateTagsResponse.tags();
 
-        asyncMemoTagService.createStructure(aiCreateTagsResponse, memo, userId);
+        asyncMemoTagService.createStructure(rawTags, memo, userId);
 
         return UpdateMemoTagsResponse.from(memo, aiCreateTagsResponse.tags());
     }

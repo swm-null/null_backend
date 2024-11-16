@@ -1,6 +1,12 @@
 package com.example.oatnote.domain.memotag;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -10,7 +16,7 @@ import org.springframework.stereotype.Service;
 import com.example.oatnote.domain.memotag.service.aiClient.AiMemoTagClient;
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureRequest;
 import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -35,18 +41,18 @@ public class AsyncMemoTagService {
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
 
     @Async("AsyncMemoTagExecutor")
-    public void createStructure(AiCreateTagsResponse aiCreateTagsResponse, Memo memo, String userId) {
+    public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
         lock.lock();
         try {
             AiCreateStructureRequest aiCreateStructureRequest
-                = aiCreateTagsResponse.toAiCreateStructureRequest(memo, userId);
+                = AiCreateStructureRequest.from(rawTags, rawMemo, userId);
             AiCreateStructureResponse aiCreateStructureResponse
                 = aiMemoTagClient.createStructure(aiCreateStructureRequest);
 
-            memoTagRelationService.deleteRelationsByMemoId(memo.getId(), userId);
+            memoTagRelationService.deleteRelationsByMemoId(rawMemo.getId(), userId);
 
-            processMemoTag(aiCreateStructureResponse, memo.getId(), userId);
+            processMemoTag(aiCreateStructureResponse, rawMemo.getId(), userId);
         } finally {
             lock.unlock();
         }
