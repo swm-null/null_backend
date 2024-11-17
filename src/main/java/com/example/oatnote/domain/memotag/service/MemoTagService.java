@@ -235,11 +235,7 @@ public class MemoTagService {
 
         AiSearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
-        List<Memo> memos = switch (aiSearchMemosUsingAiResponse.type()) {
-            case SIMILARITY -> memoService.getMemos(aiSearchMemosUsingAiResponse.memoIds(), userId);
-            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemosUsingAiResponse.regex(), userId);
-        };
-
+        List<Memo> memos = memoService.getMemos(aiSearchMemosUsingAiResponse.memoIds(), userId);
         List<MemoResponse> memoResponses = getMemoResponses(memos, userId);
 
         SearchMemosUsingAiResponse searchMemosUsingAiResponse = SearchMemosUsingAiResponse.from(

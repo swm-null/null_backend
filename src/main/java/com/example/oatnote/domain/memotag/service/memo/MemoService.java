@@ -38,14 +38,6 @@ public class MemoService {
         return memoRepository.findByIdInAndUserId(memoIds, userId, pageable);
     }
 
-    public List<Memo> getMemosContainingRegex(String regex, String userId) {
-        List<Memo> memos = memoRepository.findByContentRegexAndUserId(regex, userId);
-        if (memos.isEmpty()) {
-            throw OatDataNotFoundException.withDetail("해당 regex 에 맞는 메모를 찾지 못했습니다.", regex);
-        }
-        return memos;
-    }
-
     public Memo updateMemo(Memo memo) {
         log.info("메모 업데이트 / 메모: {} / 유저: {}", memo.getId(), memo.getUserId());
         memoRepository.findByIdAndUserId(memo.getId(), memo.getUserId())
