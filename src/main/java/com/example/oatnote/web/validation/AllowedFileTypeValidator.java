@@ -63,10 +63,11 @@ public class AllowedFileTypeValidator implements ConstraintValidator<AllowedFile
     }
 
     private boolean isValidMimeType(String fileExtension, String mimeType) {
-        return fileExtension != null && allowedTypes.stream()
+        return fileExtension != null && mimeType != null && allowedTypes.stream()
             .anyMatch(type -> {
-                String allowedMimeType = type.getFileTypes().get(fileExtension);
-                return allowedMimeType != null && allowedMimeType.equalsIgnoreCase(mimeType);
+                List<String> allowedMimeTypes = type.getFileTypes().get(fileExtension);
+                return allowedMimeTypes != null && allowedMimeTypes.stream()
+                    .anyMatch(mimeType::equalsIgnoreCase);
             });
     }
 
