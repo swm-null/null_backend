@@ -111,6 +111,7 @@ public class MemoTagService {
     }
 
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest createChildTagRequest, String userId) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
         AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(createChildTagRequest.name());
         Tag childTag = createChildTagRequest.toTag(userId, aiCreateEmbeddingResponse.embedding());
         Tag createdChildTag = tagService.createChildTag(tagId, childTag, userId);
