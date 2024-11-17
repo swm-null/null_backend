@@ -186,13 +186,9 @@ public class MemoTagService {
         return from(tag, childTags, criteria);
     }
 
-    public SearchHistoriesResponse getSearchHistories(
-        Integer searchHistoryPage,
-        Integer searchHistoryLimit,
-        String userId
-    ) {
+    public SearchHistoriesResponse getSearchHistories(Integer page, Integer limit, String userId) {
         Integer total = searchHistoryService.countSearchHistories(userId);
-        Criteria criteria = Criteria.of(searchHistoryPage, searchHistoryLimit, total);
+        Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(
             criteria.getPage(),
             criteria.getLimit(),
@@ -235,30 +231,27 @@ public class MemoTagService {
 
         AiSearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
-        List<Memo> memos = memoService.getMemos(aiSearchMemosUsingAiResponse.memoIds(), userId);
+        String processedMessage = aiSearchMemosUsingAiResponse.processedMessage();
+        List<String> memoIds = aiSearchMemosUsingAiResponse.memoIds();
+
+        searchHistoryService.updateAiResponse(searchHistoryId, processedMessage, memoIds, userId);
+
+        List<Memo> memos = memoService.getMemos(memoIds, userId);
         List<MemoResponse> memoResponses = getMemoResponses(memos, userId);
-
-        SearchMemosUsingAiResponse searchMemosUsingAiResponse = SearchMemosUsingAiResponse.from(
-            aiSearchMemosUsingAiResponse.processedMessage(),
-            memoResponses
-        );
-        searchHistoryService.updateAiResponse(searchHistoryId, searchMemosUsingAiResponse, userId);
-
-        return searchMemosUsingAiResponse;
+        return SearchMemosUsingAiResponse.from(processedMessage, memoResponses);
     }
 
     public SearchMemosUsingDbResponse searchMemosUsingDb(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
 
         AiSearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
+        List<String> memoIds = aiSearchMemosUsingDbResponse.memoIds();
 
-        List<Memo> memos = memoService.getMemos(aiSearchMemosUsingDbResponse.memoIds(), userId);
+        searchHistoryService.updateDbResponse(searchHistoryId, memoIds, userId);
+
+        List<Memo> memos = memoService.getMemos(memoIds, userId);
         List<MemoResponse> memoResponses = getMemoResponses(memos, userId);
-
-        SearchMemosUsingDbResponse searchMemosUsingDbResponse = SearchMemosUsingDbResponse.from(memoResponses);
-        searchHistoryService.updateDbResponse(searchHistoryId, searchMemosUsingDbResponse, userId);
-
-        return searchMemosUsingDbResponse;
+        return SearchMemosUsingDbResponse.from(memoResponses);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {

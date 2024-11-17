@@ -1,5 +1,7 @@
 package com.example.oatnote.domain.memotag.service.searchhistory;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,17 +41,21 @@ public class SearchHistoryService {
         return searchHistoryRepository.findByUserId(pageRequest, userId);
     }
 
-    public void updateAiResponse(String searchHistoryId, SearchMemosUsingAiResponse aiResponse, String userId) {
+    public void updateAiResponse(String searchHistoryId, String description, List<String> memoIds, String userId) {
         log.info("AI 검색 결과 업데이트 / 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
+
         Query query = new Query(Criteria.where("_id").is(searchHistoryId).and("uId").is(userId));
-        Update update = new Update().set("aiRes", aiResponse);
+        Update update = new Update()
+            .set("aiDesc", description)
+            .set("aiMIds", memoIds);
         mongoTemplate.updateFirst(query, update, SearchHistory.class);
     }
 
-    public void updateDbResponse(String searchHistoryId, SearchMemosUsingDbResponse dbResponse, String userId) {
+    public void updateDbResponse(String searchHistoryId, List<String> memoIds, String userId) {
         log.info("DB 검색 결과 업데이트 / 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
+
         Query query = new Query(Criteria.where("_id").is(searchHistoryId).and("uId").is(userId));
-        Update update = new Update().set("dbRes", dbResponse);
+        Update update = new Update().set("dbMIds", memoIds);
         mongoTemplate.updateFirst(query, update, SearchHistory.class);
     }
 

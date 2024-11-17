@@ -1,6 +1,7 @@
 package com.example.oatnote.domain.memotag.service.searchhistory.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -24,11 +25,14 @@ public class SearchHistory {
     @Field("query")
     private String query;
 
-    @Field("aiRes")
-    private SearchMemosUsingAiResponse searchMemosUsingAiResponse;
+    @Field("aiDesc")
+    private String aiDescription;
 
-    @Field("dbRes")
-    private SearchMemosUsingDbResponse searchMemosUsingDbResponse;
+    @Field("aiMIds")
+    private List<String> aiMemoIds;
+
+    @Field("dbMIds")
+    private List<String> dbMemoIds;
 
     @Field("uId")
     private String userId;
