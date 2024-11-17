@@ -1,6 +1,8 @@
 package com.example.oatnote.domain.memotag.service.memo;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
@@ -31,7 +33,12 @@ public class MemoService {
     }
 
     public List<Memo> getMemos(List<String> memoIds, String userId) {
-        return memoRepository.findByIdInAndUserId(memoIds, userId);
+        List<Memo> memos = memoRepository.findByIdInAndUserId(memoIds, userId);
+        Map<String, Memo> memoMap = memos.stream()
+            .collect(Collectors.toMap(Memo::getId, memo -> memo));
+        return memoIds.stream()
+            .map(memoMap::get)
+            .toList();
     }
 
     public Page<Memo> getMemos(List<String> memoIds, String userId, Pageable pageable) {
