@@ -1,6 +1,7 @@
 package com.example.oatnote.domain.memotag.service.searchhistory;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +48,7 @@ public class SearchHistoryService {
         Query query = new Query(Criteria.where("_id").is(searchHistoryId).and("uId").is(userId));
         Update update = new Update()
             .set("aiDesc", description)
-            .set("aiMIds", memoIds);
+            .set("aiMIds", Optional.ofNullable(memoIds).orElse(List.of()));
         mongoTemplate.updateFirst(query, update, SearchHistory.class);
     }
 
@@ -55,7 +56,7 @@ public class SearchHistoryService {
         log.info("DB 검색 결과 업데이트 / 검색 히스토리: {} / 유저: {}", searchHistoryId, userId);
 
         Query query = new Query(Criteria.where("_id").is(searchHistoryId).and("uId").is(userId));
-        Update update = new Update().set("dbMIds", memoIds);
+        Update update = new Update().set("dbMIds", Optional.ofNullable(memoIds).orElse(List.of()));
         mongoTemplate.updateFirst(query, update, SearchHistory.class);
     }
 
