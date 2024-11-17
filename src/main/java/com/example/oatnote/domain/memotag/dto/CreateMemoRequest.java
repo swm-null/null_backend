@@ -7,7 +7,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import java.util.List;
 
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.web.validation.AllowedFileType;
 import com.example.oatnote.web.validation.MemoAtLeastOneRequired;
