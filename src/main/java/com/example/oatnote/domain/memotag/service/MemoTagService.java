@@ -194,8 +194,43 @@ public class MemoTagService {
             criteria.getLimit(),
             Sort.by(Sort.Direction.DESC, "cTime")
         );
+
         Page<SearchHistory> result = searchHistoryService.getSearchHistories(pageRequest, userId);
-        Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
+
+        List<String> allMemoIds = result.stream()
+            .flatMap(searchHistory -> Stream.concat(
+                searchHistory.getAiMemoIds().stream(),
+                searchHistory.getDbMemoIds().stream()
+            ))
+            .distinct()
+            .toList();
+
+        List<Memo> allMemos = memoService.getMemos(allMemoIds, userId);
+        Map<String, Memo> memoMap = allMemos.stream()
+            .collect(Collectors.toMap(Memo::getId, memo -> memo));
+
+        Page<SearchHistoryResponse> pagedSearchHistories = result.map(searchHistory -> {
+            List<Memo> aiMemos = searchHistory.getAiMemoIds().stream()
+                .map(memoMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+            List<MemoResponse> aiMemoResponses = getMemoResponses(aiMemos, userId);
+
+            SearchMemosUsingAiResponse aiResponse = SearchMemosUsingAiResponse.from(
+                searchHistory.getAiDescription(),
+                aiMemoResponses
+            );
+
+            List<Memo> dbMemos = searchHistory.getDbMemoIds().stream()
+                .map(memoMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+            List<MemoResponse> dbMemoResponses = getMemoResponses(dbMemos, userId);
+            SearchMemosUsingDbResponse dbResponse = SearchMemosUsingDbResponse.from(dbMemoResponses);
+
+            return SearchHistoryResponse.from(searchHistory, aiResponse, dbResponse);
+        });
+
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }
 
@@ -228,7 +263,6 @@ public class MemoTagService {
 
     public SearchMemosUsingAiResponse searchMemosUsingAi(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
-
         AiSearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
         String processedMessage = aiSearchMemosUsingAiResponse.processedMessage();
@@ -243,7 +277,6 @@ public class MemoTagService {
 
     public SearchMemosUsingDbResponse searchMemosUsingDb(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
-
         AiSearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
         List<String> memoIds = aiSearchMemosUsingDbResponse.memoIds();
 
@@ -434,7 +467,7 @@ public class MemoTagService {
         tagService.deleteTags(visitedTagIds, userId);
     }
 
-    private void updateTagEdge(
+    void updateTagEdge(
         String tagId,
         Map<String, List<String>> tagEdges,
         Map<String, List<String>> reverseTagEdges,
