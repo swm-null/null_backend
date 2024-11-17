@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag;
+package com.example.oatnote.domain.memotag.service;
 
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
@@ -43,14 +43,14 @@ import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
-import com.example.oatnote.domain.memotag.service.aiClient.AiMemoTagClient;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
+import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;

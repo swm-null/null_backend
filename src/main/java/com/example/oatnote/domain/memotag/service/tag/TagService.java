@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;

@@ -34,6 +34,7 @@ import com.example.oatnote.domain.memotag.dto.UpdateTagRequest;
 import com.example.oatnote.domain.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.domain.memotag.dto.enums.MemoSortOrderTypeEnum;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
+import com.example.oatnote.domain.memotag.service.MemoTagService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
