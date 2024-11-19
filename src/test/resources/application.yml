@@ -66,5 +66,5 @@ aws:
 
 sse:
   timeout: 3600000
-  topic: sse
+  topic: test
 
