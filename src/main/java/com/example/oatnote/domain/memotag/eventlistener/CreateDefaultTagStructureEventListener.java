@@ -3,7 +3,7 @@ package com.example.oatnote.domain.memotag.eventlistener;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.example.oatnote.domain.memotag.MemoTagService;
+import com.example.oatnote.domain.memotag.service.MemoTagService;
 import com.example.oatnote.event.RegisterUserEvent;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 

@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag;
+package com.example.oatnote.domain.memotag.service;
 
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
@@ -43,14 +43,14 @@ import com.example.oatnote.domain.memotag.dto.innerDto.MemoResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.SearchHistoryResponse;
 import com.example.oatnote.domain.memotag.dto.innerDto.TagResponse;
 import com.example.oatnote.domain.memotag.rabbitmq.FilesMessageProducer;
-import com.example.oatnote.domain.memotag.service.aiClient.AiMemoTagClient;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateEmbeddingResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateMetadataResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsRequest;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateTagsResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingAiResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiSearchMemosUsingDbResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
+import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingAiResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingDbResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
@@ -111,6 +111,7 @@ public class MemoTagService {
     }
 
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest createChildTagRequest, String userId) {
+        tagId = Objects.requireNonNullElse(tagId, userId);
         AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(createChildTagRequest.name());
         Tag childTag = createChildTagRequest.toTag(userId, aiCreateEmbeddingResponse.embedding());
         Tag createdChildTag = tagService.createChildTag(tagId, childTag, userId);
@@ -186,22 +187,50 @@ public class MemoTagService {
         return from(tag, childTags, criteria);
     }
 
-    public SearchHistoriesResponse getSearchHistories(
-        Integer searchHistoryPage,
-        Integer searchHistoryLimit,
-        String userId
-    ) {
+    public SearchHistoriesResponse getSearchHistories(Integer page, Integer limit, String userId) {
         Integer total = searchHistoryService.countSearchHistories(userId);
-        Criteria criteria = Criteria.of(searchHistoryPage, searchHistoryLimit, total);
+        Criteria criteria = Criteria.of(page, limit, total);
         PageRequest pageRequest = PageRequest.of(
             criteria.getPage(),
             criteria.getLimit(),
             Sort.by(Sort.Direction.DESC, "cTime")
         );
+
         Page<SearchHistory> result = searchHistoryService.getSearchHistories(pageRequest, userId);
-        Page<SearchHistoryResponse> pagedSearchHistories = result.map(SearchHistoryResponse::from);
+
+        List<String> allMemoIds = result.stream()
+            .flatMap(searchHistory -> Stream.concat(
+                searchHistory.getAiMemoIds().stream(),
+                searchHistory.getDbMemoIds().stream()
+            ))
+            .distinct()
+            .toList();
+
+        Map<String, MemoResponse> memoResponseMap = getMemoResponses(allMemoIds, userId).stream()
+            .collect(Collectors.toMap(MemoResponse::id, memo -> memo));
+
+        Page<SearchHistoryResponse> pagedSearchHistories = result.map(searchHistory -> {
+            List<MemoResponse> aiMemoResponses = searchHistory.getAiMemoIds().stream()
+                .map(memoResponseMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+            SearchMemosUsingAiResponse aiResponse = SearchMemosUsingAiResponse.from(
+                searchHistory.getAiDescription(),
+                aiMemoResponses
+            );
+
+            List<MemoResponse> dbMemoResponses = searchHistory.getDbMemoIds().stream()
+                .map(memoResponseMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+            SearchMemosUsingDbResponse dbResponse = SearchMemosUsingDbResponse.from(dbMemoResponses);
+
+            return SearchHistoryResponse.from(searchHistory, aiResponse, dbResponse);
+        });
+
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }
+
 
     public MemosResponse getMemos(
         String tagId,
@@ -225,44 +254,32 @@ public class MemoTagService {
         };
         PageRequest pageRequest = PageRequest.of(criteria.getPage(), criteria.getLimit(), sort);
 
-        Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
-        Page<MemoResponse> memoResponses = getMemoResponses(memos, userId);
+        Page<MemoResponse> memoResponses = getMemoResponses(memoIds, userId, pageRequest);
         return MemosResponse.from(memoResponses, criteria);
     }
 
     public SearchMemosUsingAiResponse searchMemosUsingAi(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
-
         AiSearchMemosUsingAiResponse aiSearchMemosUsingAiResponse = aiMemoTagClient.searchMemoUsingAi(query, userId);
 
-        List<Memo> memos = switch (aiSearchMemosUsingAiResponse.type()) {
-            case SIMILARITY -> memoService.getMemos(aiSearchMemosUsingAiResponse.memoIds(), userId);
-            case REGEX -> memoService.getMemosContainingRegex(aiSearchMemosUsingAiResponse.regex(), userId);
-        };
+        String processedMessage = aiSearchMemosUsingAiResponse.processedMessage();
+        List<String> memoIds = aiSearchMemosUsingAiResponse.memoIds();
 
-        List<MemoResponse> memoResponses = getMemoResponses(memos, userId);
+        searchHistoryService.updateAiResponse(searchHistoryId, processedMessage, memoIds, userId);
 
-        SearchMemosUsingAiResponse searchMemosUsingAiResponse = SearchMemosUsingAiResponse.from(
-            aiSearchMemosUsingAiResponse.processedMessage(),
-            memoResponses
-        );
-        searchHistoryService.updateAiResponse(searchHistoryId, searchMemosUsingAiResponse, userId);
-
-        return searchMemosUsingAiResponse;
+        List<MemoResponse> memoResponses = getMemoResponses(memoIds, userId);
+        return SearchMemosUsingAiResponse.from(processedMessage, memoResponses);
     }
 
     public SearchMemosUsingDbResponse searchMemosUsingDb(String searchHistoryId, String userId) {
         String query = searchHistoryService.getQuery(searchHistoryId, userId);
-
         AiSearchMemosUsingDbResponse aiSearchMemosUsingDbResponse = aiMemoTagClient.searchMemoUsingDb(query, userId);
+        List<String> memoIds = aiSearchMemosUsingDbResponse.memoIds();
 
-        List<Memo> memos = memoService.getMemos(aiSearchMemosUsingDbResponse.memoIds(), userId);
-        List<MemoResponse> memoResponses = getMemoResponses(memos, userId);
+        searchHistoryService.updateDbResponse(searchHistoryId, memoIds, userId);
 
-        SearchMemosUsingDbResponse searchMemosUsingDbResponse = SearchMemosUsingDbResponse.from(memoResponses);
-        searchHistoryService.updateDbResponse(searchHistoryId, searchMemosUsingDbResponse, userId);
-
-        return searchMemosUsingDbResponse;
+        List<MemoResponse> memoResponses = getMemoResponses(memoIds, userId);
+        return SearchMemosUsingDbResponse.from(memoResponses);
     }
 
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
@@ -303,7 +320,7 @@ public class MemoTagService {
             embeddingMetadata
         );
         Memo updatedMemo = memoService.updateMemo(memo);
-        MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo), userId).get(0);
+        MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo.getId()), userId).get(0);
         return UpdateMemoResponse.from(memoResponse);
     }
 
@@ -369,7 +386,8 @@ public class MemoTagService {
         tagService.createDefaultTagStructureForNewUser(rootTagName, userId);
     }
 
-    List<MemoResponse> getMemoResponses(List<Memo> memos, String userId) {
+    List<MemoResponse> getMemoResponses(List<String> memoIds, String userId) {
+        List<Memo> memos = memoService.getMemos(memoIds, userId);
         Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(memos, userId);
         return memos.stream()
             .map(memo -> {
@@ -379,7 +397,8 @@ public class MemoTagService {
             .toList();
     }
 
-    Page<MemoResponse> getMemoResponses(Page<Memo> memos, String userId) {
+    Page<MemoResponse> getMemoResponses(List<String> memoIds, String userId, PageRequest pageRequest) {
+        Page<Memo> memos = memoService.getMemos(memoIds, userId, pageRequest);
         Map<String, List<Tag>> linkedTagsMap = getLinkedTagsMap(memos.getContent(), userId);
         return memos.map(memo -> {
             List<Tag> linkedTagsForMemo = linkedTagsMap.getOrDefault(memo.getId(), List.of());
@@ -445,7 +464,7 @@ public class MemoTagService {
         tagService.deleteTags(visitedTagIds, userId);
     }
 
-    private void updateTagEdge(
+    void updateTagEdge(
         String tagId,
         Map<String, List<String>> tagEdges,
         Map<String, List<String>> reverseTagEdges,

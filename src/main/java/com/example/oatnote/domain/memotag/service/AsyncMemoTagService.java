@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag;
+package com.example.oatnote.domain.memotag.service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,10 +13,10 @@ import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.domain.memotag.service.aiClient.AiMemoTagClient;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureRequest;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.AiCreateStructureResponse;
-import com.example.oatnote.domain.memotag.service.aiClient.dto.innerDto.RawTag;
+import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRequest;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;

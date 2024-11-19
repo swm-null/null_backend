@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag.service.aiClient.dto;
+package com.example.oatnote.domain.memotag.service.client.dto;
 
 import java.util.List;
 

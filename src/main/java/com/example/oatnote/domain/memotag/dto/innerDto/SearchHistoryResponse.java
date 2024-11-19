@@ -18,12 +18,16 @@ public record SearchHistoryResponse(
     LocalDateTime createdAt
 ) {
 
-    public static SearchHistoryResponse from(SearchHistory searchHistory) {
+    public static SearchHistoryResponse from(
+        SearchHistory searchHistory,
+        SearchMemosUsingAiResponse searchMemosUsingAiResponse,
+        SearchMemosUsingDbResponse searchMemosUsingDbResponse
+    ) {
         return new SearchHistoryResponse(
             searchHistory.getId(),
             searchHistory.getQuery(),
-            searchHistory.getSearchMemosUsingAiResponse(),
-            searchHistory.getSearchMemosUsingDbResponse(),
+            searchMemosUsingAiResponse,
+            searchMemosUsingDbResponse,
             searchHistory.getCreatedAt()
         );
     }
