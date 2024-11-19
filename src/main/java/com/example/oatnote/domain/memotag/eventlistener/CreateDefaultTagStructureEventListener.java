@@ -4,7 +4,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.example.oatnote.domain.memotag.service.MemoTagService;
-import com.example.oatnote.event.RegisterUserEvent;
+import com.example.oatnote._commons.event.RegisterUserEvent;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
 
 import lombok.RequiredArgsConstructor;

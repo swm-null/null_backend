@@ -3,7 +3,7 @@ package com.example.oatnote.domain.memotag.eventlistener;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.example.oatnote.event.WithdrawUserEvent;
+import com.example.oatnote._commons.event.WithdrawUserEvent;
 import com.example.oatnote.domain.memotag.service.MemoTagService;
 
 import lombok.RequiredArgsConstructor;
