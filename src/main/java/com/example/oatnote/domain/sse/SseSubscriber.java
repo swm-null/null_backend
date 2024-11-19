@@ -17,6 +17,6 @@ public class SseSubscriber {
         String userId = parts[0];
         int payload = Integer.parseInt(parts[1]);
 
-        sseService.sendToUser(userId, payload);
+        sseService.sendMemoProcessingCountToUser(userId, payload);
     }
 }
