@@ -1,14 +1,16 @@
 package com.example.oatnote._commons.config;
 
+import org.redisson.api.RedissonClient;
+import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.example.oatnote.domain.sse.SseSubscriber;
 
@@ -19,11 +21,9 @@ public class RedisConfig {
     private String topic;
 
     @Bean
-    public RedisMessageListenerContainer container(
-        RedisConnectionFactory connectionFactory,
-        MessageListenerAdapter listenerAdapter) {
+    public RedisMessageListenerContainer container(RedissonClient redissonClient, MessageListenerAdapter listenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
+        container.setConnectionFactory(new RedissonConnectionFactory(redissonClient));
         container.addMessageListener(listenerAdapter, new ChannelTopic(topic));
         return container;
     }
@@ -39,9 +39,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(RedissonClient redissonClient) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
+        template.setConnectionFactory(new RedissonConnectionFactory(redissonClient));
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
         return template;
