@@ -24,8 +24,8 @@ public class SseService {
         sseRepository.save(userId, emitter);
 
         RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
-        int memoProcessingCount = (int) memoCounter.decrementAndGet();
-        sendToUser(userId, memoProcessingCount);
+        int memoProcessingCount = (int) memoCounter.get();
+        sendMemoProcessingCountToUser(userId, memoProcessingCount);
 
         emitter.onCompletion(() -> sseRepository.deleteById(userId));
         emitter.onTimeout(() -> sseRepository.deleteById(userId));
@@ -33,11 +33,11 @@ public class SseService {
         return emitter;
     }
 
-    public void sendToUser(String userId, int message) {
+    public void sendMemoProcessingCountToUser(String userId, int memoProcessingCount) {
         SseEmitter emitter = sseRepository.findById(userId);
         if (emitter != null) {
             try {
-                emitter.send(SseEmitter.event().data(message));
+                emitter.send(SseEmitter.event().data(memoProcessingCount));
             } catch (Exception e) {
                 sseRepository.deleteById(userId);
             }
