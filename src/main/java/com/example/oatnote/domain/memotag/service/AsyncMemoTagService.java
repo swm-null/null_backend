@@ -45,7 +45,6 @@ public class AsyncMemoTagService {
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
     private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
 
-
     @Async("AsyncMemoTagExecutor")
     public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
@@ -137,5 +136,4 @@ public class AsyncMemoTagService {
         int memoProcessingCount = (int) memoCounter.decrementAndGet();
         memoEventPublisher.publish(userId, memoProcessingCount);
     }
-
 }

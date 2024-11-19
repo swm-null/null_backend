@@ -7,6 +7,8 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.redisson.api.RAtomicLong;
 
 import com.example.oatnote.domain.sse.SseSubscriber;
 
@@ -35,5 +37,11 @@ public class RedisConfig {
     public ChannelTopic topic() {
         return new ChannelTopic(topic);
     }
-}
 
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
+    }
+}

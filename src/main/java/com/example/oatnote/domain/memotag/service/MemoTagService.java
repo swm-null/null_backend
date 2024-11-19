@@ -55,6 +55,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingD
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
+import com.example.oatnote.domain.memotag.service.publisher.MemoProcessingPublisher;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
@@ -80,6 +81,7 @@ public class MemoTagService {
     private final UserService userService;
     private final FilesMessageProducer filesMessageProducer;
     private final RedissonClient redissonClient;
+    private final MemoProcessingPublisher memoEventPublisher;
 
     private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
 
@@ -511,6 +513,7 @@ public class MemoTagService {
 
     void incrementMemoCount(String userId) {
         RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
-        memoCounter.incrementAndGet();
+        int memoProcessingCount = (int) memoCounter.incrementAndGet();
+        memoEventPublisher.publish(userId, memoProcessingCount);
     }
 }
