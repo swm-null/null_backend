@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -77,8 +79,13 @@ public class MemoTagService {
     private final AiMemoTagClient aiMemoTagClient;
     private final UserService userService;
     private final FilesMessageProducer filesMessageProducer;
+    private final RedissonClient redissonClient;
+
+    private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest, String userId) {
+        incrementMemoCount(userId); //todo refactor
+
         AiCreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
@@ -90,6 +97,8 @@ public class MemoTagService {
     }
 
     public CreateMemoResponse createLinkedMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
+        incrementMemoCount(userId); //todo refactor
+
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
@@ -106,6 +115,8 @@ public class MemoTagService {
     }
 
     public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
+        incrementMemoCount(userId); //todo refactor
+
         userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(createMemosRequest.email()));
         asyncMemoTagService.createStructure(createMemosRequest.fileUrl(), userId);
     }
@@ -337,6 +348,8 @@ public class MemoTagService {
         UpdateMemoTagsRequest updateMemoTagsRequest,
         String userId
     ) {
+        incrementMemoCount(userId); //todo refactor
+
         AiCreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
@@ -494,5 +507,10 @@ public class MemoTagService {
         if (!fileUrls.isEmpty()) {
             filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
         }
+    }
+
+    void incrementMemoCount(String userId) {
+        RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
+        memoCounter.incrementAndGet();
     }
 }

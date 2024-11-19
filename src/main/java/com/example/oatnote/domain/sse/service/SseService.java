@@ -1,8 +1,8 @@
 package com.example.oatnote.domain.sse.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -11,8 +11,11 @@ public class SseService {
 
     private final SseRepository sseRepository;
 
+    @Value("${sse.timeout}")
+    private Long defaultTimeout;
+
     public SseEmitter subscribe(String userId) {
-        SseEmitter emitter = new SseEmitter(60L * 1000 * 60); // 1시간 타임아웃
+        SseEmitter emitter = new SseEmitter(defaultTimeout);
         sseRepository.save(userId, emitter);
 
         emitter.onCompletion(() -> sseRepository.deleteById(userId));
