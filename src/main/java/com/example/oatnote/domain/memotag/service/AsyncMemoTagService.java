@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
@@ -19,6 +21,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
+import com.example.oatnote.domain.memotag.service.publisher.MemoProcessingPublisher;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
@@ -36,14 +39,16 @@ public class AsyncMemoTagService {
     private final MemoTagRelationService memoTagRelationService;
     private final AiMemoTagClient aiMemoTagClient;
     private final RedissonClient redissonClient;
+    private final MemoProcessingPublisher memoEventPublisher;
 
     private static final boolean IS_LINKED_MEMO_TAG = true;
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
+    private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     @Async("AsyncMemoTagExecutor")
     public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
-        lock.lock();
+        lock.lock(20, TimeUnit.MINUTES);
         try {
             AiCreateStructureRequest aiCreateStructureRequest
                 = AiCreateStructureRequest.from(rawTags, rawMemo, userId);
@@ -55,18 +60,20 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, rawMemo.getId(), userId);
         } finally {
             lock.unlock();
+            decrementAndPublishMemoCount(userId);
         }
     }
 
     @Async("AsyncMemoTagExecutor")
     public void createStructure(String fileUrl, String userId) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
-        lock.lock();
+        lock.lock(20, TimeUnit.MINUTES);
         try {
             AiCreateStructureResponse aiCreateStructureResponse = aiMemoTagClient.createStructure(fileUrl, userId);
             processMemoTag(aiCreateStructureResponse, null, userId);
         } finally {
             lock.unlock();
+            decrementAndPublishMemoCount(userId);
         }
     }
 
@@ -122,5 +129,11 @@ public class AsyncMemoTagService {
         tagService.processTags(aiCreateStructureResponse, userId);
         memoService.createMemos(memos, userId);
         memoTagRelationService.createRelations(memoTagRelations, userId);
+    }
+
+    void decrementAndPublishMemoCount(String userId) {
+        RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
+        int memoProcessingCount = (int) memoCounter.decrementAndGet();
+        memoEventPublisher.publish(userId, memoProcessingCount);
     }
 }
