@@ -48,10 +48,10 @@ public class UserService {
     private static final int CODE_EXPIRY_MINUTES = 10;
     private static final int RE_CODE_EXPIRY_MINUTES = 30;
 
-    public void register(RegisterUserRequest registerUserRequest) {
-        String email = registerUserRequest.email();
-        String password = registerUserRequest.password();
-        String confirmPassword = registerUserRequest.confirmPassword();
+    public void register(RegisterUserRequest request) {
+        String email = request.email();
+        String password = request.password();
+        String confirmPassword = request.confirmPassword();
 
         log.info("회원가입 시도 / 이메일: {}", email);
         if (!Objects.equals(password, confirmPassword)) {
@@ -61,22 +61,22 @@ public class UserService {
             throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.");
         }
 
-        emailVerificationService.verifyCode(email, registerUserRequest.code());
+        emailVerificationService.verifyCode(email, request.code());
 
-        User user = registerUserRequest.toUser(passwordEncoder.encode(password), defaultProfileImageUrl);
+        User user = request.toUser(passwordEncoder.encode(password), defaultProfileImageUrl);
         User createdUser = userRepository.save(user);
         eventPublisher.publishEvent(new RegisterUserEvent(createdUser.getId()));
         log.info("회원가입 완료 / 이메일: {} / 유저: {}", email, createdUser.getId());
     }
 
-    public LoginUserResponse login(LoginUserRequest loginUserRequest) {
-        String email = loginUserRequest.email();
+    public LoginUserResponse login(LoginUserRequest request) {
+        String email = request.email();
         log.info("로그인 시도 / 이메일: {}", email);
 
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("이메일이 잘못 되었습니다."));
 
-        String password = loginUserRequest.password();
+        String password = request.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
@@ -87,8 +87,8 @@ public class UserService {
         return LoginUserResponse.of(accessToken, refreshToken);
     }
 
-    public RefreshUserResponse refreshAccessToken(RefreshUserRequest refreshUserRequest) {
-        String refreshToken = refreshUserRequest.refreshToken();
+    public RefreshUserResponse refreshAccessToken(RefreshUserRequest request) {
+        String refreshToken = request.refreshToken();
         jwtUtil.validateRefreshToken(refreshToken);
         String userId = jwtUtil.extractUserId(refreshToken);
         String newAccessToken = jwtUtil.generateAccessToken(userId);
@@ -97,34 +97,34 @@ public class UserService {
         return RefreshUserResponse.of(newAccessToken, refreshToken);
     }
 
-    public void checkEmailDuplication(CheckEmailDuplicationRequest checkEmailDuplicationRequest) {
-        String email = checkEmailDuplicationRequest.email();
+    public void checkEmailDuplication(CheckEmailDuplicationRequest request) {
+        String email = request.email();
         if (userRepository.findByEmail(email).isPresent()) {
             throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.", email);
         }
     }
 
-    public void sendCode(SendCodeRequest sendCodeRequest) {
-        String email = sendCodeRequest.email();
+    public void sendCode(SendCodeRequest request) {
+        String email = request.email();
         emailVerificationService.sendCode(email, CODE_EXPIRY_MINUTES);
     }
 
-    public void verifyCode(VerifyCodeRequest verifyCodeRequest) {
-        String email = verifyCodeRequest.email();
-        String code = verifyCodeRequest.code();
+    public void verifyCode(VerifyCodeRequest request) {
+        String email = request.email();
+        String code = request.code();
         emailVerificationService.verifyCode(email, code);
         emailVerificationService.insertEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
     }
 
-    public void findPassword(FindPasswordRequest findPasswordRequest) {
-        String email = findPasswordRequest.email();
-        String newPassword = findPasswordRequest.newPassword();
-        String confirmPassword = findPasswordRequest.confirmPassword();
+    public void findPassword(FindPasswordRequest request) {
+        String email = request.email();
+        String newPassword = request.newPassword();
+        String confirmPassword = request.confirmPassword();
         if (!Objects.equals(newPassword, confirmPassword)) {
             throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
 
-        String code = findPasswordRequest.code();
+        String code = request.code();
         emailVerificationService.verifyCode(email, code);
 
         User user = userRepository.findByEmail(email)
@@ -146,13 +146,13 @@ public class UserService {
         eventPublisher.publishEvent(new WithdrawUserEvent(userId));
     }
 
-    public UpdateUserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, String userId) {
+    public UpdateUserInfoResponse updateUserInfo(UpdateUserInfoRequest request, String userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", userId));
         user.update(
-            updateUserInfoRequest.email(),
-            updateUserInfoRequest.name(),
-            updateUserInfoRequest.profileImageUrl()
+            request.email(),
+            request.name(),
+            request.profileImageUrl()
         );
         User updatedUser = userRepository.save(user);
         return UpdateUserInfoResponse.from(updatedUser);
@@ -164,4 +164,3 @@ public class UserService {
             .orElseThrow(() -> OatDataNotFoundException.withDetail("유저를 찾지 못했습니다.", email));
     }
 }
-

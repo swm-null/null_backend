@@ -38,7 +38,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/register")
     ResponseEntity<Void> register(
-        @RequestBody @Valid RegisterUserRequest registerUserRequest
+        @RequestBody @Valid RegisterUserRequest request
     );
 
     @Operation(summary = "로그인")
@@ -49,7 +49,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/login")
     ResponseEntity<LoginUserResponse> login(
-        @RequestBody @Valid LoginUserRequest loginUserRequest
+        @RequestBody @Valid LoginUserRequest request
     );
 
     @Operation(summary = "액세스 토큰 갱신")
@@ -60,7 +60,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/refresh")
     ResponseEntity<RefreshUserResponse> refreshAccessToken(
-        @RequestBody @Valid RefreshUserRequest refreshUserRequest
+        @RequestBody @Valid RefreshUserRequest request
     );
 
     @Operation(summary = "이메일 중복 체크")
@@ -70,7 +70,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/checkEmail")
     ResponseEntity<Void> checkEmailDuplication(
-        @RequestBody @Valid CheckEmailDuplicationRequest checkEmailDuplicationRequest
+        @RequestBody @Valid CheckEmailDuplicationRequest request
     );
 
     @Operation(summary = "이메일 인증 코드 전송")
@@ -80,7 +80,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/sendCode")
     ResponseEntity<Void> sendCode(
-        @RequestBody @Valid SendCodeRequest sendCodeRequest
+        @RequestBody @Valid SendCodeRequest request
     );
 
     @Operation(summary = "이메일 인증 코드 확인")
@@ -91,7 +91,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/verifyCode")
     ResponseEntity<Void> verifyCode(
-        @RequestBody @Valid VerifyCodeRequest verifyCodeRequest
+        @RequestBody @Valid VerifyCodeRequest request
     );
 
     @Operation(summary = "비밀번호 찾기")
@@ -102,7 +102,7 @@ public interface UserApiDoc {
     })
     @PostMapping("/user/findPassword")
     ResponseEntity<Void> findPassword(
-        @RequestBody @Valid FindPasswordRequest findPasswordRequest
+        @RequestBody @Valid FindPasswordRequest request
     );
 
     @Operation(summary = "유저 본인 정보 조회")
@@ -126,7 +126,7 @@ public interface UserApiDoc {
     })
     @PutMapping("/user/me")
     ResponseEntity<UpdateUserInfoResponse> updateUserInfo(
-        @RequestBody @Valid UpdateUserInfoRequest updateUserInfoRequest,
+        @RequestBody @Valid UpdateUserInfoRequest request,
         @AuthenticationPrincipal String userId
     );
 

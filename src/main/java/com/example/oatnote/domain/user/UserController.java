@@ -34,57 +34,57 @@ public class UserController implements UserApiDoc {
 
     @PostMapping("/user/register")
     public ResponseEntity<Void> register(
-        @RequestBody @Valid RegisterUserRequest registerUserRequest
+        @RequestBody @Valid RegisterUserRequest request
     ) {
-        userService.register(registerUserRequest);
+        userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/user/login")
     public ResponseEntity<LoginUserResponse> login(
-        @RequestBody @Valid LoginUserRequest loginUserRequest
+        @RequestBody @Valid LoginUserRequest request
     ) {
-        LoginUserResponse loginUserResponse = userService.login(loginUserRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(loginUserResponse);
+        LoginUserResponse response = userService.login(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/user/refresh")
     public ResponseEntity<RefreshUserResponse> refreshAccessToken(
-        @RequestBody RefreshUserRequest refreshUserRequest
+        @RequestBody RefreshUserRequest request
     ) {
-        RefreshUserResponse refreshUserResponse = userService.refreshAccessToken(refreshUserRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(refreshUserResponse);
+        RefreshUserResponse response = userService.refreshAccessToken(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/user/checkEmail")
     public ResponseEntity<Void> checkEmailDuplication(
-        @RequestBody @Valid CheckEmailDuplicationRequest checkEmailDuplicationRequest
+        @RequestBody @Valid CheckEmailDuplicationRequest request
     ) {
-        userService.checkEmailDuplication(checkEmailDuplicationRequest);
+        userService.checkEmailDuplication(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/user/sendCode")
     public ResponseEntity<Void> sendCode(
-        @RequestBody @Valid SendCodeRequest sendCodeRequest
+        @RequestBody @Valid SendCodeRequest request
     ) {
-        userService.sendCode(sendCodeRequest);
+        userService.sendCode(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/user/verifyCode")
     public ResponseEntity<Void> verifyCode(
-        @RequestBody @Valid VerifyCodeRequest verifyCodeRequest
+        @RequestBody @Valid VerifyCodeRequest request
     ) {
-        userService.verifyCode(verifyCodeRequest);
+        userService.verifyCode(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/user/findPassword")
     public ResponseEntity<Void> findPassword(
-        @RequestBody @Valid FindPasswordRequest findPasswordRequest
+        @RequestBody @Valid FindPasswordRequest request
     ) {
-        userService.findPassword(findPasswordRequest);
+        userService.findPassword(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -92,17 +92,17 @@ public class UserController implements UserApiDoc {
     public ResponseEntity<UserInfoResponse> getUserInfo(
         @AuthenticationPrincipal String userId
     ) {
-        UserInfoResponse userInfoResponse = userService.getUserInfo(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(userInfoResponse);
+        UserInfoResponse response = userService.getUserInfo(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/user/me")
     public ResponseEntity<UpdateUserInfoResponse> updateUserInfo(
-        @RequestBody @Valid UpdateUserInfoRequest updateUserInfoRequest,
+        @RequestBody @Valid UpdateUserInfoRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateUserInfoResponse updateUserInfoResponse = userService.updateUserInfo(updateUserInfoRequest, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(updateUserInfoResponse);
+        UpdateUserInfoResponse response = userService.updateUserInfo(request, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/user")
