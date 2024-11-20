@@ -3,9 +3,8 @@ package com.example.oatnote.domain.memotag.eventlistener;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.example.oatnote.domain.memotag.service.MemoTagService;
 import com.example.oatnote._commons.event.RegisterUserEvent;
-import com.example.oatnote.domain.memotag.service.tag.TagService;
+import com.example.oatnote.domain.memotag.service.MemoTagService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateDefaultTagStructureEventListener {
 
-    private final TagService tagService;
     private final MemoTagService memoTagService;
 
     @EventListener

@@ -245,6 +245,7 @@ public class MemoTagService {
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }
 
+
     public MemosResponse getMemos(
         String tagId,
         Integer page,
