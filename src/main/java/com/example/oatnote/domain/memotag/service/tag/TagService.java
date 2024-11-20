@@ -16,6 +16,7 @@ import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -155,7 +156,7 @@ public class TagService {
 
     public void validateTagExist(String name, String userId) {
         if(tagRepository.existsByNameAndUserId(name, userId)) {
-            throw OatDataNotFoundException.withDetail("이미 존재하는 태그입니다.", name);
+            throw OatIllegalArgumentException.withDetail("이미 존재하는 태그입니다.", name);
         }
     }
 }
