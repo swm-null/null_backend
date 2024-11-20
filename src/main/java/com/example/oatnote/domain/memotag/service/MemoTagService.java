@@ -64,6 +64,7 @@ import com.example.oatnote.domain.memotag.service.tag.TagService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.domain.user.service.UserService;
+import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -124,6 +125,9 @@ public class MemoTagService {
     }
 
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest request, String userId) {
+        if (tagService.isTagExist(request.name(), userId)) {
+            throw OatIllegalArgumentException.withDetail("이미 존재하는 태그명입니다.", request.name());
+        }
         tagId = Objects.requireNonNullElse(tagId, userId);
         AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(request.name());
         Tag childTag = request.toTag(userId, aiCreateEmbeddingResponse.embedding());
@@ -243,7 +247,6 @@ public class MemoTagService {
 
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }
-
 
     public MemosResponse getMemos(
         String tagId,
@@ -513,7 +516,7 @@ public class MemoTagService {
 
     void incrementMemoCount(String userId) {
         RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
-        int memoProcessingCount = (int) memoCounter.incrementAndGet();
+        int memoProcessingCount = (int)memoCounter.incrementAndGet();
         memoEventPublisher.publish(userId, memoProcessingCount);
     }
 }

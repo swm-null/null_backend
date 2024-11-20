@@ -148,4 +148,8 @@ public class TagService {
         List<String> parentTagIds = reversedTagEdges.getOrDefault(currentTagId, List.of());
         getAncestorTagsUsingDFS(parentTagIds.get(0), userId, reversedTagEdges, ancestorTags, visited);
     }
+
+    public boolean isTagExist(String name, String userId) {
+        return tagRepository.existsByNameAndUserId(name, userId);
+    }
 }
