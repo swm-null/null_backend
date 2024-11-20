@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,13 +37,16 @@ public class TagService {
         TagEdge tagEdge = tagEdgeService.getTagEdge(userId);
         Map<String, List<String>> tagEdges = tagEdge.getEdges();
         Map<String, List<String>> reversedTagEdges = tagEdge.getReversedEdges();
+
+        tagEdges.putIfAbsent(tagId, new ArrayList<>());
         tagEdges.get(tagId).add(childTag.getId());
-        tagEdges.put(childTag.getId(), List.of());
+
         reversedTagEdges.put(childTag.getId(), List.of(tagId));
         tagEdgeService.updateTagEdge(tagEdge, userId);
 
         return createTag(childTag, userId);
     }
+
 
     public void createTags(List<Tag> tags, String userId) {
         log.info("태그 리스트 생성 {} / 유저: {}", tags.stream().map(Tag::getId).toList(), userId);
