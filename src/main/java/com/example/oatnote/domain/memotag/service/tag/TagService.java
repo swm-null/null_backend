@@ -153,7 +153,9 @@ public class TagService {
         getAncestorTagsUsingDFS(parentTagIds.get(0), userId, reversedTagEdges, ancestorTags, visited);
     }
 
-    public boolean isTagExist(String name, String userId) {
-        return tagRepository.existsByNameAndUserId(name, userId);
+    public void validateTagExist(String name, String userId) {
+        if(tagRepository.existsByNameAndUserId(name, userId)) {
+            throw OatDataNotFoundException.withDetail("이미 존재하는 태그입니다.", name);
+        }
     }
 }

@@ -64,7 +64,6 @@ import com.example.oatnote.domain.memotag.service.tag.TagService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.domain.user.service.UserService;
-import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
 import com.example.oatnote.web.model.Criteria;
 
 import lombok.RequiredArgsConstructor;
@@ -125,9 +124,7 @@ public class MemoTagService {
     }
 
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest request, String userId) {
-        if (tagService.isTagExist(request.name(), userId)) {
-            throw OatIllegalArgumentException.withDetail("이미 존재하는 태그명입니다.", request.name());
-        }
+        tagService.validateTagExist(request.name(), userId);
         tagId = Objects.requireNonNullElse(tagId, userId);
         AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(request.name());
         Tag childTag = request.toTag(userId, aiCreateEmbeddingResponse.embedding());
