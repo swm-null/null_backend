@@ -55,7 +55,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 생성")
     @PostMapping("/memo")
     ResponseEntity<CreateMemoResponse> createMemo(
-        @RequestBody @Valid CreateMemoRequest createMemoRequest,
+        @RequestBody @Valid CreateMemoRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -72,7 +72,7 @@ public interface MemoTagApiDoc {
     @PostMapping("/linkedMemo")
     ResponseEntity<CreateMemoResponse> createLinkedMemo(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestBody @Valid CreateMemoRequest createMemoRequest,
+        @RequestBody @Valid CreateMemoRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -87,7 +87,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "파일로 메모 리스트 생성")
     @PostMapping("/memos")
     ResponseEntity<Void> createMemos(
-        @RequestBody @Valid CreateMemosRequest createMemosRequest,
+        @RequestBody @Valid CreateMemosRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -103,7 +103,7 @@ public interface MemoTagApiDoc {
     @PostMapping("/childTag")
     ResponseEntity<CreateChildTagResponse> createChildTag(
         @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestBody @Valid CreateChildTagRequest createChildTagRequest,
+        @RequestBody @Valid CreateChildTagRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -118,7 +118,7 @@ public interface MemoTagApiDoc {
     @Operation(summary = "메모 검색 기록 생성")
     @PostMapping("/memos/search/history")
     ResponseEntity<CreateSearchHistoryResponse> createSearchHistory(
-        @RequestBody @Valid CreateSearchHistoryRequest createSearchHistoryRequest,
+        @RequestBody @Valid CreateSearchHistoryRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -249,7 +249,7 @@ public interface MemoTagApiDoc {
     @PutMapping("/memo/{memoId}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
         @PathVariable("memoId") String memoId,
-        @RequestBody @Valid UpdateMemoRequest updateMemoRequest,
+        @RequestBody @Valid UpdateMemoRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -266,7 +266,7 @@ public interface MemoTagApiDoc {
     @PutMapping("/memo/{memoId}/tags")
     ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
         @PathVariable("memoId") String memoId,
-        @RequestBody @Valid UpdateMemoTagsRequest updateMemoTagsRequest,
+        @RequestBody @Valid UpdateMemoTagsRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -282,7 +282,7 @@ public interface MemoTagApiDoc {
     @PutMapping("/tag/{tagId}")
     ResponseEntity<UpdateTagResponse> updateTag(
         @PathVariable("tagId") String tagId,
-        @RequestBody @Valid UpdateTagRequest updateTagRequest,
+        @RequestBody @Valid UpdateTagRequest request,
         @AuthenticationPrincipal String userId
     );
 

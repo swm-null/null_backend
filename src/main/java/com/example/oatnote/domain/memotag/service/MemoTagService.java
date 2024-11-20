@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -53,6 +55,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiSearchMemosUsingD
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
+import com.example.oatnote.domain.memotag.service.publisher.MemoProcessingPublisher;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
@@ -77,52 +80,63 @@ public class MemoTagService {
     private final AiMemoTagClient aiMemoTagClient;
     private final UserService userService;
     private final FilesMessageProducer filesMessageProducer;
+    private final RedissonClient redissonClient;
+    private final MemoProcessingPublisher memoEventPublisher;
 
-    public CreateMemoResponse createMemo(CreateMemoRequest createMemoRequest, String userId) {
-        AiCreateTagsRequest aiCreateTagsRequest = createMemoRequest.toAiCreateMemoRequest(userId);
+    private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
+
+    public CreateMemoResponse createMemo(CreateMemoRequest request, String userId) {
+        incrementMemoCount(userId); //todo refactor
+
+        AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
-        Memo rawMemo = createMemoRequest.toRawMemo(userId, aiCreateTagsResponse.metadata());
+        Memo rawMemo = request.toRawMemo(userId, aiCreateTagsResponse.metadata());
         List<RawTag> rawTags = aiCreateTagsResponse.tags();
         asyncMemoTagService.createStructure(rawTags, rawMemo, userId);
 
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
-    public CreateMemoResponse createLinkedMemo(String tagId, CreateMemoRequest createMemoRequest, String userId) {
+    public CreateMemoResponse createLinkedMemo(String tagId, CreateMemoRequest request, String userId) {
+        incrementMemoCount(userId); //todo refactor
+
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
         AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
-            createMemoRequest.content(),
-            createMemoRequest.imageUrls(),
-            createMemoRequest.voiceUrls()
+            request.content(),
+            request.imageUrls(),
+            request.voiceUrls()
         );
-        Memo rawMemo = createMemoRequest.toRawMemo(userId, aiCreateMetadataResponse.metadata());
+        Memo rawMemo = request.toRawMemo(userId, aiCreateMetadataResponse.metadata());
         RawTag rawTag = new RawTag(tag.getId(), tag.getName(), false);
         asyncMemoTagService.createStructure(List.of(rawTag), rawMemo, userId);
 
         return CreateMemoResponse.from(rawMemo, List.of(rawTag));
     }
 
-    public void createMemos(CreateMemosRequest createMemosRequest, String userId) {
-        userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(createMemosRequest.email()));
-        asyncMemoTagService.createStructure(createMemosRequest.fileUrl(), userId);
+    public void createMemos(CreateMemosRequest request, String userId) {
+        incrementMemoCount(userId); //todo refactor
+
+        userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(request.email()));
+        asyncMemoTagService.createStructure(request.fileUrl(), userId);
     }
 
-    public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest createChildTagRequest, String userId) {
+    public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest request, String userId) {
+        tagService.validateTagExist(request.name(), userId);
         tagId = Objects.requireNonNullElse(tagId, userId);
-        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(createChildTagRequest.name());
-        Tag childTag = createChildTagRequest.toTag(userId, aiCreateEmbeddingResponse.embedding());
+        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(request.name());
+        Tag childTag = request.toTag(userId, aiCreateEmbeddingResponse.embedding());
         Tag createdChildTag = tagService.createChildTag(tagId, childTag, userId);
         return CreateChildTagResponse.from(createdChildTag);
     }
 
     public CreateSearchHistoryResponse createSearchHistory(
-        CreateSearchHistoryRequest createSearchHistoryRequest,
+        CreateSearchHistoryRequest request,
         String userId
     ) {
-        SearchHistory searchHistory = createSearchHistoryRequest.toSearchHistory(userId);
+        SearchHistory searchHistory = request.toSearchHistory(userId);
         SearchHistory createdSearchHistory = searchHistoryService.createSearchHistory(searchHistory);
         return CreateSearchHistoryResponse.from(createdSearchHistory);
     }
@@ -282,10 +296,10 @@ public class MemoTagService {
         return SearchMemosUsingDbResponse.from(memoResponses);
     }
 
-    public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest updateMemoRequest, String userId) {
-        String updatedContent = updateMemoRequest.content();
-        List<String> updatedImageUrls = updateMemoRequest.imageUrls();
-        List<String> updatedVoiceUrls = updateMemoRequest.voiceUrls();
+    public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest request, String userId) {
+        String updatedContent = request.content();
+        List<String> updatedImageUrls = request.imageUrls();
+        List<String> updatedVoiceUrls = request.voiceUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
 
@@ -324,28 +338,30 @@ public class MemoTagService {
         return UpdateMemoResponse.from(memoResponse);
     }
 
-    public UpdateTagResponse updateTag(String tagId, UpdateTagRequest updateTagRequest, String userId) {
-        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updateTagRequest.name());
+    public UpdateTagResponse updateTag(String tagId, UpdateTagRequest request, String userId) {
+        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(request.name());
         Tag tag = tagService.getTag(tagId, userId);
-        tag.update(updateTagRequest.name(), aiCreateEmbeddingResponse.embedding());
+        tag.update(request.name(), aiCreateEmbeddingResponse.embedding());
         Tag updatedTag = tagService.updateTag(tag);
         return UpdateTagResponse.from(updatedTag);
     }
 
     public UpdateMemoTagsResponse updateMemoTags(
         String memoId,
-        UpdateMemoTagsRequest updateMemoTagsRequest,
+        UpdateMemoTagsRequest request,
         String userId
     ) {
-        AiCreateTagsRequest aiCreateTagsRequest = updateMemoTagsRequest.toAiCreateMemoRequest(userId);
+        incrementMemoCount(userId); //todo refactor
+
+        AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
         Memo memo = memoService.getMemo(memoId, userId);
-        processDeletedFiles(memo, updateMemoTagsRequest.imageUrls(), updateMemoTagsRequest.voiceUrls(), userId);
+        processDeletedFiles(memo, request.imageUrls(), request.voiceUrls(), userId);
         memo.update(
-            updateMemoTagsRequest.content(),
-            updateMemoTagsRequest.imageUrls(),
-            updateMemoTagsRequest.voiceUrls(),
+            request.content(),
+            request.imageUrls(),
+            request.voiceUrls(),
             aiCreateTagsResponse.metadata()
         );
         List<RawTag> rawTags = aiCreateTagsResponse.tags();
@@ -494,5 +510,11 @@ public class MemoTagService {
         if (!fileUrls.isEmpty()) {
             filesMessageProducer.sendDeleteFilesRequest(fileUrls, userId);
         }
+    }
+
+    void incrementMemoCount(String userId) {
+        RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
+        int memoProcessingCount = (int)memoCounter.incrementAndGet();
+        memoEventPublisher.publish(userId, memoProcessingCount);
     }
 }

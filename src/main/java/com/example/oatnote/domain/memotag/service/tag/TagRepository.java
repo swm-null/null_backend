@@ -18,9 +18,9 @@ public interface TagRepository extends MongoRepository<Tag, String> {
 
     List<Tag> findByIdInAndUserIdOrderByUpdatedAtDesc(List<String> tagIds, String userId);
 
-    List<Tag> findByIdInAndUserIdOrderByUpdatedAtDesc(Set<String> tagIds, String userId);
-
     void deleteByIdInAndUserId(Set<String> tagIds, String userId);
 
     void deleteByUserId(String userId);
+
+    boolean existsByNameAndUserId(String name, String userId);
 }

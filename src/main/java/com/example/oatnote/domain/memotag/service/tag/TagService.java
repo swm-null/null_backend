@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service.tag;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.example.oatnote.domain.memotag.service.tag.edge.TagEdgeService;
 import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
+import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +38,16 @@ public class TagService {
         TagEdge tagEdge = tagEdgeService.getTagEdge(userId);
         Map<String, List<String>> tagEdges = tagEdge.getEdges();
         Map<String, List<String>> reversedTagEdges = tagEdge.getReversedEdges();
+
+        tagEdges.putIfAbsent(tagId, new ArrayList<>());
         tagEdges.get(tagId).add(childTag.getId());
-        tagEdges.put(childTag.getId(), List.of());
+
         reversedTagEdges.put(childTag.getId(), List.of(tagId));
         tagEdgeService.updateTagEdge(tagEdge, userId);
 
         return createTag(childTag, userId);
     }
+
 
     public void createTags(List<Tag> tags, String userId) {
         log.info("태그 리스트 생성 {} / 유저: {}", tags.stream().map(Tag::getId).toList(), userId);
@@ -147,5 +152,11 @@ public class TagService {
 
         List<String> parentTagIds = reversedTagEdges.getOrDefault(currentTagId, List.of());
         getAncestorTagsUsingDFS(parentTagIds.get(0), userId, reversedTagEdges, ancestorTags, visited);
+    }
+
+    public void validateTagExist(String name, String userId) {
+        if(tagRepository.existsByNameAndUserId(name, userId)) {
+            throw OatIllegalArgumentException.withDetail("이미 존재하는 태그입니다.", name);
+        }
     }
 }
