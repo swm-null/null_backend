@@ -294,40 +294,19 @@ public class MemoTagService {
 
     @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest request, String userId) {
-        String updatedContent = request.content();
-        List<String> updatedImageUrls = request.imageUrls();
-        List<String> updatedVoiceUrls = request.voiceUrls();
+        String content = request.content();
+        List<String> imageUrls = request.imageUrls();
+        List<String> voiceUrls = request.voiceUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
 
-        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = null;
-
-        boolean isContentChanged = !updatedContent.equals(memo.getContent());
-        if (isContentChanged) {
-            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updatedContent);
-        }
-
-        AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
-            updatedContent,
-            updatedImageUrls,
-            updatedVoiceUrls
-        );
-        List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
-            ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
-        String metadata = Objects.nonNull(aiCreateMetadataResponse)
-            ? aiCreateMetadataResponse.metadata() : memo.getMetadata();
-        List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
-            ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
-
-        processDeletedFiles(memo, updatedImageUrls, updatedVoiceUrls, userId);
+        processDeletedFiles(memo, imageUrls, voiceUrls, userId);
+        asyncMemoTagService.updateEmbeddingAndMetadata(memo, content, imageUrls, voiceUrls, userId);
 
         memo.update(
-            updatedContent,
-            updatedImageUrls,
-            updatedVoiceUrls,
-            metadata,
-            embedding,
-            embeddingMetadata
+            content,
+            imageUrls,
+            voiceUrls
         );
         Memo updatedMemo = memoService.updateMemo(memo);
         MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo.getId()), userId).get(0);

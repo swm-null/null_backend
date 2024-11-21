@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.client.AiMemoTagClient;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateEmbeddingResponse;
+import com.example.oatnote.domain.memotag.service.client.dto.AiCreateMetadataResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRequest;
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
@@ -128,5 +131,39 @@ public class AsyncMemoTagService {
         tagService.processTags(aiCreateStructureResponse, userId);
         memoService.createMemos(memos, userId);
         memoTagRelationService.createRelations(memoTagRelations, userId);
+    }
+
+    public void updateEmbeddingAndMetadata(
+        Memo memo,
+            String content,
+        List<String> imageUrls,
+        List<String> voiceUrls,
+        String userId
+    ) {
+        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = null;
+
+        boolean isContentChanged = !content.equals(memo.getContent());
+        if (isContentChanged) {
+            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(content);
+        }
+
+        AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
+            content,
+            imageUrls,
+            voiceUrls
+        );
+        List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
+            ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
+        String metadata = Objects.nonNull(aiCreateMetadataResponse)
+            ? aiCreateMetadataResponse.metadata() : memo.getMetadata();
+        List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
+            ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
+
+        memo.update(
+            embedding,
+            embeddingMetadata,
+            metadata
+        );
+        memoService.updateMemo(memo);
     }
 }
