@@ -54,12 +54,12 @@ public class ProcessingMemoCountAspect {
 
     @AfterThrowing("@annotation(annotation)")
     public void handleException(ProcessingMemoCount annotation) {
+        String userId = AuthenticationContextHelper.getUserId();
         if (annotation.action() == ActionType.INCREMENT) {
-            String userId = AuthenticationContextHelper.getUserId();
             RAtomicLong memoCounter = redissonClient.getAtomicLong(PROCESSING_MEMOS_COUNT_KEY_PREFIX + userId);
             memoCounter.decrementAndGet();
             log.warn("Exception occurred. Decremented processing memo count for userId: {}", userId);
-            sseMessageProducer.publishProcessingMemosCount(userId);
         }
+        sseMessageProducer.publishProcessingMemosCount(userId);
     }
 }
