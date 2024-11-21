@@ -3,6 +3,7 @@ package com.example.oatnote.domain.memotag.service;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -88,7 +89,7 @@ public class MemoTagService {
     private static final String PROCESSING_MEMOS_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     public CreateMemoResponse createMemo(CreateMemoRequest request, String userId) {
-        incrementProcessingMemosCount(userId); //todo refactor
+        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
 
         AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
@@ -101,7 +102,7 @@ public class MemoTagService {
     }
 
     public CreateMemoResponse createLinkedMemo(String tagId, CreateMemoRequest request, String userId) {
-        incrementProcessingMemosCount(userId); //todo refactor
+        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
 
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
@@ -119,7 +120,7 @@ public class MemoTagService {
     }
 
     public void createMemos(CreateMemosRequest request, String userId) {
-        incrementProcessingMemosCount(userId); //todo refactor
+        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
 
         userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(request.email()));
         asyncMemoTagService.createStructure(request.fileUrl(), userId);
@@ -352,7 +353,7 @@ public class MemoTagService {
         UpdateMemoTagsRequest request,
         String userId
     ) {
-        incrementProcessingMemosCount(userId); //todo refactor
+        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
 
         AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
@@ -513,9 +514,10 @@ public class MemoTagService {
         }
     }
 
-    void incrementProcessingMemosCount(String userId) {
+    void incrementAndPublishSendProcessingMemosCount(String userId) {
         RAtomicLong memoCounter = redissonClient.getAtomicLong(PROCESSING_MEMOS_COUNT_KEY_PREFIX + userId);
         memoCounter.incrementAndGet();
+        memoCounter.expire(Instant.now().plusSeconds(3600));
         sseMessageProducer.publishProcessingMemosCount(userId);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -60,7 +61,7 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, rawMemo.getId(), userId);
         } finally {
             lock.unlock();
-            decrementAndPublishProcessingMemoCount(userId);
+            decrementAndPublishSendProcessingMemoCount(userId);
         }
     }
 
@@ -73,7 +74,7 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, null, userId);
         } finally {
             lock.unlock();
-            decrementAndPublishProcessingMemoCount(userId);
+            decrementAndPublishSendProcessingMemoCount(userId);
         }
     }
 
@@ -131,9 +132,10 @@ public class AsyncMemoTagService {
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
-    void decrementAndPublishProcessingMemoCount(String userId) {
+    void decrementAndPublishSendProcessingMemoCount(String userId) {
         RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
         memoCounter.decrementAndGet();
+        memoCounter.expire(Instant.now().plusSeconds(3600));
         sseMessageProducer.publishProcessingMemosCount(userId);
     }
 }

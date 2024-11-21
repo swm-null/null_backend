@@ -19,13 +19,10 @@ public class SseService {
     private final SseRepository sseRepository;
     private final RedissonClient redissonClient;
 
-    @Value("${sse.timeout}")
-    private Long defaultTimeout;
-
     private static final String PROCESSING_MEMOS_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     public SseEmitter subscribe(String userId) {
-        SseEmitter emitter = new SseEmitter(defaultTimeout);
+        SseEmitter emitter = new SseEmitter(3600000L);
         sseRepository.save(userId, emitter);
 
         sendProcessingMemosCountToUser(userId);
