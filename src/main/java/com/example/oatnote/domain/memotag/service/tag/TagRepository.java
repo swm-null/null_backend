@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
@@ -16,7 +17,7 @@ public interface TagRepository extends MongoRepository<Tag, String> {
 
     Page<Tag> findByIdInAndUserId(List<String> tagIds, String userId, Pageable pageable);
 
-    List<Tag> findByIdInAndUserIdOrderByUpdatedAtDesc(List<String> tagIds, String userId);
+    List<Tag> findByIdInAndUserId(List<String> tagIds, String userId, Sort sort);
 
     void deleteByIdInAndUserId(Set<String> tagIds, String userId);
 

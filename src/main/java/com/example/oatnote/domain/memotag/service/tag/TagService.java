@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureResponse;
@@ -60,7 +61,8 @@ public class TagService {
     }
 
     public List<Tag> getTags(List<String> tagIds, String userId) {
-        return tagRepository.findByIdInAndUserIdOrderByUpdatedAtDesc(tagIds, userId);
+        Sort sort = Sort.by(Sort.Direction.ASC, "name");
+        return tagRepository.findByIdInAndUserId(tagIds, userId, sort);
     }
 
     public Page<Tag> getTags(List<String> tagIds, String userId, Pageable pageable) {
