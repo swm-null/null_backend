@@ -301,7 +301,7 @@ public class MemoTagService {
         Memo memo = memoService.getMemo(memoId, userId);
 
         processDeletedFiles(memo, imageUrls, voiceUrls, userId);
-        asyncMemoTagService.updateEmbeddingAndMetadata(memo, content, imageUrls, voiceUrls, userId);
+        asyncMemoTagService.updateEmbeddingAndMetadata(memo, content, imageUrls, voiceUrls);
 
         memo.update(
             content,
