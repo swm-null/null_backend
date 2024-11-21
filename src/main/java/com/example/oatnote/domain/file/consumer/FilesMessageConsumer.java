@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.file.rabbitmq;
+package com.example.oatnote.domain.file.consumer;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;

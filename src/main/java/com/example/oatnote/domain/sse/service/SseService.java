@@ -5,6 +5,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,15 +18,13 @@ public class SseService {
     @Value("${sse.timeout}")
     private Long defaultTimeout;
 
-    private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
+    private static final String PROCESSING_MEMOS_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     public SseEmitter subscribe(String userId) {
         SseEmitter emitter = new SseEmitter(defaultTimeout);
         sseRepository.save(userId, emitter);
 
-        RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
-        int memoProcessingCount = (int) memoCounter.get();
-        sendMemoProcessingCountToUser(userId, memoProcessingCount);
+        sendProcessingMemosCountToUser(userId);
 
         emitter.onCompletion(() -> sseRepository.deleteById(userId));
         emitter.onTimeout(() -> sseRepository.deleteById(userId));
@@ -33,7 +32,10 @@ public class SseService {
         return emitter;
     }
 
-    public void sendMemoProcessingCountToUser(String userId, int memoProcessingCount) {
+    public void sendProcessingMemosCountToUser(String userId) {
+        RAtomicLong memoCounter = redissonClient.getAtomicLong(PROCESSING_MEMOS_COUNT_KEY_PREFIX + userId);
+        int memoProcessingCount = (int)memoCounter.get();
+
         SseEmitter emitter = sseRepository.findById(userId);
         if (emitter != null) {
             try {

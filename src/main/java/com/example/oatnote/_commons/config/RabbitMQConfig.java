@@ -1,9 +1,9 @@
-package com.example.oatnote._commons.config;
+package com.example.oatnote.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,25 +19,34 @@ public class RabbitMQConfig {
     private String fileExchangeName;
 
     @Value("${spring.rabbitmq.queues.file.delete.queue}")
-    private String deleteFileQueueName;
+    private String fileDeleteQueueName;
 
     @Value("${spring.rabbitmq.queues.file.delete.routing-key}")
-    private String deleteFileRoutingKey;
+    private String fileDeleteRoutingKey;
 
     @Value("${spring.rabbitmq.queues.file.delete-all.queue}")
-    private String deleteAllFilesQueueName;
+    private String fileDeleteAllQueueName;
 
     @Value("${spring.rabbitmq.queues.file.delete-all.routing-key}")
-    private String deleteAllFilesRoutingKey;
+    private String fileDeleteAllRoutingKey;
+
+    @Value("${spring.rabbitmq.queues.sse.exchange}")
+    private String sseExchangeName;
+
+    @Value("${spring.rabbitmq.queues.sse.send-processing-memos-count.queue}")
+    private String sseSendProcessingMemosCountQueueName;
+
+    @Value("${spring.rabbitmq.queues.sse.send-processing-memos-count.routing-key}")
+    private String sseSendProcessingMemosCountRoutingKey;
 
     @Value("${spring.rabbitmq.queues.dlx.exchange}")
     private String dlxExchangeName;
 
-    @Value("${spring.rabbitmq.queues.dlx.routing-key}")
-    private String dlxRoutingKey;
-
     @Value("${spring.rabbitmq.queues.dlx.queue}")
     private String dlxQueueName;
+
+    @Value("${spring.rabbitmq.queues.dlx.routing-key}")
+    private String dlxRoutingKey;
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
@@ -55,37 +64,54 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public TopicExchange fileTopicExchange() {
-        return new TopicExchange(fileExchangeName, true, false);
+    public DirectExchange fileExchange() {
+        return new DirectExchange(fileExchangeName, true, false);
     }
 
     @Bean
-    public Queue deleteFileQueue() {
-        return new Queue(deleteFileQueueName, true);
+    public Queue fileDeleteQueue() {
+        return new Queue(fileDeleteQueueName, true);
     }
 
     @Bean
-    public Queue deleteAllFilesQueue() {
-        return new Queue(deleteAllFilesQueueName, true);
+    public Binding fileDeleteBinding(Queue fileDeleteQueue, DirectExchange fileExchange) {
+        return BindingBuilder.bind(fileDeleteQueue)
+            .to(fileExchange)
+            .with(fileDeleteRoutingKey);
     }
 
     @Bean
-    public Binding deleteFileBinding(Queue deleteFileQueue, TopicExchange fileTopicExchange) {
-        return BindingBuilder.bind(deleteFileQueue)
-            .to(fileTopicExchange)
-            .with(deleteFileRoutingKey);
+    public Queue fileDeleteAllQueue() {
+        return new Queue(fileDeleteAllQueueName, true);
     }
 
     @Bean
-    public Binding deleteAllFilesBinding(Queue deleteAllFilesQueue, TopicExchange fileTopicExchange) {
-        return BindingBuilder.bind(deleteAllFilesQueue)
-            .to(fileTopicExchange)
-            .with(deleteAllFilesRoutingKey);
+    public Binding fileDeleteAllBinding(Queue fileDeleteAllQueue, DirectExchange fileExchange) {
+        return BindingBuilder.bind(fileDeleteAllQueue)
+            .to(fileExchange)
+            .with(fileDeleteAllRoutingKey);
     }
 
     @Bean
-    public TopicExchange dlxTopicExchange() {
-        return new TopicExchange(dlxExchangeName, true, false);
+    public DirectExchange sseExchange() {
+        return new DirectExchange(sseExchangeName, true, false);
+    }
+
+    @Bean
+    public Queue sseSendProcessingMemosCountQueue() {
+        return new Queue(sseSendProcessingMemosCountQueueName, true);
+    }
+
+    @Bean
+    public Binding sseSendProcessingMemosCountBinding(Queue sseSendProcessingMemosCountQueue, DirectExchange sseExchange) {
+        return BindingBuilder.bind(sseSendProcessingMemosCountQueue)
+            .to(sseExchange)
+            .with(sseSendProcessingMemosCountRoutingKey);
+    }
+
+    @Bean
+    public DirectExchange dlxExchange() {
+        return new DirectExchange(dlxExchangeName, true, false);
     }
 
     @Bean
@@ -94,9 +120,9 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding dlxBinding(Queue dlxQueue, TopicExchange dlxTopicExchange) {
+    public Binding dlxBinding(Queue dlxQueue, DirectExchange dlxExchange) {
         return BindingBuilder.bind(dlxQueue)
-            .to(dlxTopicExchange)
+            .to(dlxExchange)
             .with(dlxRoutingKey);
     }
 }

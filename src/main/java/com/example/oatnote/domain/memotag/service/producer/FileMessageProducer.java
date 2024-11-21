@@ -1,4 +1,4 @@
-package com.example.oatnote.domain.memotag.rabbitmq;
+package com.example.oatnote.domain.memotag.service.producer;
 
 import java.util.List;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class FilesMessageProducer {
+public class FileMessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -40,7 +40,7 @@ public class FilesMessageProducer {
         maxAttempts = 2,
         backoff = @Backoff(delay = 1000)
     )
-    public void sendDeleteFilesRequest(List<String> fileUrls, String userId) {
+    public void publishDeleteFiles(List<String> fileUrls, String userId) {
         log.info("Producing RabbitMQ delete files request. userId: {}", userId);
         DeleteFilesMessage deleteFilesMessage = DeleteFilesMessage.of(fileUrls, userId);
         rabbitTemplate.convertAndSend(fileExchangeName, deleteFileRoutingKey, deleteFilesMessage);
@@ -51,7 +51,7 @@ public class FilesMessageProducer {
         maxAttempts = 2,
         backoff = @Backoff(delay = 1000)
     )
-    public void sendDeleteAllFilesRequest(String userId) {
+    public void handleFailureToDLX(String userId) {
         log.info("Producing RabbitMQ delete all files request. userId: {}", userId);
         DeleteAllFilesMessage deleteAllFilesMessage = DeleteAllFilesMessage.of(userId);
         rabbitTemplate.convertAndSend(fileExchangeName, deleteAllFilesRoutingKey, deleteAllFilesMessage);
