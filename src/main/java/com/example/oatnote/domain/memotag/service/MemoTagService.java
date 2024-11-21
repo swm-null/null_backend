@@ -340,6 +340,9 @@ public class MemoTagService {
         );
         Memo updatedMemo = memoService.updateMemo(memo);
         MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo.getId()), userId).get(0);
+
+        sseMessageProducer.publishProcessingMemosCount(userId); //todo refactor
+
         return UpdateMemoResponse.from(memoResponse);
     }
 
@@ -348,6 +351,9 @@ public class MemoTagService {
         Tag tag = tagService.getTag(tagId, userId);
         tag.update(request.name(), aiCreateEmbeddingResponse.embedding());
         Tag updatedTag = tagService.updateTag(tag);
+
+        sseMessageProducer.publishProcessingMemosCount(userId); //todo refactor
+
         return UpdateTagResponse.from(updatedTag);
     }
 
@@ -382,18 +388,20 @@ public class MemoTagService {
         sendDeleteFilesRequest(fileUrls, userId);
         memoTagRelationService.deleteRelationsByMemoId(memoId, userId);
         memoService.deleteMemo(memoId, userId);
+
+        sseMessageProducer.publishProcessingMemosCount(userId); //todo refactor
     }
 
     public void deleteTag(String tagId, String userId) {
         List<String> memoIds = memoTagRelationService.getMemoIds(tagId, userId);
-        memoService.deleteMemos(memoIds, userId);
-
         List<String> fileUrls = memoService.getFileUrls(memoIds, userId);
+
+        memoService.deleteMemos(memoIds, userId);
         fileMessageProducer.publishDeleteFiles(fileUrls, userId);
-
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
-
         deleteTagAndDescendants(tagId, userId);
+
+        sseMessageProducer.publishProcessingMemosCount(userId); //todo refactor
     }
 
     public void deleteUserAllData(String userId) {
