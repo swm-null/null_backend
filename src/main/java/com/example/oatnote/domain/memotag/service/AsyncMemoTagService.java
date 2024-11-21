@@ -1,6 +1,5 @@
 package com.example.oatnote.domain.memotag.service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,7 +10,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.redisson.api.RAtomicLong;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
@@ -23,7 +21,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
-import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.tag.TagService;

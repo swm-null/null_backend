@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -55,7 +54,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.producer.FileMessageProducer;
-import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
@@ -121,6 +119,7 @@ public class MemoTagService {
         asyncMemoTagService.createStructure(request.fileUrl(), userId);
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest request, String userId) {
         tagService.validateTagExist(request.name(), userId);
         tagId = Objects.requireNonNullElse(tagId, userId);
@@ -313,7 +312,6 @@ public class MemoTagService {
             updatedImageUrls,
             updatedVoiceUrls
         );
-
         List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
             ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
         String metadata = Objects.nonNull(aiCreateMetadataResponse)
