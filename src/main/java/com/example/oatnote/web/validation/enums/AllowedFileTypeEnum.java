@@ -20,7 +20,7 @@ public enum AllowedFileTypeEnum {
         "mp3", List.of("audio/mpeg"),
         "mpeg", List.of("audio/mpeg"),
         "mpga", List.of("audio/mpeg"),
-        "m4a", List.of("audio/mp4"),
+        "m4a", List.of("audio/m4a"),
         "wav", List.of("audio/wav"),
         "webm", List.of("audio/webm", "video/webm"),
         "mp4", List.of("video/mp4"),
