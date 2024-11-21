@@ -2,6 +2,7 @@ package com.example.oatnote.domain.memotag.service.memo.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -61,7 +62,7 @@ public class Memo {
         this.updatedAt = LocalDateTime.now();
     }
 
-    private Memo(
+    public Memo(
         String id,
         String content,
         List<String> imageUrls,
@@ -70,10 +71,9 @@ public class Memo {
         String metadata,
         List<Double> embedding,
         List<Double> embeddingMetadata,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime time
     ) {
-        this.id = id != null ? id : UUID.randomUUID().toString();
+        this.id = Objects.requireNonNullElse(id, UUID.randomUUID().toString());
         this.content = content;
         this.imageUrls = imageUrls;
         this.voiceUrls = voiceUrls;
@@ -81,33 +81,8 @@ public class Memo {
         this.metadata = metadata;
         this.embedding = embedding;
         this.embeddingMetadata = embeddingMetadata;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public static Memo of(
-        String memoId,
-        String content,
-        List<String> imageUrls,
-        List<String> voiceUrls,
-        String userId,
-        String metadata,
-        List<Double> embedding,
-        List<Double> embeddingMetadata,
-        LocalDateTime timestamp
-    ) {
-        return new Memo(
-            memoId,
-            content,
-            imageUrls,
-            voiceUrls,
-            userId,
-            metadata,
-            embedding,
-            embeddingMetadata,
-            timestamp,
-            timestamp
-        );
+        this.createdAt = Objects.requireNonNullElse(createdAt, time);
+        this.updatedAt = time;
     }
 
     public void update(
