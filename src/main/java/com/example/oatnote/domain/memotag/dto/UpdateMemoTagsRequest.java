@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.example.oatnote.domain.memotag.service.client.dto.AiCreateTagsRequest;
 import com.example.oatnote.web.validation.AllowedFileType;
+import com.example.oatnote.web.validation.MemoAtLeastOneRequired;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -16,10 +17,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @JsonNaming(SnakeCaseStrategy.class)
+@MemoAtLeastOneRequired
 public record UpdateMemoTagsRequest(
     @Schema(description = "업데이트할 내용", example = "내일 5시로 멘토링이 변경되었다.", requiredMode = REQUIRED)
     @NotNull(message = "내용은 null일 수 없습니다.")
-    @Size(max = 2000, message = "내용은 최대 2000자까지 입력 가능합니다.")
+    @Size(max = 1000, message = "내용은 최대 1000자까지 입력 가능합니다.")
     String content,
 
     @Schema(
