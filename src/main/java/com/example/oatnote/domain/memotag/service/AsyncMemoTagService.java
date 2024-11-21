@@ -1,5 +1,6 @@
 package com.example.oatnote.domain.memotag.service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,7 +22,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
-import com.example.oatnote.domain.memotag.service.publisher.MemoProcessingPublisher;
+import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
@@ -39,7 +40,7 @@ public class AsyncMemoTagService {
     private final MemoTagRelationService memoTagRelationService;
     private final AiMemoTagClient aiMemoTagClient;
     private final RedissonClient redissonClient;
-    private final MemoProcessingPublisher memoEventPublisher;
+    private final SseMessageProducer sseMessageProducer;
 
     private static final boolean IS_LINKED_MEMO_TAG = true;
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
@@ -60,7 +61,7 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, rawMemo.getId(), userId);
         } finally {
             lock.unlock();
-            decrementAndPublishMemoCount(userId);
+            decrementAndPublishSendProcessingMemoCount(userId);
         }
     }
 
@@ -73,7 +74,7 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, null, userId);
         } finally {
             lock.unlock();
-            decrementAndPublishMemoCount(userId);
+            decrementAndPublishSendProcessingMemoCount(userId);
         }
     }
 
@@ -131,9 +132,10 @@ public class AsyncMemoTagService {
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
-    void decrementAndPublishMemoCount(String userId) {
+    void decrementAndPublishSendProcessingMemoCount(String userId) {
         RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
-        int memoProcessingCount = (int) memoCounter.decrementAndGet();
-        memoEventPublisher.publish(userId, memoProcessingCount);
+        memoCounter.decrementAndGet();
+        memoCounter.expire(Instant.now().plusSeconds(3600));
+        sseMessageProducer.publishProcessingMemosCount(userId);
     }
 }
