@@ -45,7 +45,7 @@ public class AsyncMemoTagService {
 
     private static final boolean IS_LINKED_MEMO_TAG = true;
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
-    private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
+    private static final String PROCESSING_MEMOS_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     @Async("AsyncMemoTagExecutor")
     public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId, LocalDateTime time) {
@@ -134,7 +134,7 @@ public class AsyncMemoTagService {
     }
 
     void decrementAndPublishSendProcessingMemoCount(String userId) {
-        RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
+        RAtomicLong memoCounter = redissonClient.getAtomicLong(PROCESSING_MEMOS_COUNT_KEY_PREFIX + userId);
         memoCounter.decrementAndGet();
         memoCounter.expire(Instant.now().plusSeconds(3600));
         sseMessageProducer.publishProcessingMemosCount(userId);
