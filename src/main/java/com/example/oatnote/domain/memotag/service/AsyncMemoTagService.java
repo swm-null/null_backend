@@ -134,13 +134,7 @@ public class AsyncMemoTagService {
     }
 
     @Async("AsyncMemoTagExecutor")
-    public void updateEmbeddingAndMetadata(
-        Memo memo,
-            String content,
-        List<String> imageUrls,
-        List<String> voiceUrls,
-        String userId
-    ) {
+    public void updateEmbeddingAndMetadata(Memo memo, String content, List<String> imageUrls, List<String> voiceUrls) {
         AiCreateEmbeddingResponse aiCreateEmbeddingResponse = null;
 
         boolean isContentChanged = !content.equals(memo.getContent());
@@ -161,9 +155,12 @@ public class AsyncMemoTagService {
             ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
 
         memo.update(
+            content,
+            imageUrls,
+            voiceUrls,
+            metadata,
             embedding,
-            embeddingMetadata,
-            metadata
+            embeddingMetadata
         );
         memoService.updateMemo(memo);
     }

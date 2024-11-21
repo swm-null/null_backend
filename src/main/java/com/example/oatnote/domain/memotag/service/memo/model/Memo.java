@@ -99,20 +99,23 @@ public class Memo {
     }
 
     public void update(
-        String updatedContent,
-        List<String> updatedImageUrls,
-        List<String> updatedVoiceUrls
+        String content,
+        List<String> imageUrls,
+        List<String> voiceUrls
     ) {
-        this.content = updatedContent;
-        this.imageUrls = updatedImageUrls;
-        this.voiceUrls = updatedVoiceUrls;
+        this.content = content;
+        this.imageUrls = imageUrls;
+        this.voiceUrls = voiceUrls;
         this.updatedAt = LocalDateTime.now();
     }
 
     public void update(
+        String content,
+        List<String> imageUrls,
+        List<String> voiceUrls,
+        String metadata,
         List<Double> embedding,
-        List<Double> embeddingMetadata,
-        String metadata
+        List<Double> embeddingMetadata
     ) {
         this.metadata = metadata;
         this.embedding = embedding;

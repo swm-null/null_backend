@@ -11,16 +11,15 @@ import com.example.oatnote.web.validation.enums.AllowedFileTypeEnum;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class AllowedFileTypeValidator implements ConstraintValidator<AllowedFileType, Object> {
 
-    private Set<AllowedFileTypeEnum> allowedTypes;
+    private Set<String> allowedExtensions;
 
     @Override
     public void initialize(AllowedFileType constraintAnnotation) {
-        allowedTypes = Arrays.stream(constraintAnnotation.value())
+        allowedExtensions = Arrays.stream(constraintAnnotation.value())
+            .flatMap(type -> type.getExtensions().stream())
             .collect(Collectors.toSet());
     }
 
@@ -42,8 +41,7 @@ public class AllowedFileTypeValidator implements ConstraintValidator<AllowedFile
 
     private boolean isValidFile(MultipartFile file) {
         String fileExtension = getFileExtension(file.getOriginalFilename());
-        String mimeType = file.getContentType();
-        return !file.isEmpty() && isValidExtension(fileExtension) && isValidMimeType(fileExtension, mimeType);
+        return !file.isEmpty() && isValidExtension(fileExtension);
     }
 
     private boolean isValidList(List<?> list) {
@@ -52,23 +50,13 @@ public class AllowedFileTypeValidator implements ConstraintValidator<AllowedFile
         }
 
         return list.stream().allMatch(item ->
-            (item instanceof String && isValidExtension(getFileExtension((String)item))) ||
-                (item instanceof MultipartFile && isValidFile((MultipartFile)item))
+            (item instanceof String && isValidExtension(getFileExtension((String) item))) ||
+                (item instanceof MultipartFile && isValidFile((MultipartFile) item))
         );
     }
 
     private boolean isValidExtension(String fileExtension) {
-        return fileExtension != null && allowedTypes.stream()
-            .anyMatch(type -> type.getFileTypes().containsKey(fileExtension));
-    }
-
-    private boolean isValidMimeType(String fileExtension, String mimeType) {
-        return fileExtension != null && mimeType != null && allowedTypes.stream()
-            .anyMatch(type -> {
-                List<String> allowedMimeTypes = type.getFileTypes().get(fileExtension);
-                return allowedMimeTypes != null && allowedMimeTypes.stream()
-                    .anyMatch(mimeType::equalsIgnoreCase);
-            });
+        return fileExtension != null && allowedExtensions.contains(fileExtension.toLowerCase());
     }
 
     private String getFileExtension(String fileName) {
