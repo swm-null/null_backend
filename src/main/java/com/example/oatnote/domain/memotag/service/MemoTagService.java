@@ -4,6 +4,7 @@ import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -91,12 +92,13 @@ public class MemoTagService {
     public CreateMemoResponse createMemo(CreateMemoRequest request, String userId) {
         incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
 
+        LocalDateTime now = LocalDateTime.now(); //todo refactor
         AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
         Memo rawMemo = request.toRawMemo(userId, aiCreateTagsResponse.metadata());
         List<RawTag> rawTags = aiCreateTagsResponse.tags();
-        asyncMemoTagService.createStructure(rawTags, rawMemo, userId);
+        asyncMemoTagService.createStructure(rawTags, rawMemo, userId, now);
 
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
@@ -107,6 +109,7 @@ public class MemoTagService {
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
+        LocalDateTime now = LocalDateTime.now();
         AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
             request.content(),
             request.imageUrls(),
@@ -114,7 +117,7 @@ public class MemoTagService {
         );
         Memo rawMemo = request.toRawMemo(userId, aiCreateMetadataResponse.metadata());
         RawTag rawTag = new RawTag(tag.getId(), tag.getName(), false);
-        asyncMemoTagService.createStructure(List.of(rawTag), rawMemo, userId);
+        asyncMemoTagService.createStructure(List.of(rawTag), rawMemo, userId, now);
 
         return CreateMemoResponse.from(rawMemo, List.of(rawTag));
     }
@@ -355,6 +358,7 @@ public class MemoTagService {
     ) {
         incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
 
+        LocalDateTime now = LocalDateTime.now();
         AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
 
@@ -368,7 +372,7 @@ public class MemoTagService {
         );
         List<RawTag> rawTags = aiCreateTagsResponse.tags();
 
-        asyncMemoTagService.createStructure(rawTags, memo, userId);
+        asyncMemoTagService.createStructure(rawTags, memo, userId, now);
 
         return UpdateMemoTagsResponse.from(memo, aiCreateTagsResponse.tags());
     }

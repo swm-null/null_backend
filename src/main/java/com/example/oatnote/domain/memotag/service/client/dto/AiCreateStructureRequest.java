@@ -16,14 +16,14 @@ public record AiCreateStructureRequest(
     String userId
 ) {
 
-    public static AiCreateStructureRequest from(List<RawTag> rawTags, Memo memo, String userId) {
+    public static AiCreateStructureRequest from(List<RawTag> rawTags, Memo memo, String userId, LocalDateTime time) {
         return new AiCreateStructureRequest(
             List.of(new RawMemo(
                 memo.getContent(),
                 memo.getImageUrls(),
                 memo.getVoiceUrls(),
                 memo.getMetadata(),
-                LocalDateTime.now(),
+                time,
                 rawTags
             )),
             null,

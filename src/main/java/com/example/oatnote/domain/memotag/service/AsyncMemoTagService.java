@@ -1,6 +1,7 @@
 package com.example.oatnote.domain.memotag.service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -47,12 +48,12 @@ public class AsyncMemoTagService {
     private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     @Async("AsyncMemoTagExecutor")
-    public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId) {
+    public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId, LocalDateTime time) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
         lock.lock(20, TimeUnit.MINUTES);
         try {
             AiCreateStructureRequest aiCreateStructureRequest
-                = AiCreateStructureRequest.from(rawTags, rawMemo, userId);
+                = AiCreateStructureRequest.from(rawTags, rawMemo, userId, time);
             AiCreateStructureResponse aiCreateStructureResponse
                 = aiMemoTagClient.createStructure(aiCreateStructureRequest);
 
@@ -86,7 +87,7 @@ public class AsyncMemoTagService {
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AiCreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
-            Memo memo = Memo.of(
+            Memo memo = new Memo(
                 memoId,
                 processedMemo.content(),
                 processedMemo.imageUrls(),
