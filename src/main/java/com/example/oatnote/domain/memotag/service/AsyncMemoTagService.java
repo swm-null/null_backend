@@ -133,6 +133,7 @@ public class AsyncMemoTagService {
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
+    @Async("AsyncMemoTagExecutor")
     public void updateEmbeddingAndMetadata(
         Memo memo,
             String content,
