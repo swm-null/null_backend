@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.concurrent.DelegatingSecurityContextExecutor;
 
 import com.example.oatnote.web.controller.exception.OatException;
 
@@ -26,7 +27,7 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setQueueCapacity(200);
         executor.setThreadNamePrefix("AsyncMemoTagThread-");
         executor.initialize();
-        return executor;
+        return new DelegatingSecurityContextExecutor(executor);
     }
 
     @Override

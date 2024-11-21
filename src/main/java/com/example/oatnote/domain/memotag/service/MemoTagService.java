@@ -3,7 +3,6 @@ package com.example.oatnote.domain.memotag.service;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.ChildTag;
 import static com.example.oatnote.domain.memotag.dto.TagsResponse.from;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,8 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.redisson.api.RAtomicLong;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -57,7 +54,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.producer.FileMessageProducer;
-import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
@@ -67,6 +63,8 @@ import com.example.oatnote.domain.memotag.service.tag.edge.model.TagEdge;
 import com.example.oatnote.domain.memotag.service.tag.model.Tag;
 import com.example.oatnote.domain.user.service.UserService;
 import com.example.oatnote.web.model.Criteria;
+import com.example.oatnote.web.validation.ProcessingMemoCount;
+import com.example.oatnote.web.validation.enums.ActionType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -82,16 +80,10 @@ public class MemoTagService {
     private final AiMemoTagClient aiMemoTagClient;
     private final UserService userService;
 
-    private final RedissonClient redissonClient;
-
     private final FileMessageProducer fileMessageProducer;
-    private final SseMessageProducer sseMessageProducer;
 
-    private static final String PROCESSING_MEMOS_COUNT_KEY_PREFIX = "processingMemoCount:";
-
+    @ProcessingMemoCount(action = ActionType.INCREMENT)
     public CreateMemoResponse createMemo(CreateMemoRequest request, String userId) {
-        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
-
         LocalDateTime now = LocalDateTime.now(); //todo refactor
         AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
@@ -103,9 +95,8 @@ public class MemoTagService {
         return CreateMemoResponse.from(rawMemo, aiCreateTagsResponse.tags());
     }
 
+    @ProcessingMemoCount(action = ActionType.INCREMENT)
     public CreateMemoResponse createLinkedMemo(String tagId, CreateMemoRequest request, String userId) {
-        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
-
         tagId = Objects.requireNonNullElse(tagId, userId);
         Tag tag = tagService.getTag(tagId, userId);
 
@@ -122,13 +113,13 @@ public class MemoTagService {
         return CreateMemoResponse.from(rawMemo, List.of(rawTag));
     }
 
+    @ProcessingMemoCount(action = ActionType.INCREMENT)
     public void createMemos(CreateMemosRequest request, String userId) {
-        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
-
         userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(request.email()));
         asyncMemoTagService.createStructure(request.fileUrl(), userId);
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest request, String userId) {
         tagService.validateTagExist(request.name(), userId);
         tagId = Objects.requireNonNullElse(tagId, userId);
@@ -301,48 +292,28 @@ public class MemoTagService {
         return SearchMemosUsingDbResponse.from(memoResponses);
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest request, String userId) {
-        String updatedContent = request.content();
-        List<String> updatedImageUrls = request.imageUrls();
-        List<String> updatedVoiceUrls = request.voiceUrls();
+        String content = request.content();
+        List<String> imageUrls = request.imageUrls();
+        List<String> voiceUrls = request.voiceUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
 
-        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = null;
-
-        boolean isContentChanged = !updatedContent.equals(memo.getContent());
-        if (isContentChanged) {
-            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updatedContent);
-        }
-
-        AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
-            updatedContent,
-            updatedImageUrls,
-            updatedVoiceUrls
-        );
-
-        List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
-            ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
-        String metadata = Objects.nonNull(aiCreateMetadataResponse)
-            ? aiCreateMetadataResponse.metadata() : memo.getMetadata();
-        List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
-            ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
-
-        processDeletedFiles(memo, updatedImageUrls, updatedVoiceUrls, userId);
+        processDeletedFiles(memo, imageUrls, voiceUrls, userId);
+        asyncMemoTagService.updateEmbeddingAndMetadata(memo, content, imageUrls, voiceUrls, userId);
 
         memo.update(
-            updatedContent,
-            updatedImageUrls,
-            updatedVoiceUrls,
-            metadata,
-            embedding,
-            embeddingMetadata
+            content,
+            imageUrls,
+            voiceUrls
         );
         Memo updatedMemo = memoService.updateMemo(memo);
         MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo.getId()), userId).get(0);
         return UpdateMemoResponse.from(memoResponse);
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public UpdateTagResponse updateTag(String tagId, UpdateTagRequest request, String userId) {
         AiCreateEmbeddingResponse aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(request.name());
         Tag tag = tagService.getTag(tagId, userId);
@@ -351,13 +322,12 @@ public class MemoTagService {
         return UpdateTagResponse.from(updatedTag);
     }
 
+    @ProcessingMemoCount(action = ActionType.INCREMENT)
     public UpdateMemoTagsResponse updateMemoTags(
         String memoId,
         UpdateMemoTagsRequest request,
         String userId
     ) {
-        incrementAndPublishSendProcessingMemosCount(userId); //todo refactor
-
         LocalDateTime now = LocalDateTime.now();
         AiCreateTagsRequest aiCreateTagsRequest = request.toAiCreateMemoRequest(userId);
         AiCreateTagsResponse aiCreateTagsResponse = aiMemoTagClient.createTags(aiCreateTagsRequest);
@@ -377,6 +347,7 @@ public class MemoTagService {
         return UpdateMemoTagsResponse.from(memo, aiCreateTagsResponse.tags());
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public void deleteMemo(String memoId, String userId) {
         List<String> fileUrls = memoService.getFileUrls(List.of(memoId), userId);
         sendDeleteFilesRequest(fileUrls, userId);
@@ -384,15 +355,14 @@ public class MemoTagService {
         memoService.deleteMemo(memoId, userId);
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public void deleteTag(String tagId, String userId) {
         List<String> memoIds = memoTagRelationService.getMemoIds(tagId, userId);
-        memoService.deleteMemos(memoIds, userId);
-
         List<String> fileUrls = memoService.getFileUrls(memoIds, userId);
+
+        memoService.deleteMemos(memoIds, userId);
         fileMessageProducer.publishDeleteFiles(fileUrls, userId);
-
         memoTagRelationService.deleteRelationsByTagId(tagId, userId);
-
         deleteTagAndDescendants(tagId, userId);
     }
 
@@ -516,12 +486,5 @@ public class MemoTagService {
         if (!fileUrls.isEmpty()) {
             fileMessageProducer.publishDeleteFiles(fileUrls, userId);
         }
-    }
-
-    void incrementAndPublishSendProcessingMemosCount(String userId) {
-        RAtomicLong memoCounter = redissonClient.getAtomicLong(PROCESSING_MEMOS_COUNT_KEY_PREFIX + userId);
-        memoCounter.incrementAndGet();
-        memoCounter.expire(Instant.now().plusSeconds(3600));
-        sseMessageProducer.publishProcessingMemosCount(userId);
     }
 }
