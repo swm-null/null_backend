@@ -34,7 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // Redisson
-    implementation 'org.redisson:redisson-spring-boot-starter:3.35.0'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.39.0'
 
     // RabbitMQ
     implementation 'org.springframework.boot:spring-boot-starter-amqp'

@@ -1,8 +1,9 @@
-package com.example.oatnote.config;
+package com.example.oatnote._commons.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -93,8 +94,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public DirectExchange sseExchange() {
-        return new DirectExchange(sseExchangeName, true, false);
+    public FanoutExchange sseFanoutExchange() {
+        return new FanoutExchange(sseExchangeName, true, false);
     }
 
     @Bean
@@ -103,10 +104,9 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding sseSendProcessingMemosCountBinding(Queue sseSendProcessingMemosCountQueue, DirectExchange sseExchange) {
-        return BindingBuilder.bind(sseSendProcessingMemosCountQueue)
-            .to(sseExchange)
-            .with(sseSendProcessingMemosCountRoutingKey);
+    public Binding sseSendProcessingMemosCountBinding(Queue sseSendProcessingMemosCountQueue,
+        FanoutExchange sseFanoutExchange) {
+        return BindingBuilder.bind(sseSendProcessingMemosCountQueue).to(sseFanoutExchange);
     }
 
     @Bean
