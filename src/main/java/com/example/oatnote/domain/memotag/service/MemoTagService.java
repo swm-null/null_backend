@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -55,7 +54,6 @@ import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
 import com.example.oatnote.domain.memotag.service.producer.FileMessageProducer;
-import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.searchhistory.SearchHistoryService;
@@ -121,6 +119,7 @@ public class MemoTagService {
         asyncMemoTagService.createStructure(request.fileUrl(), userId);
     }
 
+    @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public CreateChildTagResponse createChildTag(String tagId, CreateChildTagRequest request, String userId) {
         tagService.validateTagExist(request.name(), userId);
         tagId = Objects.requireNonNullElse(tagId, userId);
@@ -295,41 +294,19 @@ public class MemoTagService {
 
     @ProcessingMemoCount(action = ActionType.JUST_PUBLISH)
     public UpdateMemoResponse updateMemo(String memoId, UpdateMemoRequest request, String userId) {
-        String updatedContent = request.content();
-        List<String> updatedImageUrls = request.imageUrls();
-        List<String> updatedVoiceUrls = request.voiceUrls();
+        String content = request.content();
+        List<String> imageUrls = request.imageUrls();
+        List<String> voiceUrls = request.voiceUrls();
 
         Memo memo = memoService.getMemo(memoId, userId);
 
-        AiCreateEmbeddingResponse aiCreateEmbeddingResponse = null;
-
-        boolean isContentChanged = !updatedContent.equals(memo.getContent());
-        if (isContentChanged) {
-            aiCreateEmbeddingResponse = aiMemoTagClient.createEmbedding(updatedContent);
-        }
-
-        AiCreateMetadataResponse aiCreateMetadataResponse = aiMemoTagClient.createMetadata(
-            updatedContent,
-            updatedImageUrls,
-            updatedVoiceUrls
-        );
-
-        List<Double> embedding = Objects.nonNull(aiCreateEmbeddingResponse)
-            ? aiCreateEmbeddingResponse.embedding() : memo.getEmbedding();
-        String metadata = Objects.nonNull(aiCreateMetadataResponse)
-            ? aiCreateMetadataResponse.metadata() : memo.getMetadata();
-        List<Double> embeddingMetadata = Objects.nonNull(aiCreateMetadataResponse)
-            ? aiCreateMetadataResponse.embeddingMetadata() : memo.getEmbeddingMetadata();
-
-        processDeletedFiles(memo, updatedImageUrls, updatedVoiceUrls, userId);
+        processDeletedFiles(memo, imageUrls, voiceUrls, userId);
+        asyncMemoTagService.updateEmbeddingAndMetadata(memo, content, imageUrls, voiceUrls, userId);
 
         memo.update(
-            updatedContent,
-            updatedImageUrls,
-            updatedVoiceUrls,
-            metadata,
-            embedding,
-            embeddingMetadata
+            content,
+            imageUrls,
+            voiceUrls
         );
         Memo updatedMemo = memoService.updateMemo(memo);
         MemoResponse memoResponse = getMemoResponses(List.of(updatedMemo.getId()), userId).get(0);
