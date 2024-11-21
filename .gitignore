@@ -1,46 +1,39 @@
-.gradle
-build/*
-!build/libs/memo-0.0.1-SNAPSHOT.jar
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+### 기본 IDE ###
+.idea/
 *.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
 .vscode/
-.DS_STORE
-.DS_Store
+.classpath
+.project
+.settings/
+.springBeans
 
-*adminsdk.json
+### 빌드 및 배포 ###
+build/
+out/
+bin/
+*.jar
+*.war
+*.ear
 
+### 환경 변수 및 인증 ###
+*.json
+*.env
 application.yml
 application-*.yml
+secret.properties
+local.properties
 
-logs
+### 시스템 파일 ###
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
+
+### 기타 ###
+logs/
+heapdump.hprof
+hs_err_pid*
+*.prof
