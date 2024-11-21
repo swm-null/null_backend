@@ -1,5 +1,7 @@
 package com.example.oatnote.domain.memotag.service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,7 +23,7 @@ import com.example.oatnote.domain.memotag.service.client.dto.AiCreateStructureRe
 import com.example.oatnote.domain.memotag.service.client.dto.innerDto.RawTag;
 import com.example.oatnote.domain.memotag.service.memo.MemoService;
 import com.example.oatnote.domain.memotag.service.memo.model.Memo;
-import com.example.oatnote.domain.memotag.service.publisher.MemoProcessingPublisher;
+import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
 import com.example.oatnote.domain.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.domain.memotag.service.relation.model.MemoTagRelation;
 import com.example.oatnote.domain.memotag.service.tag.TagService;
@@ -39,19 +41,19 @@ public class AsyncMemoTagService {
     private final MemoTagRelationService memoTagRelationService;
     private final AiMemoTagClient aiMemoTagClient;
     private final RedissonClient redissonClient;
-    private final MemoProcessingPublisher memoEventPublisher;
+    private final SseMessageProducer sseMessageProducer;
 
     private static final boolean IS_LINKED_MEMO_TAG = true;
     private static final String LOCK_KEY_PREFIX = "memoTagLock:";
     private static final String MEMO_PROCESSING_COUNT_KEY_PREFIX = "processingMemoCount:";
 
     @Async("AsyncMemoTagExecutor")
-    public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId) {
+    public void createStructure(List<RawTag> rawTags, Memo rawMemo, String userId, LocalDateTime time) {
         RLock lock = redissonClient.getLock(LOCK_KEY_PREFIX + userId);
         lock.lock(20, TimeUnit.MINUTES);
         try {
             AiCreateStructureRequest aiCreateStructureRequest
-                = AiCreateStructureRequest.from(rawTags, rawMemo, userId);
+                = AiCreateStructureRequest.from(rawTags, rawMemo, userId, time);
             AiCreateStructureResponse aiCreateStructureResponse
                 = aiMemoTagClient.createStructure(aiCreateStructureRequest);
 
@@ -60,7 +62,7 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, rawMemo.getId(), userId);
         } finally {
             lock.unlock();
-            decrementAndPublishMemoCount(userId);
+            decrementAndPublishSendProcessingMemoCount(userId);
         }
     }
 
@@ -73,7 +75,7 @@ public class AsyncMemoTagService {
             processMemoTag(aiCreateStructureResponse, null, userId);
         } finally {
             lock.unlock();
-            decrementAndPublishMemoCount(userId);
+            decrementAndPublishSendProcessingMemoCount(userId);
         }
     }
 
@@ -85,7 +87,7 @@ public class AsyncMemoTagService {
         Set<String> visitedTagIds = new HashSet<>();
 
         for (AiCreateStructureResponse.ProcessedMemo processedMemo : aiCreateStructureResponse.processedMemos()) {
-            Memo memo = Memo.of(
+            Memo memo = new Memo(
                 memoId,
                 processedMemo.content(),
                 processedMemo.imageUrls(),
@@ -131,9 +133,10 @@ public class AsyncMemoTagService {
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
-    void decrementAndPublishMemoCount(String userId) {
+    void decrementAndPublishSendProcessingMemoCount(String userId) {
         RAtomicLong memoCounter = redissonClient.getAtomicLong(MEMO_PROCESSING_COUNT_KEY_PREFIX + userId);
-        int memoProcessingCount = (int) memoCounter.decrementAndGet();
-        memoEventPublisher.publish(userId, memoProcessingCount);
+        memoCounter.decrementAndGet();
+        memoCounter.expire(Instant.now().plusSeconds(3600));
+        sseMessageProducer.publishProcessingMemosCount(userId);
     }
 }
