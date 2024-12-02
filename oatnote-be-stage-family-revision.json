@@ -1,5 +1,5 @@
 {
-  "family": "oatnote-be-prod-family",
+  "family": "oatnote-be-stage-family",
   "containerDefinitions": [
     {
       "name": "oatnote-be-stage-container",
