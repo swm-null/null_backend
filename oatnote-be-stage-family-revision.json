@@ -1,15 +1,14 @@
 {
-  "family": "oatnote-be-stage-family",
+  "family": "oatnote-be-prod-family",
   "containerDefinitions": [
     {
-      "name": "oatnote-be-stage-container",
-      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote-be/stage:${IMAGE_TAG}",
+      "name": "oatnote-be-prod-container",
+      "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote-be/prod:${IMAGE_TAG}",
       "cpu": 1024,
       "memory": 2048,
       "portMappings": [
         {
           "containerPort": 8080,
-          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
@@ -17,9 +16,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/oatnote-be-stage-family",
-          "mode": "non-blocking",
-          "max-buffer-size": "25m",
+          "awslogs-group": "/ecs/oatnote-be-prod-family",
           "awslogs-region": "ap-northeast-2",
           "awslogs-stream-prefix": "ecs"
         }
@@ -33,9 +30,5 @@
     "FARGATE"
   ],
   "cpu": "1024",
-  "memory": "2048",
-  "runtimePlatform": {
-    "cpuArchitecture": "X86_64",
-    "operatingSystemFamily": "LINUX"
-  }
+  "memory": "2048"
 }

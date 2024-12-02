@@ -9,7 +9,6 @@
       "portMappings": [
         {
           "containerPort": 8080,
-          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
@@ -18,8 +17,6 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/oatnote-be-prod-family",
-          "mode": "non-blocking",
-          "max-buffer-size": "25m",
           "awslogs-region": "ap-northeast-2",
           "awslogs-stream-prefix": "ecs"
         }
@@ -33,9 +30,5 @@
     "FARGATE"
   ],
   "cpu": "1024",
-  "memory": "2048",
-  "runtimePlatform": {
-    "cpuArchitecture": "X86_64",
-    "operatingSystemFamily": "LINUX"
-  }
+  "memory": "2048"
 }
