@@ -4,7 +4,7 @@ FROM openjdk:17-jdk-alpine3.13
 WORKDIR /app
 
 # 애플리케이션 JAR 파일 복사
-COPY build/libs/memo-0.0.1-SNAPSHOT.jar app.jar
+COPY build/libs/oatnote-0.0.1-SNAPSHOT.jar app.jar
 
 # 컨테이너 실행 시 실행할 명령어 설정
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
