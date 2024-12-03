@@ -9,6 +9,7 @@
       "portMappings": [
         {
           "containerPort": 8080,
+          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
@@ -30,5 +31,9 @@
     "FARGATE"
   ],
   "cpu": "1024",
-  "memory": "2048"
+  "memory": "2048",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
 }
