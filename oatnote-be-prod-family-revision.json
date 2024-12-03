@@ -4,8 +4,8 @@
     {
       "name": "oatnote-be-prod-container",
       "image": "905418277583.dkr.ecr.ap-northeast-2.amazonaws.com/oatnote-be/prod:${IMAGE_TAG}",
-      "cpu": 1024,
-      "memory": 2048,
+      "cpu": 2048,
+      "memory": 5120,
       "portMappings": [
         {
           "containerPort": 8080,
@@ -30,10 +30,6 @@
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "cpu": "1024",
-  "memory": "2048",
-  "runtimePlatform": {
-    "cpuArchitecture": "X86_64",
-    "operatingSystemFamily": "LINUX"
-  }
+  "cpu": "2048",
+  "memory": "5120"
 }
