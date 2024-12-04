@@ -6,9 +6,9 @@ import java.util.Objects;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import com.example.oatnote.domain.memotag.dto.CreateMemoRequest;
-import com.example.oatnote.domain.memotag.dto.UpdateMemoRequest;
-import com.example.oatnote.domain.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.memotag.dto.CreateMemoRequest;
+import com.example.oatnote.memotag.dto.UpdateMemoRequest;
+import com.example.oatnote.memotag.dto.UpdateMemoTagsRequest;
 
 public class MemoAtLeastOneRequiredValidator implements ConstraintValidator<MemoAtLeastOneRequired, Object> {
 
