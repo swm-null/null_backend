@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RedissonClient;
 
-import com.example.oatnote.domain.memotag.service.producer.SseMessageProducer;
+import com.example.oatnote.memo.service.producer.SseMessageProducer;
 import com.example.oatnote.web.validation.enums.ActionType;
 import com.example.oatnote.web.validation.helper.AuthenticationContextHelper;
 
