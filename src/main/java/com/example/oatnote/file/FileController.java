@@ -28,6 +28,7 @@ public class FileController implements FileApiDoc {
 
     private final FileService fileService;
 
+    @Override
     @PostMapping(
         value = "/upload/file",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -41,6 +42,7 @@ public class FileController implements FileApiDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(uploadFileResponse);
     }
 
+    @Override
     @PostMapping(
         value = "/upload/files",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,

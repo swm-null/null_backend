@@ -16,6 +16,7 @@ public class SseController implements SseApiDoc {
 
     private final SseService sseService;
 
+    @Override
     @GetMapping("/sse/subscribe")
     public ResponseEntity<SseEmitter> subscribe(
         @AuthenticationPrincipal String userId
