@@ -2,7 +2,8 @@ name: Continuous Integration
 
 on:
   push:
-    paths: '/**'
+    paths:
+      - '/**'
   pull_request:
     branches:
       - develop
