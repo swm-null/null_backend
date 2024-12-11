@@ -53,14 +53,12 @@ public class UserService {
         String password = request.password();
         String confirmPassword = request.confirmPassword();
 
-        log.info("회원가입 시도 / 이메일: {}", email);
         if (!Objects.equals(password, confirmPassword)) {
             throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
         if (userRepository.findByEmail(email).isPresent()) {
             throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.");
         }
-
         emailVerificationService.verifyCode(email, request.code());
 
         User user = request.toUser(passwordEncoder.encode(password), defaultProfileImageUrl);
@@ -71,18 +69,17 @@ public class UserService {
 
     public LoginUserResponse login(LoginUserRequest request) {
         String email = request.email();
-        log.info("로그인 시도 / 이메일: {}", email);
+        String password = request.password();
 
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> OatDataNotFoundException.withDetail("이메일이 잘못 되었습니다."));
 
-        String password = request.password();
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw OatInvalidPasswordException.withDetail("비밀번호가 일치하지 않습니다.");
         }
+
         String accessToken = jwtUtil.generateAccessToken(user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getId());
-
         log.info("로그인 성공 / 이메일: {} / 유저: {}", email, user.getId());
         return LoginUserResponse.of(accessToken, refreshToken);
     }
@@ -105,8 +102,7 @@ public class UserService {
     }
 
     public void sendCode(SendCodeRequest request) {
-        String email = request.email();
-        emailVerificationService.sendCode(email, CODE_EXPIRY_MINUTES);
+        emailVerificationService.sendCode(request.email(), CODE_EXPIRY_MINUTES);
     }
 
     public void verifyCode(VerifyCodeRequest request) {
@@ -141,9 +137,9 @@ public class UserService {
     }
 
     public void withdraw(String userId) {
-        log.info("회원탈퇴 / 유저: {}", userId);
         userRepository.deleteById(userId);
         eventPublisher.publishEvent(new WithdrawUserEvent(userId));
+        log.info("회원탈퇴 / 유저: {}", userId);
     }
 
     public UpdateUserInfoResponse updateUserInfo(UpdateUserInfoRequest request, String userId) {
