@@ -4,7 +4,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.example.oatnote._commons.event.WithdrawUserEvent;
-import com.example.oatnote.memotag.service.MemoTagService;
+import com.example.oatnote.memotag.service.MemoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeleteUserAllDataEventListener {
 
-    private final MemoTagService memoTagService;
+    private final MemoService memoService;
 
     @EventListener
     public void handleWithdrawUserEvent(WithdrawUserEvent event) {
-        memoTagService.deleteUserAllData(event.userId());
+        memoService.deleteUserAllData(event.userId());
     }
 }

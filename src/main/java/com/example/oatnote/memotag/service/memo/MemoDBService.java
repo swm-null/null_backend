@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MemoService {
+public class MemoDBService {
 
     private final MemoRepository memoRepository;
 

@@ -22,7 +22,7 @@ import com.example.oatnote.memotag.service.client.dto.AiCreateMetadataResponse;
 import com.example.oatnote.memotag.service.client.dto.AiCreateStructureRequest;
 import com.example.oatnote.memotag.service.client.dto.AiCreateStructureResponse;
 import com.example.oatnote.memotag.service.client.dto.innerDto.RawTag;
-import com.example.oatnote.memotag.service.memo.MemoService;
+import com.example.oatnote.memotag.service.memo.MemoDBService;
 import com.example.oatnote.memotag.service.memo.model.Memo;
 import com.example.oatnote.memotag.service.relation.MemoTagRelationService;
 import com.example.oatnote.memotag.service.relation.model.MemoTagRelation;
@@ -36,9 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AsyncMemoTagService {
+public class AsyncMemoService {
 
-    private final MemoService memoService;
+    private final MemoDBService memoDBService;
     private final TagService tagService;
     private final MemoTagRelationService memoTagRelationService;
     private final AiMemoTagClient aiMemoTagClient;
@@ -129,7 +129,7 @@ public class AsyncMemoTagService {
             }
         }
         tagService.processTags(aiCreateStructureResponse, userId);
-        memoService.createMemos(memos, userId);
+        memoDBService.createMemos(memos, userId);
         memoTagRelationService.createRelations(memoTagRelations, userId);
     }
 
@@ -162,6 +162,6 @@ public class AsyncMemoTagService {
             embedding,
             embeddingMetadata
         );
-        memoService.updateMemo(memo);
+        memoDBService.updateMemo(memo);
     }
 }
