@@ -5,14 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.oatnote.memotag.dto.CreateChildTagRequest;
 import com.example.oatnote.memotag.dto.CreateChildTagResponse;
@@ -32,7 +25,7 @@ public class TagController implements TagApiDoc {
     private final MemoService memoService;
 
     @Override
-    @PostMapping("/childTag")
+    @PostMapping("/tag/child")
     public ResponseEntity<CreateChildTagResponse> createChildTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateChildTagRequest request,
@@ -43,17 +36,7 @@ public class TagController implements TagApiDoc {
     }
 
     @Override
-    @GetMapping("/ancestorTags")
-    public ResponseEntity<List<TagResponse>> getAncestorTags(
-        @RequestParam(value = "tagId") String tagId,
-        @AuthenticationPrincipal String userId
-    ) {
-        List<TagResponse> response = memoService.getAncestorTags(tagId, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @Override
-    @GetMapping("/childTags")
+    @GetMapping("/tags/children")
     public ResponseEntity<List<TagResponse>> getChildTags(
         @RequestParam(value = "tagId", required = false) String tagId,
         @AuthenticationPrincipal String userId
@@ -63,7 +46,17 @@ public class TagController implements TagApiDoc {
     }
 
     @Override
-    @GetMapping("/tags")
+    @GetMapping("/tag/ancestors")
+    public ResponseEntity<List<TagResponse>> getAncestorTags(
+        @RequestParam(value = "tagId") String tagId,
+        @AuthenticationPrincipal String userId
+    ) {
+        List<TagResponse> response = memoService.getAncestorTags(tagId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    @GetMapping("/tags/descendants")
     public ResponseEntity<TagsResponse> getTags(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(value = "page", defaultValue = "1") Integer page,

@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "태그 API")
+@Tag(name = "Tag", description = "태그 API")
 public interface TagApiDoc {
 
     @ApiResponses(
@@ -39,7 +39,7 @@ public interface TagApiDoc {
         }
     )
     @Operation(summary = "특정 태그 하위에 자식 태그 생성")
-    @PostMapping("/childTag")
+    @PostMapping("/tag/child")
     ResponseEntity<CreateChildTagResponse> createChildTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateChildTagRequest request,
@@ -55,7 +55,7 @@ public interface TagApiDoc {
         }
     )
     @Operation(summary = "특정 태그의 전체 자식 태그 리스트 조회")
-    @GetMapping("/childTags")
+    @GetMapping("/tags/children")
     ResponseEntity<List<TagResponse>> getChildTags(
         @RequestParam(value = "tagId", required = false) String tagId,
         @AuthenticationPrincipal String userId
@@ -70,7 +70,7 @@ public interface TagApiDoc {
         }
     )
     @Operation(summary = "특정 태그의 조상 태그 리스트 조회")
-    @GetMapping("/ancestorTags")
+    @GetMapping("/tags/ancestors")
     ResponseEntity<List<TagResponse>> getAncestorTags(
         @RequestParam(value = "tagId") String tagId,
         @AuthenticationPrincipal String userId
@@ -85,7 +85,7 @@ public interface TagApiDoc {
         }
     )
     @Operation(summary = "특정 태그와 그 자식, 손자 태그 리스트 조회")
-    @GetMapping("/tags")
+    @GetMapping("/tags/descendants")
     ResponseEntity<TagsResponse> getTags(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
