@@ -112,7 +112,7 @@ public class UserService {
         emailVerificationService.insertEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
     }
 
-    public void findPassword(FindPasswordRequest request) {
+    public void resetPassword(FindPasswordRequest request) {
         String email = request.email();
         String newPassword = request.newPassword();
         String confirmPassword = request.confirmPassword();

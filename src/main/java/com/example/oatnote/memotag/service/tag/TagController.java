@@ -46,7 +46,7 @@ public class TagController implements TagApiDoc {
     }
 
     @Override
-    @GetMapping("/tag/ancestors")
+    @GetMapping("/tags/ancestors")
     public ResponseEntity<List<TagResponse>> getAncestorTags(
         @RequestParam(value = "tagId") String tagId,
         @AuthenticationPrincipal String userId

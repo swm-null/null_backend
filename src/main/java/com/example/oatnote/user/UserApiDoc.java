@@ -7,18 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.oatnote.user.dto.CheckEmailDuplicationRequest;
-import com.example.oatnote.user.dto.FindPasswordRequest;
-import com.example.oatnote.user.dto.LoginUserRequest;
-import com.example.oatnote.user.dto.LoginUserResponse;
-import com.example.oatnote.user.dto.RefreshUserRequest;
-import com.example.oatnote.user.dto.RefreshUserResponse;
-import com.example.oatnote.user.dto.RegisterUserRequest;
-import com.example.oatnote.user.dto.SendCodeRequest;
-import com.example.oatnote.user.dto.UpdateUserInfoRequest;
-import com.example.oatnote.user.dto.UpdateUserInfoResponse;
-import com.example.oatnote.user.dto.UserInfoResponse;
-import com.example.oatnote.user.dto.VerifyCodeRequest;
+import com.example.oatnote.user.dto.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -58,7 +47,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/refresh")
+    @PostMapping("/user/token/refresh")
     ResponseEntity<RefreshUserResponse> refreshAccessToken(
         @RequestBody @Valid RefreshUserRequest request
     );
@@ -68,7 +57,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/checkEmail")
+    @PostMapping("/user/email/exists")
     ResponseEntity<Void> checkEmailDuplication(
         @RequestBody @Valid CheckEmailDuplicationRequest request
     );
@@ -78,30 +67,30 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/sendCode")
+    @PostMapping("/user/email/verificationCode")
     ResponseEntity<Void> sendCode(
         @RequestBody @Valid SendCodeRequest request
     );
 
-    @Operation(summary = "이메일 인증 코드 확인")
+    @Operation(summary = "인증 코드 검사")
     @ApiResponses({
         @ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/verifyCode")
+    @PostMapping("/user/email/verifyCode")
     ResponseEntity<Void> verifyCode(
         @RequestBody @Valid VerifyCodeRequest request
     );
 
-    @Operation(summary = "비밀번호 찾기")
+    @Operation(summary = "비밀번호 재설정")
     @ApiResponses({
         @ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping("/user/findPassword")
-    ResponseEntity<Void> findPassword(
+    @PostMapping("/user/password/reset")
+    ResponseEntity<Void> resetPassword(
         @RequestBody @Valid FindPasswordRequest request
     );
 
@@ -137,7 +126,7 @@ public interface UserApiDoc {
         @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
         @ApiResponse(responseCode = "403", content = @Content(schema = @Schema(hidden = true))),
     })
-    @DeleteMapping("/user")
+    @DeleteMapping("/user/me")
     ResponseEntity<Void> withdraw(
         @AuthenticationPrincipal String userId
     );

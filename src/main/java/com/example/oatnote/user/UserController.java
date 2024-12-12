@@ -3,24 +3,9 @@ package com.example.oatnote.user;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.oatnote.user.dto.CheckEmailDuplicationRequest;
-import com.example.oatnote.user.dto.FindPasswordRequest;
-import com.example.oatnote.user.dto.LoginUserRequest;
-import com.example.oatnote.user.dto.LoginUserResponse;
-import com.example.oatnote.user.dto.RefreshUserRequest;
-import com.example.oatnote.user.dto.RefreshUserResponse;
-import com.example.oatnote.user.dto.RegisterUserRequest;
-import com.example.oatnote.user.dto.SendCodeRequest;
-import com.example.oatnote.user.dto.UpdateUserInfoRequest;
-import com.example.oatnote.user.dto.UpdateUserInfoResponse;
-import com.example.oatnote.user.dto.UserInfoResponse;
-import com.example.oatnote.user.dto.VerifyCodeRequest;
+import com.example.oatnote.user.dto.*;
 import com.example.oatnote.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -51,7 +36,7 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/refresh")
+    @PostMapping("/user/token/refresh")
     public ResponseEntity<RefreshUserResponse> refreshAccessToken(
         @RequestBody RefreshUserRequest request
     ) {
@@ -60,7 +45,7 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/checkEmail")
+    @PostMapping("/user/email/exists")
     public ResponseEntity<Void> checkEmailDuplication(
         @RequestBody @Valid CheckEmailDuplicationRequest request
     ) {
@@ -69,7 +54,7 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/sendCode")
+    @PostMapping("/user/email/verificationCode")
     public ResponseEntity<Void> sendCode(
         @RequestBody @Valid SendCodeRequest request
     ) {
@@ -78,7 +63,7 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/verifyCode")
+    @PostMapping("/user/email/verifyCode")
     public ResponseEntity<Void> verifyCode(
         @RequestBody @Valid VerifyCodeRequest request
     ) {
@@ -87,16 +72,16 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/findPassword")
-    public ResponseEntity<Void> findPassword(
+    @PostMapping("/user/password/reset")
+    public ResponseEntity<Void> resetPassword(
         @RequestBody @Valid FindPasswordRequest request
     ) {
-        userService.findPassword(request);
+        userService.resetPassword(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Override
-    @PostMapping("/user/me")
+    @GetMapping("/user/me")
     public ResponseEntity<UserInfoResponse> getUserInfo(
         @AuthenticationPrincipal String userId
     ) {
@@ -115,7 +100,7 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @DeleteMapping("/user")
+    @DeleteMapping("/user/me")
     public ResponseEntity<Void> withdraw(
         @AuthenticationPrincipal String userId
     ) {
