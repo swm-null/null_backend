@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
-import com.example.oatnote.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.memotag.dto.CreateMemosByFileRequest;
 import com.example.oatnote.memotag.dto.CreateSearchHistoryRequest;
 import com.example.oatnote.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.memotag.dto.MemosResponse;
@@ -48,8 +48,8 @@ public class MemoController implements MemoApiDoc {
     }
 
     @Override
-    @PostMapping("/memo/linked")
-    public ResponseEntity<CreateMemoResponse> createLinkedMemo(
+    @PostMapping("/memo/tag")
+    public ResponseEntity<CreateMemoResponse> createMemoLinkedTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateMemoRequest request,
         @AuthenticationPrincipal String userId
@@ -59,12 +59,12 @@ public class MemoController implements MemoApiDoc {
     }
 
     @Override
-    @PostMapping("/memos")
-    public ResponseEntity<Void> createMemos(
-        @RequestBody @Valid CreateMemosRequest request,
+    @PostMapping("/memos/file")
+    public ResponseEntity<Void> createMemosByFile(
+        @RequestBody @Valid CreateMemosByFileRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        memoService.createMemos(request, userId);
+        memoService.createMemosByFile(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -79,8 +79,8 @@ public class MemoController implements MemoApiDoc {
     }
 
     @Override
-    @GetMapping("/memos")
-    public ResponseEntity<MemosResponse> getMemos(
+    @GetMapping("/memos/tag")
+    public ResponseEntity<MemosResponse> getMemosLinkedTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "10") Integer limit,
@@ -88,7 +88,7 @@ public class MemoController implements MemoApiDoc {
         @RequestParam(value = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     ) {
-        MemosResponse response = memoService.getMemos(tagId, page, limit, sortOrder, isLinked, userId);
+        MemosResponse response = memoService.getMemosLinkedTag(tagId, page, limit, sortOrder, isLinked, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -124,35 +124,34 @@ public class MemoController implements MemoApiDoc {
     }
 
     @Override
-    @PutMapping("/memo/{memoId}")
+    @PutMapping("/memo/{id}")
     public ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateMemoRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateMemoResponse response = memoService.updateMemo(memoId, request, userId);
+        UpdateMemoResponse response = memoService.updateMemo(id, request, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @PutMapping("/memo/{memoId}/tags")
+    @PutMapping("/memo/{id}/tags")
     public ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateMemoTagsRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateMemoTagsResponse response = memoService.updateMemoTags(memoId, request, userId);
+        UpdateMemoTagsResponse response = memoService.updateMemoTags(id, request, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @DeleteMapping("/memo/{memoId}")
+    @DeleteMapping("/memo/{id}")
     public ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @AuthenticationPrincipal String userId
     ) {
-        memoService.deleteMemo(memoId, userId);
+        memoService.deleteMemo(id, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
-

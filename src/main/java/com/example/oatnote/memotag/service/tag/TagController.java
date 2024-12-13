@@ -5,7 +5,14 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.oatnote.memotag.dto.CreateChildTagRequest;
 import com.example.oatnote.memotag.dto.CreateChildTagResponse;
@@ -27,64 +34,64 @@ public class TagController implements TagApiDoc {
     @Override
     @PostMapping("/tag/child")
     public ResponseEntity<CreateChildTagResponse> createChildTag(
-        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(value = "id", required = false) String id,
         @RequestBody @Valid CreateChildTagRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        CreateChildTagResponse response = memoService.createChildTag(tagId, request, userId);
+        CreateChildTagResponse response = memoService.createChildTag(id, request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @GetMapping("/tags/children")
+    @GetMapping("/tag/children")
     public ResponseEntity<List<TagResponse>> getChildTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(value = "id", required = false) String id,
         @AuthenticationPrincipal String userId
     ) {
-        List<TagResponse> response = memoService.getChildTags(tagId, userId);
+        List<TagResponse> response = memoService.getChildTags(id, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @GetMapping("/tags/ancestors")
+    @GetMapping("/tag/ancestors")
     public ResponseEntity<List<TagResponse>> getAncestorTags(
-        @RequestParam(value = "tagId") String tagId,
+        @RequestParam(value = "id") String id,
         @AuthenticationPrincipal String userId
     ) {
-        List<TagResponse> response = memoService.getAncestorTags(tagId, userId);
+        List<TagResponse> response = memoService.getAncestorTags(id, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @GetMapping("/tags/descendants")
+    @GetMapping("/tag/descendants")
     public ResponseEntity<TagsResponse> getTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(value = "id", required = false) String id,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        TagsResponse response = memoService.getTags(tagId, page, limit, userId);
+        TagsResponse response = memoService.getTags(id, page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @PutMapping("/tag/{tagId}")
+    @PutMapping("/tag/{id}")
     public ResponseEntity<UpdateTagResponse> updateTag(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateTagRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateTagResponse response = memoService.updateTag(tagId, request, userId);
+        UpdateTagResponse response = memoService.updateTag(id, request, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @DeleteMapping("/tag/{tagId}")
+    @DeleteMapping("/tag/{id}")
     public ResponseEntity<Void> deleteTag(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("id") String id,
         @AuthenticationPrincipal String userId
     ) {
-        memoService.deleteTag(tagId, userId);
+        memoService.deleteTag(id, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 @JsonNaming(SnakeCaseStrategy.class)
-public record CreateMemosRequest(
+public record CreateMemosByFileRequest(
     @Schema(description = "파일 url", example = "https://example.com/kakao.csv", requiredMode = REQUIRED)
     @NotBlank(message = "파일 url은 비워둘 수 없습니다.")
     @AllowedFileType({TXT, CSV})

@@ -2,9 +2,27 @@ package com.example.oatnote.memotag;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.oatnote.memotag.dto.*;
+import com.example.oatnote.memotag.dto.CreateMemoRequest;
+import com.example.oatnote.memotag.dto.CreateMemoResponse;
+import com.example.oatnote.memotag.dto.CreateMemosByFileRequest;
+import com.example.oatnote.memotag.dto.CreateSearchHistoryRequest;
+import com.example.oatnote.memotag.dto.CreateSearchHistoryResponse;
+import com.example.oatnote.memotag.dto.MemosResponse;
+import com.example.oatnote.memotag.dto.SearchHistoriesResponse;
+import com.example.oatnote.memotag.dto.SearchMemosUsingAiResponse;
+import com.example.oatnote.memotag.dto.SearchMemosUsingDbResponse;
+import com.example.oatnote.memotag.dto.UpdateMemoRequest;
+import com.example.oatnote.memotag.dto.UpdateMemoResponse;
+import com.example.oatnote.memotag.dto.UpdateMemoTagsRequest;
+import com.example.oatnote.memotag.dto.UpdateMemoTagsResponse;
 import com.example.oatnote.memotag.dto.enums.MemoSortOrderTypeEnum;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +31,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
 
 @Tag(name = "Memo", description = "메모 API")
@@ -40,8 +57,8 @@ public interface MemoApiDoc {
         @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
     })
     @Operation(summary = "특정 태그와 연결된 메모 생성")
-    @PostMapping("/memo/linked")
-    ResponseEntity<CreateMemoResponse> createLinkedMemo(
+    @PostMapping("/memo/tag")
+    ResponseEntity<CreateMemoResponse> createMemoLinkedTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateMemoRequest request,
         @AuthenticationPrincipal String userId
@@ -54,9 +71,9 @@ public interface MemoApiDoc {
         @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
     })
     @Operation(summary = "파일로 메모 리스트 생성")
-    @PostMapping("/memos")
-    ResponseEntity<Void> createMemos(
-        @RequestBody @Valid CreateMemosRequest request,
+    @PostMapping("/memos/file")
+    ResponseEntity<Void> createMemosByFile(
+        @RequestBody @Valid CreateMemosByFileRequest request,
         @AuthenticationPrincipal String userId
     );
 
@@ -81,7 +98,7 @@ public interface MemoApiDoc {
     })
     @Operation(summary = "특정 태그의 메모 리스트 조회")
     @GetMapping("/memos")
-    ResponseEntity<MemosResponse> getMemos(
+    ResponseEntity<MemosResponse> getMemosLinkedTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "10") Integer limit,
@@ -140,9 +157,9 @@ public interface MemoApiDoc {
         @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
     })
     @Operation(summary = "메모 수정")
-    @PutMapping("/memo/{memoId}")
+    @PutMapping("/memo/{id}")
     ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateMemoRequest request,
         @AuthenticationPrincipal String userId
     );
@@ -155,9 +172,9 @@ public interface MemoApiDoc {
         @ApiResponse(responseCode = "500", content = @Content(schema = @Schema(hidden = true))),
     })
     @Operation(summary = "메모 내용 업데이트 및 태그 재생성")
-    @PutMapping("/memo/{memoId}/tags")
+    @PutMapping("/memo/{id}/tags")
     ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateMemoTagsRequest request,
         @AuthenticationPrincipal String userId
     );
@@ -169,9 +186,9 @@ public interface MemoApiDoc {
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
     })
     @Operation(summary = "메모 삭제")
-    @DeleteMapping("/memo/{memoId}")
+    @DeleteMapping("/memo/{id}")
     ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @AuthenticationPrincipal String userId
     );
 }

@@ -7,23 +7,22 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.oatnote.user.dto.CheckEmailDuplicationRequest;
-import com.example.oatnote.user.dto.FindPasswordRequest;
+import com.example.oatnote._commons.event.RegisterUserEvent;
+import com.example.oatnote._commons.event.WithdrawUserEvent;
+import com.example.oatnote._commons.util.JwtUtil;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
+import com.example.oatnote.user.dto.UpdatePasswordRequest;
 import com.example.oatnote.user.dto.UpdateUserInfoRequest;
 import com.example.oatnote.user.dto.UpdateUserInfoResponse;
 import com.example.oatnote.user.dto.UserInfoResponse;
 import com.example.oatnote.user.dto.VerifyCodeRequest;
 import com.example.oatnote.user.service.email.EmailVerificationService;
 import com.example.oatnote.user.service.model.User;
-import com.example.oatnote._commons.event.RegisterUserEvent;
-import com.example.oatnote._commons.event.WithdrawUserEvent;
-import com.example.oatnote._commons.util.JwtUtil;
 import com.example.oatnote.web.controller.exception.auth.OatInvalidPasswordException;
 import com.example.oatnote.web.controller.exception.client.OatDataNotFoundException;
 import com.example.oatnote.web.controller.exception.client.OatIllegalArgumentException;
@@ -94,8 +93,7 @@ public class UserService {
         return RefreshUserResponse.of(newAccessToken, refreshToken);
     }
 
-    public void checkEmailDuplication(CheckEmailDuplicationRequest request) {
-        String email = request.email();
+    public void checkEmailExists(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw OatIllegalArgumentException.withDetail("이미 존재하는 이메일입니다.", email);
         }
@@ -112,7 +110,7 @@ public class UserService {
         emailVerificationService.insertEmailVerification(email, code, RE_CODE_EXPIRY_MINUTES);
     }
 
-    public void resetPassword(FindPasswordRequest request) {
+    public void updatePassword(UpdatePasswordRequest request) {
         String email = request.email();
         String newPassword = request.newPassword();
         String confirmPassword = request.confirmPassword();
@@ -138,7 +136,7 @@ public class UserService {
 
     public void withdraw(String userId) {
         userRepository.deleteById(userId);
-        eventPublisher.publishEvent(new WithdrawUserEvent(userId));
+        eventPublisher.publishEvent(WithdrawUserEvent.of(userId));
         log.info("회원탈퇴 / 유저: {}", userId);
     }
 

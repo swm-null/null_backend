@@ -25,7 +25,7 @@ import com.example.oatnote.memotag.dto.CreateChildTagRequest;
 import com.example.oatnote.memotag.dto.CreateChildTagResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
-import com.example.oatnote.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.memotag.dto.CreateMemosByFileRequest;
 import com.example.oatnote.memotag.dto.CreateSearchHistoryRequest;
 import com.example.oatnote.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.memotag.dto.MemosResponse;
@@ -114,7 +114,7 @@ public class MemoService {
     }
 
     @ProcessingMemoCount(action = ActionType.INCREMENT)
-    public void createMemos(CreateMemosRequest request, String userId) {
+    public void createMemosByFile(CreateMemosByFileRequest request, String userId) {
         userId = Objects.requireNonNullElse(userId, userService.getUserIdByEmail(request.email()));
         asyncMemoService.createStructure(request.fileUrl(), userId);
     }
@@ -242,7 +242,7 @@ public class MemoService {
         return SearchHistoriesResponse.from(pagedSearchHistories, criteria);
     }
 
-    public MemosResponse getMemos(
+    public MemosResponse getMemosLinkedTag(
         String tagId,
         Integer page,
         Integer limit,

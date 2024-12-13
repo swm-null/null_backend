@@ -30,97 +30,85 @@ import jakarta.validation.Valid;
 @Tag(name = "Tag", description = "태그 API")
 public interface TagApiDoc {
 
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "201"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "201"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
     @Operation(summary = "특정 태그 하위에 자식 태그 생성")
     @PostMapping("/tag/child")
     ResponseEntity<CreateChildTagResponse> createChildTag(
-        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(value = "id", required = false) String id,
         @RequestBody @Valid CreateChildTagRequest request,
         @AuthenticationPrincipal String userId
     );
 
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
     @Operation(summary = "특정 태그의 전체 자식 태그 리스트 조회")
-    @GetMapping("/tags/children")
+    @GetMapping("/tag/children")
     ResponseEntity<List<TagResponse>> getChildTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(value = "id", required = false) String id,
         @AuthenticationPrincipal String userId
     );
 
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
     @Operation(summary = "특정 태그의 조상 태그 리스트 조회")
-    @GetMapping("/tags/ancestors")
+    @GetMapping("/tag/ancestors")
     ResponseEntity<List<TagResponse>> getAncestorTags(
-        @RequestParam(value = "tagId") String tagId,
+        @RequestParam(value = "id") String id,
         @AuthenticationPrincipal String userId
     );
 
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
     @Operation(summary = "특정 태그와 그 자식, 손자 태그 리스트 조회")
-    @GetMapping("/tags/descendants")
+    @GetMapping("/tag/descendants")
     ResponseEntity<TagsResponse> getTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
+        @RequestParam(value = "id", required = false) String id,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "10") Integer limit,
         @AuthenticationPrincipal String userId
     );
 
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
     @Operation(summary = "태그 수정")
-    @PutMapping("/tag/{tagId}")
+    @PutMapping("/tag/{id}")
     ResponseEntity<UpdateTagResponse> updateTag(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateTagRequest request,
         @AuthenticationPrincipal String userId
     );
 
-    @ApiResponses(
-        value = {
-            @ApiResponse(responseCode = "204"),
-            @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
-        }
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(hidden = true))),
+    })
     @Operation(summary = "태그 삭제")
-    @DeleteMapping("/tag/{tagId}")
+    @DeleteMapping("/tag/{id}")
     ResponseEntity<Void> deleteTag(
-        @PathVariable("tagId") String tagId,
+        @PathVariable("id") String id,
         @AuthenticationPrincipal String userId
     );
 }
