@@ -4,19 +4,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.user.dto.CheckEmailDuplicationRequest;
-import com.example.oatnote.user.dto.FindPasswordRequest;
 import com.example.oatnote.user.dto.LoginUserRequest;
 import com.example.oatnote.user.dto.LoginUserResponse;
 import com.example.oatnote.user.dto.RefreshUserRequest;
 import com.example.oatnote.user.dto.RefreshUserResponse;
 import com.example.oatnote.user.dto.RegisterUserRequest;
 import com.example.oatnote.user.dto.SendCodeRequest;
+import com.example.oatnote.user.dto.UpdatePasswordRequest;
 import com.example.oatnote.user.dto.UpdateUserInfoRequest;
 import com.example.oatnote.user.dto.UpdateUserInfoResponse;
 import com.example.oatnote.user.dto.UserInfoResponse;
@@ -46,30 +47,28 @@ public class UserController implements UserApiDoc {
     public ResponseEntity<LoginUserResponse> login(
         @RequestBody @Valid LoginUserRequest request
     ) {
-        LoginUserResponse response = userService.login(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.login(request));
     }
 
     @Override
-    @PostMapping("/user/refresh")
+    @PostMapping("/user/token/refresh")
     public ResponseEntity<RefreshUserResponse> refreshAccessToken(
-        @RequestBody RefreshUserRequest request
+        @RequestBody @Valid RefreshUserRequest request
     ) {
-        RefreshUserResponse response = userService.refreshAccessToken(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.refreshAccessToken(request));
     }
 
     @Override
-    @PostMapping("/user/checkEmail")
-    public ResponseEntity<Void> checkEmailDuplication(
-        @RequestBody @Valid CheckEmailDuplicationRequest request
+    @GetMapping("/users/email/exists")
+    public ResponseEntity<Void> checkEmailExists(
+        @RequestParam("email") String email
     ) {
-        userService.checkEmailDuplication(request);
+        userService.checkEmailExists(email);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Override
-    @PostMapping("/user/sendCode")
+    @PostMapping("/user/email/verificationCode")
     public ResponseEntity<Void> sendCode(
         @RequestBody @Valid SendCodeRequest request
     ) {
@@ -78,7 +77,7 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/verifyCode")
+    @PostMapping("/user/email/verificationCode/verify")
     public ResponseEntity<Void> verifyCode(
         @RequestBody @Valid VerifyCodeRequest request
     ) {
@@ -87,21 +86,20 @@ public class UserController implements UserApiDoc {
     }
 
     @Override
-    @PostMapping("/user/findPassword")
-    public ResponseEntity<Void> findPassword(
-        @RequestBody @Valid FindPasswordRequest request
+    @PutMapping("/user/password")
+    public ResponseEntity<Void> updatePassword(
+        @RequestBody @Valid UpdatePasswordRequest request
     ) {
-        userService.findPassword(request);
+        userService.updatePassword(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Override
-    @PostMapping("/user/me")
+    @GetMapping("/user/me")
     public ResponseEntity<UserInfoResponse> getUserInfo(
         @AuthenticationPrincipal String userId
     ) {
-        UserInfoResponse response = userService.getUserInfo(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfo(userId));
     }
 
     @Override
@@ -110,12 +108,11 @@ public class UserController implements UserApiDoc {
         @RequestBody @Valid UpdateUserInfoRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateUserInfoResponse response = userService.updateUserInfo(request, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserInfo(request, userId));
     }
 
     @Override
-    @DeleteMapping("/user")
+    @DeleteMapping("/user/me")
     public ResponseEntity<Void> withdraw(
         @AuthenticationPrincipal String userId
     ) {

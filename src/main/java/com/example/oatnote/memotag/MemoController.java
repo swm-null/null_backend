@@ -1,7 +1,5 @@
 package com.example.oatnote.memotag;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,36 +12,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.oatnote.memotag.dto.CreateChildTagRequest;
-import com.example.oatnote.memotag.dto.CreateChildTagResponse;
 import com.example.oatnote.memotag.dto.CreateMemoRequest;
 import com.example.oatnote.memotag.dto.CreateMemoResponse;
-import com.example.oatnote.memotag.dto.CreateMemosRequest;
+import com.example.oatnote.memotag.dto.CreateMemosByFileRequest;
 import com.example.oatnote.memotag.dto.CreateSearchHistoryRequest;
 import com.example.oatnote.memotag.dto.CreateSearchHistoryResponse;
 import com.example.oatnote.memotag.dto.MemosResponse;
 import com.example.oatnote.memotag.dto.SearchHistoriesResponse;
 import com.example.oatnote.memotag.dto.SearchMemosUsingAiResponse;
 import com.example.oatnote.memotag.dto.SearchMemosUsingDbResponse;
-import com.example.oatnote.memotag.dto.TagsResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoResponse;
 import com.example.oatnote.memotag.dto.UpdateMemoTagsRequest;
 import com.example.oatnote.memotag.dto.UpdateMemoTagsResponse;
-import com.example.oatnote.memotag.dto.UpdateTagRequest;
-import com.example.oatnote.memotag.dto.UpdateTagResponse;
 import com.example.oatnote.memotag.dto.enums.MemoSortOrderTypeEnum;
-import com.example.oatnote.memotag.dto.innerDto.TagResponse;
-import com.example.oatnote.memotag.service.MemoTagService;
+import com.example.oatnote.memotag.service.MemoService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class MemoTagController implements MemoTagApiDoc {
+public class MemoController implements MemoApiDoc {
 
-    private final MemoTagService memoTagService;
+    private final MemoService memoService;
 
     @Override
     @PostMapping("/memo")
@@ -51,40 +43,29 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestBody @Valid CreateMemoRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        CreateMemoResponse response = memoTagService.createMemo(request, userId);
+        CreateMemoResponse response = memoService.createMemo(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @PostMapping("/linkedMemo")
-    public ResponseEntity<CreateMemoResponse> createLinkedMemo(
+    @PostMapping("/memo/tag")
+    public ResponseEntity<CreateMemoResponse> createMemoLinkedTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestBody @Valid CreateMemoRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        CreateMemoResponse response = memoTagService.createLinkedMemo(tagId, request, userId);
+        CreateMemoResponse response = memoService.createLinkedMemo(tagId, request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @PostMapping("/memos")
-    public ResponseEntity<Void> createMemos(
-        @RequestBody @Valid CreateMemosRequest request,
+    @PostMapping("/memos/file")
+    public ResponseEntity<Void> createMemosByFile(
+        @RequestBody @Valid CreateMemosByFileRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        memoTagService.createMemos(request, userId);
+        memoService.createMemosByFile(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @Override
-    @PostMapping("/childTag")
-    public ResponseEntity<CreateChildTagResponse> createChildTag(
-        @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestBody @Valid CreateChildTagRequest request,
-        @AuthenticationPrincipal String userId
-    ) {
-        CreateChildTagResponse response = memoTagService.createChildTag(tagId, request, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
@@ -93,45 +74,13 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestBody @Valid CreateSearchHistoryRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        CreateSearchHistoryResponse response = memoTagService.createSearchHistory(request, userId);
+        CreateSearchHistoryResponse response = memoService.createSearchHistory(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @GetMapping("/ancestorTags")
-    public ResponseEntity<List<TagResponse>> getAncestorTags(
-        @RequestParam(value = "tagId") String tagId,
-        @AuthenticationPrincipal String userId
-    ) {
-        List<TagResponse> response = memoTagService.getAncestorTags(tagId, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @Override
-    @GetMapping("/childTags")
-    public ResponseEntity<List<TagResponse>> getChildTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
-        @AuthenticationPrincipal String userId
-    ) {
-        List<TagResponse> response = memoTagService.getChildTags(tagId, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @Override
-    @GetMapping("/tags")
-    public ResponseEntity<TagsResponse> getTags(
-        @RequestParam(value = "tagId", required = false) String tagId,
-        @RequestParam(value = "page", defaultValue = "1") Integer page,
-        @RequestParam(value = "limit", defaultValue = "10") Integer limit,
-        @AuthenticationPrincipal String userId
-    ) {
-        TagsResponse response = memoTagService.getTags(tagId, page, limit, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @Override
-    @GetMapping("/tag/memos")
-    public ResponseEntity<MemosResponse> getMemos(
+    @GetMapping("/memos/tag")
+    public ResponseEntity<MemosResponse> getMemosLinkedTag(
         @RequestParam(value = "tagId", required = false) String tagId,
         @RequestParam(value = "page", defaultValue = "1") Integer page,
         @RequestParam(value = "limit", defaultValue = "10") Integer limit,
@@ -139,7 +88,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(value = "isLinked", required = false) Boolean isLinked,
         @AuthenticationPrincipal String userId
     ) {
-        MemosResponse response = memoTagService.getMemos(tagId, page, limit, sortOrder, isLinked, userId);
+        MemosResponse response = memoService.getMemosLinkedTag(tagId, page, limit, sortOrder, isLinked, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -149,7 +98,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     ) {
-        SearchMemosUsingAiResponse response = memoTagService.searchMemosUsingAi(searchHistoryId, userId);
+        SearchMemosUsingAiResponse response = memoService.searchMemosUsingAi(searchHistoryId, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -159,7 +108,7 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(value = "searchHistoryId") String searchHistoryId,
         @AuthenticationPrincipal String userId
     ) {
-        SearchMemosUsingDbResponse response = memoTagService.searchMemosUsingDb(searchHistoryId, userId);
+        SearchMemosUsingDbResponse response = memoService.searchMemosUsingDb(searchHistoryId, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -170,60 +119,39 @@ public class MemoTagController implements MemoTagApiDoc {
         @RequestParam(value = "limit", defaultValue = "15") Integer limit,
         @AuthenticationPrincipal String userId
     ) {
-        SearchHistoriesResponse response = memoTagService.getSearchHistories(page, limit, userId);
+        SearchHistoriesResponse response = memoService.getSearchHistories(page, limit, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @PutMapping("/memo/{memoId}")
+    @PutMapping("/memo/{id}")
     public ResponseEntity<UpdateMemoResponse> updateMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateMemoRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateMemoResponse response = memoTagService.updateMemo(memoId, request, userId);
+        UpdateMemoResponse response = memoService.updateMemo(id, request, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @PutMapping("/tag/{tagId}")
-    public ResponseEntity<UpdateTagResponse> updateTag(
-        @PathVariable("tagId") String tagId,
-        @RequestBody @Valid UpdateTagRequest request,
-        @AuthenticationPrincipal String userId
-    ) {
-        UpdateTagResponse response = memoTagService.updateTag(tagId, request, userId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @Override
-    @PutMapping("/memo/{memoId}/tags")
+    @PutMapping("/memo/{id}/tags")
     public ResponseEntity<UpdateMemoTagsResponse> updateMemoTags(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @RequestBody @Valid UpdateMemoTagsRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        UpdateMemoTagsResponse response = memoTagService.updateMemoTags(memoId, request, userId);
+        UpdateMemoTagsResponse response = memoService.updateMemoTags(id, request, userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Override
-    @DeleteMapping("/memo/{memoId}")
+    @DeleteMapping("/memo/{id}")
     public ResponseEntity<Void> deleteMemo(
-        @PathVariable("memoId") String memoId,
+        @PathVariable("id") String id,
         @AuthenticationPrincipal String userId
     ) {
-        memoTagService.deleteMemo(memoId, userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @Override
-    @DeleteMapping("/tag/{tagId}")
-    public ResponseEntity<Void> deleteTag(
-        @PathVariable("tagId") String tagId,
-        @AuthenticationPrincipal String userId
-    ) {
-        memoTagService.deleteTag(tagId, userId);
+        memoService.deleteMemo(id, userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
