@@ -64,9 +64,20 @@
 
 ### 🛠️ 기술 스택
 
-- **LLM (Large Language Model)** – 자연어 분석 및 분류
-- **STT (Speech to Text)** – 음성 메모 텍스트 변환
-- **OCR (Optical Character Recognition)** – 이미지 내 텍스트 인식
+**FE**
+- React
+
+**BE**
+- Java
+- Spring Boot
+- MongoDB
+- Redisson
+- RabbitMQ
+
+**AI**
+- LLM (자연어 분석 및 분류)
+- STT (음성 메모 텍스트 변환)
+- OCR (이미지 내 텍스트 인식)
 
 ---
 
